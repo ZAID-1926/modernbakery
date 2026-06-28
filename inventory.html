@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inventory — Modern Bakery</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f5f6fa;
+      --card:#fff;
+      --accent:#1C1C1C;
+      --accent-2:#F1C40F;
+      --muted:#777;
+      --radius:14px;
+    }
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background:var(--bg);
+      color:#222;
+    }
+
+    /* Topbar */
+    .topbar{
+    width: 100vw !important;
+    max-width: 100% !important;
+    background: linear-gradient(135deg, #1C1C1C, #262626);
+    color: white;
+    padding: 18px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+    border-bottom:4px solid var(--accent-2);
+}
+    .topbar .title{ font-size:20px; font-weight:700; letter-spacing:0.3px; }
+    .topbar .actions { display:flex; gap:12px; align-items:center; }
+    .back-btn { background:var(--accent-2); color:#000; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:600; }
+
+    /* Layout */
+    .wrap{ max-width:1200px; margin:22px auto; padding:0 18px; }
+    .grid{ display:grid; grid-template-columns: 440px 1fr; gap:22px; align-items:start; }
+
+    /* Left card (form) */
+    .card{
+      background:var(--card);
+      padding:20px;
+      border-radius:var(--radius);
+      box-shadow:0 8px 30px rgba(20,20,20,0.06);
+    }
+    .section-title{ font-size:20px; font-weight:700; margin:0 0 12px; color:var(--accent); }
+    label{ display:block; margin-top:12px; font-size:13px; color:var(--muted); }
+    input, select, textarea {
+      width:100%;
+      padding:12px 12px;
+      margin-top:8px;
+      border-radius:10px;
+      border:1px solid #e6e6e6;
+      font-size:15px;
+      box-sizing:border-box;
+    }
+    textarea { min-height:80px; resize:vertical; }
+
+    .row { display:flex; gap:10px; }
+    .row .col{ flex:1; }
+
+    .btn {
+      background:var(--accent);
+      color:var(--accent-2);
+      border:none;
+      padding:12px 16px;
+      border-radius:10px;
+      font-weight:700;
+      cursor:pointer;
+      margin-top:14px;
+      width:100%;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    }
+    .btn.secondary { background:#eee; color:var(--accent); font-weight:600; box-shadow:none; }
+
+    /* Right: table */
+    .table-wrap{ overflow:auto; }
+    table{ width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.05); }
+    th, td { padding:12px 14px; text-align:left; font-size:14px; border-bottom:1px solid #f0f0f0; }
+    th { background:#fafafa; color:var(--accent); font-weight:700; }
+    tr:last-child td { border-bottom:0; }
+    .small { font-size:13px; color:var(--muted); }
+
+    /* badges */
+    .badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; color:#111; background:var(--accent-2); }
+
+    /* responsive */
+    @media (max-width: 880px){
+      .grid{ grid-template-columns: 1fr; }
+      .wrap{ padding:10px; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="title">Inventory — Modern Bakery</div>
+    <div class="actions">
+      <div id="userEmail" class="small">Checking...</div>
+      <a class="back-btn" href="home.html">Back</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="grid">
+
+      <!-- LEFT: Add Item + Vendor -->
+      <div class="card" id="leftCard">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="section-title">Add Item & Vendor</div>
+          <div class="small">Inventory / Vendor record</div>
+        </div>
+
+        <!-- Item Fields -->
+        <label>Item Name</label>
+        <input id="itemName" placeholder="e.g. Maida / Rusk / Packaging Box" />
+
+        <div class="row">
+          <div class="col">
+            <label>Quantity</label>
+            <input id="itemQty" type="number" min="0" step="0.01" placeholder="numeric (kg or pcs)" />
+          </div>
+          <div class="col">
+            <label>Unit</label>
+            <select id="itemUnit">
+              <option value="kg">kg</option>
+              <option value="pcs">pcs</option>
+              <option value="packet">packet</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Category</label>
+        <select id="itemCategory">
+          <option value="Raw">Raw Material</option>
+          <option value="Finished">Finished Product</option>
+          <option value="Packaging">Packaging</option>
+        </select>
+
+        <label>Price (per unit) — optional</label>
+        <input id="itemPrice" type="number" min="0" step="0.01" placeholder="e.g. 40" />
+
+        <hr style="margin:18px 0;border:none;border-top:1px solid #f0f0f0" />
+
+        <!-- Vendor Fields -->
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="section-title" style="font-size:16px">Vendor Details</div>
+          <div class="small">optional</div>
+        </div>
+
+        <label>Vendor Name</label>
+        <input id="vendorName" placeholder="e.g. ABC Traders" />
+
+        <label>Vendor Phone</label>
+        <input id="vendorPhone" placeholder="10 digit mobile" />
+
+        <label>Delivered Quantity (same unit)</label>
+        <input id="deliveredQty" type="number" min="0" step="0.01" placeholder="how much vendor delivered" />
+
+        <div class="row">
+          <div class="col">
+            <label>Purchase Date</label>
+            <input id="purchaseDate" type="date" />
+          </div>
+          <div class="col">
+            <label>Notes</label>
+            <input id="vendorNotes" placeholder="notes (quality/payment etc)" />
+          </div>
+        </div>
+
+        <button class="btn" id="saveBtn">Save Item + Vendor Record</button>
+        <button class="btn secondary" id="clearBtn" style="margin-top:8px">Clear</button>
+
+        <div id="status" class="small" style="margin-top:12px;color:var(--muted)"></div>
+      </div>
+
+      <!-- RIGHT: Inventory list -->
+
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="section-title">Inventory List</div>
+            <div>
+              <span class="small">Total items: </span><span id="totalCount" class="badge">0</span>
+            </div>
+          </div>
+
+
+          <div class="table-wrap" style="margin-top:12px">
+            <table id="itemsTable">
+              <thead>
+                <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Category</th><th>Price/Unit</th><th>Total price</th><th>Last Updated</th></tr>
+              </thead>
+              <tbody id="itemsBody">
+
+                <!-- rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Latest Vendor Records</div>
+          <div id="vendorList" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+<div style="margin-top:20px;">
+    <h3>Reduce Stock</h3>
+
+    <input id="reduceName" type="text" placeholder="Enter item name"
+        style="padding:10px;width:70%;border-radius:6px;border:1px solid #ccc;margin-bottom:10px;">
+
+    <input id="reduceQty" type="number" placeholder="Qty to reduce"
+        style="padding:10px;width:70%;border-radius:6px;border:1px solid #ccc;margin-bottom:10px;">
+
+    <button onclick="reduceQty()"
+        style="padding:10px 20px;border:none;border-radius:6px;background:black;color:white;">
+        Reduce Qty
+    </button>
+</div>
+<div style="margin-top: 20px;">
+  <input id="deleteName" 
+         placeholder="Enter item name to delete" 
+         style="padding:10px;width:70%;border-radius:6px;border:1px solid #ccc;">
+  
+  <button onclick="deleteItem()" 
+          style="padding:10px 20px;border:none;border-radius:6px;background:black;color:white;">
+    Delete Item
+  </button>
+
+</div>
+
+  <!-- FIREBASE + LOGIC -->
+  <script type="module">
+    // -------------------- FIREBASE IMPORTS --------------------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, setDoc, getDocs,
+  query, where, updateDoc, deleteDoc, orderBy, limit, addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+import {
+  getAuth, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+// -------------------- FIREBASE CONFIG --------------------
+const firebaseConfig = {
+  apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
+  authDomain: "modernbakery-08.firebaseapp.com",
+  projectId: "modernbakery-08",
+  storageBucket: "modernbakery-08.firebasestorage.app",
+  messagingSenderId: "551391878340",
+  appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// -------------------- ELEMENTS --------------------
+const itemName = document.getElementById("itemName");
+const itemQty = document.getElementById("itemQty");
+const itemUnit = document.getElementById("itemUnit");
+const itemCategory = document.getElementById("itemCategory");
+const itemPrice = document.getElementById("itemPrice");
+
+const vendorName = document.getElementById("vendorName");
+const vendorPhone = document.getElementById("vendorPhone");
+const deliveredQty = document.getElementById("deliveredQty");
+const purchaseDate = document.getElementById("purchaseDate");
+const vendorNotes = document.getElementById("vendorNotes");
+
+const saveBtn = document.getElementById("saveBtn");
+const clearBtn = document.getElementById("clearBtn");
+const status = document.getElementById("status");
+
+const itemsBody = document.getElementById("itemsBody");
+const totalCount = document.getElementById("totalCount");
+const vendorList = document.getElementById("vendorList");
+const userEmailSpan = document.getElementById("userEmail");
+
+// -------------------- AUTH CHECK --------------------
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+  } else {
+    userEmailSpan.innerText = user.email;
+    loadInventory();
+    loadVendorRecords();
+  }
+});
+
+// -------------------- DATE FORMAT --------------------
+function formatDate(ts) {
+  if (!ts) return "-";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// -------------------- CLEAR FORM --------------------
+function clearForm() {
+  itemName.value = "";
+  itemQty.value = "";
+  itemUnit.value = "kg";
+  itemCategory.value = "Raw";
+  itemPrice.value = "";
+  vendorName.value = "";
+  vendorPhone.value = "";
+  deliveredQty.value = "";
+  purchaseDate.value = "";
+  vendorNotes.value = "";
+  status.innerText = "";
+}
+
+clearBtn.addEventListener("click", clearForm);
+
+// -------------------- SAVE ITEM --------------------
+saveBtn.addEventListener("click", async () => {
+  const name = itemName.value.trim();
+  const qtyVal = Number(itemQty.value);
+  const unit = itemUnit.value;
+  const category = itemCategory.value;
+  const price = itemPrice.value ? Number(itemPrice.value) : null;
+
+  if (!name || qtyVal <= 0) {
+    status.innerText = "Enter valid item and quantity";
+    return;
+  }
+
+  saveBtn.disabled = true;
+  status.innerText = "Saving...";
+
+  try {
+    // Check if item exists
+    const q = query(collection(db, "Inventory"), where("nameLower", "==", name.toLowerCase()));
+    const snap = await getDocs(q);
+
+    let docRef;
+
+    if (!snap.empty) {
+      const existing = snap.docs[0];
+      docRef = existing.ref;
+      const oldQty = existing.data().qty || 0;
+
+      await updateDoc(docRef, {
+        qty: oldQty + qtyVal,
+        unit,
+        category,
+        price: price ?? existing.data().price ?? null,
+        lastUpdated: serverTimestamp()
+      });
+
+    } else {
+      docRef = doc(collection(db, "Inventory"));
+      await setDoc(docRef, {
+        name,
+        nameLower: name.toLowerCase(),
+        qty: qtyVal,
+        unit,
+        category,
+        price: price ?? null,
+        createdAt: serverTimestamp(),
+        lastUpdated: serverTimestamp()
+      });
+    }
+
+    // Vendor record saving
+    if (vendorName.value.trim() || deliveredQty.value) {
+      await addDoc(collection(db, "vendor_records"), {
+        vendorName: vendorName.value || "Unknown",
+        phone: vendorPhone.value || null,
+        itemName: name,
+        deliveredQty: Number(deliveredQty.value) || qtyVal,
+        unit,
+        date: serverTimestamp(),
+        notes: vendorNotes.value || "",
+        inventoryRef: docRef.path
+      });
+    }
+
+    status.innerText = "Saved ✔";
+    clearForm();
+    loadInventory();
+    loadVendorRecords();
+
+  } catch (e) {
+    status.innerText = "Error: " + e.message;
+  }
+
+  saveBtn.disabled = false;
+  setTimeout(() => (status.innerText = ""), 3000);
+});
+
+// -------------------- LOAD INVENTORY --------------------
+async function loadInventory() {
+  itemsBody.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
+
+  const snap = await getDocs(query(collection(db, "Inventory"), orderBy("lastUpdated", "desc")));
+
+  itemsBody.innerHTML = "";
+  let total = 0;
+
+  snap.forEach((d) => {
+    const item = d.data();
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td><strong>${item.name}</strong></td>
+      <td>${item.qty}</td>
+      <td>${item.unit}</td>
+      <td>${item.category}</td>
+      <td>${item.price ?? "-"}</td>
+      <td>${item.price ? item.qty * item.price : "-"}</td>
+      <td>${item.lastUpdated ? formatDate(item.lastUpdated) : "-"}</td>
+    `;
+
+    itemsBody.appendChild(tr);
+    total++;
+  });
+
+  totalCount.innerText = total;
+
+  if (total === 0) {
+    itemsBody.innerHTML = "<tr><td colspan='7'>No items found</td></tr>";
+  }
+}
+
+// -------------------- LOAD VENDOR RECORDS --------------------
+async function loadVendorRecords() {
+  vendorList.innerHTML = "Loading...";
+
+  const snap = await getDocs(
+    query(collection(db, "vendor_records"), orderBy("date", "desc"), limit(8))
+  );
+
+  vendorList.innerHTML = "";
+
+  snap.forEach((d) => {
+    const v = d.data();
+    const div = document.createElement("div");
+    div.style.padding = "10px";
+    div.style.borderBottom = "1px solid #ddd";
+
+    div.innerHTML = `
+      <strong>${v.vendorName}</strong>  
+      <div>${v.itemName} • ${v.deliveredQty} ${v.unit}</div>
+      <small>${v.notes || ""}</small>
+    `;
+
+    vendorList.appendChild(div);
+  });
+}
+
+// -------------------- REDUCE ITEM --------------------
+window.reduceQty = async function () {
+  const name = document.getElementById("reduceName").value.trim().toLowerCase();
+  const qty = Number(document.getElementById("reduceQty").value);
+
+  if (!name || qty <= 0) return alert("Enter valid details");
+
+  const q = query(collection(db, "Inventory"), where("nameLower", "==", name));
+  const snap = await getDocs(q);
+
+  if (snap.empty) return alert("Item not found");
+
+  const ref = snap.docs[0].ref;
+  const data = snap.docs[0].data();
+
+  if (data.qty - qty < 0) return alert("Not enough stock");
+
+  await updateDoc(ref, { qty: data.qty - qty, lastUpdated: serverTimestamp() });
+
+  alert("Reduced successfully");
+  loadInventory();
+};
+
+// -------------------- DELETE ITEM --------------------
+window.deleteItem = async function () {
+  const name = document.getElementById("deleteName").value.trim().toLowerCase();
+  if (!name) return alert("Enter item name");
+
+  const q = query(collection(db, "Inventory"), where("nameLower", "==", name));
+  const snap = await getDocs(q);
+
+  if (snap.empty) return alert("Item not found");
+
+  await deleteDoc(snap.docs[0].ref);
+
+  alert("Deleted");
+  loadInventory();
+};
+
+  </script>
+</body>
+</html>

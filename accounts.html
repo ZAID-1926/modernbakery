@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Accounts — Modern Bakery</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f5f6fa;
+      --card:#fff;
+      --accent:#0b5ed7;
+      --muted:#6b7280;
+      --radius:14px;
+      --success:#16a34a;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background:var(--bg);
+      color:#111;
+    }
+
+    .topbar{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:18px 28px; background:linear-gradient(135deg,#042c6b,#0b5ed7);
+      color:white; box-shadow:0 6px 20px rgba(3,7,18,0.12);
+    }
+    .logo{font-weight:700;font-size:20px}
+    .actions{display:flex;gap:12px;align-items:center}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.15);color:white;padding:8px 12px;border-radius:10px;cursor:pointer}
+
+    .wrap{max-width:1200px;margin:22px auto;padding:18px}
+    .grid{display:grid;grid-template-columns:420px 1fr;gap:20px}
+
+    .card{background:var(--card);padding:20px;border-radius:var(--radius);box-shadow:0 8px 30px rgba(20,20,20,0.06)}
+    .h1{font-size:18px;font-weight:700;margin:0 0 12px}
+    label{display:block;margin-top:12px;color:var(--muted);font-size:13px}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #e6e6e6;margin-top:8px;font-size:14px}
+    .row{display:flex;gap:10px}
+    .col{flex:1}
+    .primary{background:var(--accent);color:white;padding:10px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* Summary */
+    .summary{display:flex;gap:12px;align-items:stretch}
+    .sum-card{flex:1;padding:14px;border-radius:12px;background:linear-gradient(180deg, #fff,#fbfbff);box-shadow:0 6px 20px rgba(10,20,60,0.04)}
+    .sum-title{font-size:13px;color:var(--muted)}
+    .sum-value{font-size:20px;font-weight:700;margin-top:6px}
+    .status-pill{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;margin-top:8px}
+
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left;font-size:14px}
+    th{background:#fafafa;font-weight:700}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* responsive */
+    @media(max-width:980px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="logo">Modern Bakery — Accounts</div>
+    <div class="actions">
+      <div id="userEmail" class="small">Checking...</div>
+      <button class="btn-ghost" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="grid">
+
+      <!-- LEFT: Add / Select Customer -->
+      <div class="card">
+        <div class="h1">Add / Select Customer</div>
+
+        <label>Find customer (type name or phone)</label>
+        <input id="customerSearch" placeholder="Search or type new name...">
+
+        <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+          <select id="customerSelect" style="flex:1;padding:10px;border-radius:8px">
+            <option value="">— Select existing customer —</option>
+          </select>
+          <button id="newCustBtn" class="primary" style="padding:8px 12px">New</button>
+          <!-- DELETE BUTTON (shows when a customer is selected) -->
+          <button id="delCustBtn" style="display:none;margin-left:6px;background:#ef4444;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer">Delete</button>
+        </div>
+
+        <div id="custInfo" style="margin-top:12px;display:none">
+          <label>Customer Name</label>
+          <input id="custName">
+
+          <label>Phone (optional)</label>
+          <input id="custPhone">
+
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button id="saveCustomer" class="primary">Save Customer</button>
+            <button id="clearCustomer" class="muted" style="background:#f3f4f6;border:none;padding:10px;border-radius:8px">Cancel</button>
+          </div>
+        </div>
+
+        <hr style="margin:16px 0">
+
+        <div class="h1">Add Goods (to customer)</div>
+
+        <label>Item name</label>
+        <input id="goodItem" placeholder="e.g. Rusk">
+
+        <div class="row">
+          <div class="col">
+            <label>Quantity</label>
+            <input id="goodQty" type="number" min="0" step="0.01">
+          </div>
+          <div class="col">
+            <label>Price / unit</label>
+            <input id="goodPrice" type="number" min="0" step="0.01">
+          </div>
+        </div>
+
+        <label>Notes (optional)</label>
+        <input id="goodNotes">
+
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button id="addGoodBtn" class="primary" style="flex:1">Add Goods</button>
+          <button id="clearGoodBtn" class="muted" style="flex:1;background:#f3f4f6;border:none;padding:10px;border-radius:8px">Clear</button>
+        </div>
+
+        <hr style="margin:16px 0">
+
+        <div class="h1">Add Payment</div>
+
+        <label>Amount</label>
+        <input id="payAmount" type="number" min="0" step="0.01">
+
+        <label>Date</label>
+        <input id="payDate" type="date">
+
+        <label>Notes</label>
+        <input id="payNotes">
+
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button id="addPayBtn" class="primary" style="flex:1">Add Payment</button>
+          <button id="clearPayBtn" class="muted" style="flex:1;background:#f3f4f6;border:none;padding:10px;border-radius:8px">Clear</button>
+        </div>
+
+        <div id="leftStatus" class="small" style="margin-top:12px;color:var(--muted)"></div>
+      </div>
+
+      <!-- RIGHT: Summary + History -->
+      <div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="h1">Customer Summary</div>
+              <div class="small">Select a customer to see ledger</div>
+            </div>
+            <div>
+              <button id="refreshBtn" class="muted" style="background:#f3f4f6;border:none;padding:8px;border-radius:8px">Refresh</button>
+            </div>
+          </div>
+
+          <div style="margin-top:12px" id="summaryWrap">
+            <div class="summary">
+              <div class="sum-card">
+                <div class="sum-title">Total Goods Value</div>
+                <div class="sum-value" id="sumGoods">₹ 0</div>
+              </div>
+              <div class="sum-card">
+                <div class="sum-title">Total Payments</div>
+                <div class="sum-value" id="sumPaid">₹ 0</div>
+              </div>
+              <div class="sum-card">
+                <div class="sum-title">Balance Due</div>
+                <div class="sum-value" id="sumDue">₹ 0</div>
+                <div id="statusPill"></div>
+              </div>
+            </div>
+          </div>
+
+          <hr style="margin:14px 0">
+
+          <div style="display:flex;gap:14px">
+            <div style="flex:1">
+              <div class="small">Goods History</div>
+              <table id="goodsTable">
+                <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Date</th><th></th></tr></thead>
+                <tbody id="goodsBody"><tr><td colspan="6" class="small">No customer selected.</td></tr></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <div class="small">Payments</div>
+              <table id="payTable">
+                <thead><tr><th>Amount</th><th>Date</th><th>Notes</th><th></th></tr></thead>
+                <tbody id="payBody"><tr><td colspan="4" class="small">No customer selected.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FIREBASE + LOGIC -->
+  <script type="module">
+    // Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore, collection, doc, setDoc, addDoc, getDocs, getDoc,
+      query, where, orderBy, updateDoc, deleteDoc, serverTimestamp, limit
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // ---- FIREBASE CONFIG: REPLACE WITH YOURS IF NEEDED ----
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
+      authDomain: "modernbakery-08.firebaseapp.com",
+      projectId: "modernbakery-08",
+      storageBucket: "modernbakery-08.firebasestorage.app",
+      messagingSenderId: "551391878340",
+      appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Elements
+    const userEmail = document.getElementById("userEmail");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const customerSearch = document.getElementById("customerSearch");
+    const customerSelect = document.getElementById("customerSelect");
+    const newCustBtn = document.getElementById("newCustBtn");
+    const delCustBtn = document.getElementById("delCustBtn");
+    const custInfo = document.getElementById("custInfo");
+    const custName = document.getElementById("custName");
+    const custPhone = document.getElementById("custPhone");
+    const saveCustomer = document.getElementById("saveCustomer");
+    const clearCustomer = document.getElementById("clearCustomer");
+
+    const goodItem = document.getElementById("goodItem");
+    const goodQty = document.getElementById("goodQty");
+    const goodPrice = document.getElementById("goodPrice");
+    const goodNotes = document.getElementById("goodNotes");
+    const addGoodBtn = document.getElementById("addGoodBtn");
+    const clearGoodBtn = document.getElementById("clearGoodBtn");
+
+    const payAmount = document.getElementById("payAmount");
+    const payDate = document.getElementById("payDate");
+    const payNotes = document.getElementById("payNotes");
+    const addPayBtn = document.getElementById("addPayBtn");
+    const clearPayBtn = document.getElementById("clearPayBtn");
+
+    const leftStatus = document.getElementById("leftStatus");
+
+    const sumGoods = document.getElementById("sumGoods");
+    const sumPaid = document.getElementById("sumPaid");
+    const sumDue = document.getElementById("sumDue");
+    const statusPill = document.getElementById("statusPill");
+
+    const goodsBody = document.getElementById("goodsBody");
+    const payBody = document.getElementById("payBody");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    // State
+    let selectedCustomerId = null;
+    let selectedCustomerData = null;
+
+    // Auth
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      userEmail.innerText = user.email || user.displayName || "Admin";
+      loadCustomersIntoSelect();
+    });
+
+    logoutBtn.addEventListener("click", ()=> signOut(auth).then(()=> location.href="index.html"));
+
+    // Helpers
+    function fmt(x){ return "₹ "+Number(x||0).toFixed(2); }
+    function toISODateInput(d){
+      if(!d) return "";
+      const dt = d.toDate ? d.toDate() : new Date(d);
+      const yyyy = dt.getFullYear();
+      const mm = String(dt.getMonth()+1).padStart(2,"0");
+      const dd = String(dt.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+    function prettyDate(ts){
+      if(!ts) return "-";
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+    }
+
+    // Load customers for select (simple)
+    async function loadCustomersIntoSelect(){
+      customerSelect.innerHTML = `<option value="">— Select existing customer —</option>`;
+      const snap = await getDocs(query(collection(db,"customers"), orderBy("name","asc"), limit(200)));
+      snap.forEach(docSnap=>{
+        const c = docSnap.data();
+        const opt = document.createElement("option");
+        opt.value = docSnap.id;
+        opt.innerText = `${c.name} ${c.phone? "• "+c.phone:""}`;
+        customerSelect.appendChild(opt);
+      });
+      // hide delete button by default
+      delCustBtn.style.display = "none";
+    }
+
+    // Search auto-suggest (basic)
+    customerSearch.addEventListener("input", async (e)=>{
+      const qtxt = e.target.value.trim();
+      if(!qtxt){ customerSelect.value=""; onCustomerSelect(); return; }
+      // search by nameLower starting with qtxt
+      const q = query(collection(db,"customers"), where("nameLower", ">=", qtxt.toLowerCase()), limit(10));
+      const snap = await getDocs(q);
+      customerSelect.innerHTML = `<option value="">— Select —</option>`;
+      snap.forEach(s=>{
+        const c = s.data();
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.innerText = `${c.name} ${c.phone? "• "+c.phone:""}`;
+        customerSelect.appendChild(opt);
+      });
+    });
+
+    // New customer UI
+    newCustBtn.addEventListener("click", ()=>{
+      custInfo.style.display = "block";
+      custName.value = customerSearch.value || "";
+    });
+    clearCustomer.addEventListener("click", ()=>{
+      custInfo.style.display = "none";
+      custName.value = ""; custPhone.value = "";
+    });
+
+    // Save customer
+    saveCustomer.addEventListener("click", async ()=>{
+      const name = custName.value.trim();
+      if(!name) return alert("Enter name");
+      const phone = custPhone.value.trim();
+
+      try{
+        const newDocRef = doc(collection(db,"customers"));
+        await setDoc(newDocRef, {
+          name,
+          nameLower: name.toLowerCase(),
+          phone: phone || null,
+          createdAt: serverTimestamp()
+        });
+
+        custInfo.style.display = "none";
+        custName.value=""; custPhone.value="";
+        await loadCustomersIntoSelect();
+        // select new
+        customerSelect.value = newDocRef.id;
+        await onCustomerSelect();
+      } catch(e){
+        alert("Error creating customer: "+e.message);
+      }
+    });
+
+    // When select changes
+    customerSelect.addEventListener("change", onCustomerSelect);
+
+    async function onCustomerSelect(){
+      const id = customerSelect.value;
+      selectedCustomerId = id || null;
+      selectedCustomerData = null;
+
+      // toggle delete button
+      delCustBtn.style.display = selectedCustomerId ? "inline-block" : "none";
+
+      if(!selectedCustomerId){
+        // clear UI
+        goodsBody.innerHTML = `<tr><td colspan="6" class="small">No customer selected.</td></tr>`;
+        payBody.innerHTML = `<tr><td colspan="4" class="small">No customer selected.</td></tr>`;
+        sumGoods.innerText = "₹ 0"; sumPaid.innerText = "₹ 0"; sumDue.innerText = "₹ 0"; statusPill.innerHTML="";
+        return;
+      }
+
+      // load summary (compute from subcollections)
+      await reloadLedgerForCustomer(selectedCustomerId);
+    }
+
+    // Add Goods
+    addGoodBtn.addEventListener("click", async ()=>{
+      if(!selectedCustomerId) return alert("Select/Create customer first");
+      const name = goodItem.value.trim();
+      const qty = Number(goodQty.value || 0);
+      const price = Number(goodPrice.value || 0);
+      const notes = goodNotes.value.trim();
+
+      if(!name || qty<=0 || price<=0) return alert("Enter valid item, qty and price");
+
+      try{
+        const goodsRef = collection(db, `customers/${selectedCustomerId}/goods_history`);
+        await addDoc(goodsRef, {
+          itemName: name,
+          qty,
+          price,
+          total: qty*price,
+          notes: notes || null,
+          date: serverTimestamp()
+        });
+        // update customer totals optionally (we compute on load)
+        goodItem.value=""; goodQty.value=""; goodPrice.value=""; goodNotes.value="";
+        leftStatus.innerText = "Good added ✔";
+        await reloadLedgerForCustomer(selectedCustomerId);
+      }catch(e){
+        alert("Error: "+e.message);
+      }
+    });
+
+    clearGoodBtn.addEventListener("click", ()=>{ goodItem.value=""; goodQty.value=""; goodPrice.value=""; goodNotes.value=""; });
+
+    // Add Payment
+    addPayBtn.addEventListener("click", async ()=>{
+      if(!selectedCustomerId) return alert("Select/Create customer first");
+      const amount = Number(payAmount.value || 0);
+      const dateVal = payDate.value ? new Date(payDate.value) : new Date();
+      const notes = payNotes.value.trim();
+
+      if(amount<=0) return alert("Enter valid amount");
+
+      try{
+        const payRef = collection(db, `customers/${selectedCustomerId}/payment_history`);
+        await addDoc(payRef, {
+          amount,
+          notes: notes || null,
+          dateClient: dateVal.toISOString(),
+          date: serverTimestamp()
+        });
+        payAmount.value=""; payDate.value=""; payNotes.value="";
+        leftStatus.innerText = "Payment added ✔";
+        await reloadLedgerForCustomer(selectedCustomerId);
+      }catch(e){
+        alert("Error: "+e.message);
+      }
+    });
+
+    clearPayBtn.addEventListener("click", ()=>{ payAmount.value=""; payDate.value=""; payNotes.value=""; });
+
+    refreshBtn.addEventListener("click", ()=>{ if(selectedCustomerId) reloadLedgerForCustomer(selectedCustomerId); });
+
+    // Reload ledger (goods + payments + summary)
+    async function reloadLedgerForCustomer(customerId){
+      try{
+        const goodsSnap = await getDocs(query(collection(db, `customers/${customerId}/goods_history`), orderBy("date","desc"), limit(200)));
+        const paySnap = await getDocs(query(collection(db, `customers/${customerId}/payment_history`), orderBy("date","desc"), limit(200)));
+
+        // render goods
+        goodsBody.innerHTML = "";
+        let totalGoodsVal = 0;
+        if(goodsSnap.empty){
+          goodsBody.innerHTML = `<tr><td colspan="6" class="small">No goods yet.</td></tr>`;
+        } else {
+          goodsSnap.forEach(s=>{
+            const g = s.data();
+            totalGoodsVal += Number(g.total || 0);
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${g.itemName}</td>
+              <td>${g.qty}</td>
+              <td>${g.price?.toFixed ? g.price.toFixed(2) : g.price}</td>
+              <td>${g.total?.toFixed ? g.total.toFixed(2) : g.total}</td>
+              <td>${prettyDate(g.date)}</td>
+              <td><button onclick="deleteGood('${customerId}','${s.id}')" style="background:#ef4444;color:white;border:none;padding:6px 8px;border-radius:6px;cursor:pointer">Delete</button></td>
+            `;
+            goodsBody.appendChild(tr);
+          });
+        }
+
+        // render payments
+        payBody.innerHTML = "";
+        let totalPayments = 0;
+        if(paySnap.empty){
+          payBody.innerHTML = `<tr><td colspan="4" class="small">No payments yet.</td></tr>`;
+        } else {
+          paySnap.forEach(s=>{
+            const p = s.data();
+            totalPayments += Number(p.amount || 0);
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${(p.amount||0).toFixed(2)}</td>
+              <td>${p.dateClient ? new Date(p.dateClient).toLocaleDateString() : prettyDate(p.date)}</td>
+              <td>${p.notes || ""}</td>
+              <td><button onclick="deletePayment('${customerId}','${s.id}')" style="background:#ef4444;color:white;border:none;padding:6px 8px;border-radius:6px;cursor:pointer">Delete</button></td>
+            `;
+            payBody.appendChild(tr);
+          });
+        }
+
+        // Summary
+        const balance = totalGoodsVal - totalPayments;
+        sumGoods.innerText = fmt(totalGoodsVal);
+        sumPaid.innerText = fmt(totalPayments);
+        sumDue.innerText = fmt(balance);
+
+        statusPill.innerHTML = "";
+        const pill = document.createElement("div");
+        pill.className = "status-pill";
+        if(balance <= 0){
+          pill.style.background = "var(--success)";
+          pill.innerText = "Settled";
+        } else if(balance > 0 && balance < totalGoodsVal*0.4){
+          pill.style.background = "var(--warning)";
+          pill.innerText = "Partially Paid";
+        } else {
+          pill.style.background = "var(--danger)";
+          pill.innerText = "Due";
+        }
+        statusPill.appendChild(pill);
+      }catch(e){
+        console.error(e);
+        goodsBody.innerHTML = `<tr><td colspan="6" class="small">Failed to load goods.</td></tr>`;
+        payBody.innerHTML = `<tr><td colspan="4" class="small">Failed to load payments.</td></tr>`;
+      }
+    }
+
+    // Delete functions (confirm)
+    window.deleteGood = async function(customerId, docId){
+      if(!confirm("Delete this goods entry?")) return;
+      try{
+        await deleteDoc(doc(db, `customers/${customerId}/goods_history`, docId));
+        await reloadLedgerForCustomer(customerId);
+      }catch(e){ alert("Delete failed: "+e.message); }
+    };
+
+    window.deletePayment = async function(customerId, docId){
+      if(!confirm("Delete this payment?")) return;
+      try{
+        await deleteDoc(doc(db, `customers/${customerId}/payment_history`, docId));
+        await reloadLedgerForCustomer(customerId);
+      }catch(e){ alert("Delete failed: "+e.message); }
+    };
+
+    // DELETE CUSTOMER (with subcollections)
+    delCustBtn.addEventListener("click", async ()=>{
+      const id = selectedCustomerId;
+      if(!id) return alert("Select a customer first.");
+      if(!confirm("Delete this customer and ALL their history? This cannot be undone.")) return;
+
+      try{
+        leftStatus.innerText = "Deleting customer...";
+        // 1) delete goods_history docs
+        const goodsCol = collection(db, `customers/${id}/goods_history`);
+        const goodsSnap = await getDocs(goodsCol);
+        for(const docSnap of goodsSnap.docs){
+          await deleteDoc(doc(db, `customers/${id}/goods_history`, docSnap.id));
+        }
+        // 2) delete payment_history docs
+        const payCol = collection(db, `customers/${id}/payment_history`);
+        const paySnap = await getDocs(payCol);
+        for(const docSnap of paySnap.docs){
+          await deleteDoc(doc(db, `customers/${id}/payment_history`, docSnap.id));
+        }
+        // 3) delete customer doc
+        await deleteDoc(doc(db, "customers", id));
+
+        // refresh UI
+        await loadCustomersIntoSelect();
+        customerSelect.value = "";
+        await onCustomerSelect();
+        leftStatus.innerText = "Customer deleted ✔";
+      }catch(e){
+        console.error(e);
+        alert("Delete failed: "+e.message);
+        leftStatus.innerText = "";
+      }
+    });
+
+    // Initial state: none selected
+    onCustomerSelect(); // clear display
+
+  </script>
+</body>
+</html>

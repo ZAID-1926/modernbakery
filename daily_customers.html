@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Daily Customers — Modern Bakery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: linear-gradient(180deg,#e9f1ff 0%, #f8fbff 100%);
+      --panel:#fff; --accent:#0b5ed7; --muted:#6b7280; --radius:12px; --shadow:0 12px 40px rgba(12,34,80,0.06);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg);color:#0f1724;-webkit-font-smoothing:antialiased}
+    .topbar{position:sticky;top:0;background:linear-gradient(90deg,#062b63,#0b5ed7);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;z-index:50}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand .logo{height:42px;width:42px;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center}
+    .wrap{max-width:1200px;margin:20px auto;padding:0 18px}
+    .grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
+    .card{background:var(--panel);padding:16px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(11,94,215,0.06)}
+    h2{margin:0 0 8px;font-size:18px}
+    label{display:block;margin-top:10px;color:var(--muted);font-size:13px}
+    input,select,button,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #eef4ff;margin-top:8px;font-size:14px;background:#fbfdff}
+    .row{display:flex;gap:8px}
+    .col{flex:1}
+    .primary{background:var(--accent);color:white;border:none;padding:10px;border-radius:10px;font-weight:700;cursor:pointer}
+    .muted{color:var(--muted);font-size:13px}
+    .small{font-size:13px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:8px;border-bottom:1px solid #f3f6ff;text-align:left;font-size:13px}
+    th{background:#fafcff;font-weight:700}
+    .mini-analytics{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .mini-card{flex:1;padding:10px;border-radius:8px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef6ff;box-shadow:0 8px 20px rgba(6,22,60,0.03)}
+    .tabs{display:flex;gap:8px;margin-top:8px}
+    .tab{padding:8px 10px;border-radius:8px;background:#f3f6ff;cursor:pointer;font-weight:700}
+    .selected{background:var(--accent);color:white}
+    .suggestions{position:relative}
+    .list-suggest{position:absolute;left:0;right:0;z-index:60;background:white;border:1px solid #eef3ff;border-radius:8px;max-height:180px;overflow:auto;margin-top:6px}
+    .list-suggest div{padding:8px;cursor:pointer;border-bottom:1px solid #f3f6ff}
+    .list-suggest div:hover{background:#f5f8ff}
+    .small-cta{padding:6px 10px;border-radius:8px;background:#f3f6ff;border:none;cursor:pointer}
+    .flex-between{display:flex;justify-content:space-between;align-items:center}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="3" fill="#fff" opacity="0.06"/><path d="M6 10c.5-2 2-3 4-3s3.5 1 4 3" stroke="#fff" stroke-opacity="0.9" stroke-width="1.2"/></svg>
+      </div>
+      <div>
+        <div style="font-weight:700">Modern Bakery</div>
+        <div style="font-size:12px;opacity:.9">Daily Customers</div>
+      </div>
+    </div>
+    <div class="flex-between" style="gap:10px">
+      <div id="userEmail" class="small">Checking...</div>
+      <button id="backDash" class="small-cta">Dashboard</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="grid">
+
+      <!-- LEFT: Quick add / New customers / Package -->
+      <div class="card">
+        <h2>Quick Add</h2>
+        <div class="small">Pick category, select existing name or add new, add item/qty/rate or payment</div>
+
+        <label>Mode</label>
+        <div class="tabs">
+          <div id="mode_khula" class="tab selected">Khula Maal</div>
+          <div id="mode_package" class="tab">Package Maal</div>
+          <div id="mode_payment" class="tab">Add Payment</div>
+        </div>
+
+        <div id="quickArea" style="margin-top:10px">
+          <!-- Category + customer select/new -->
+          <label>Customer (select or type new)</label>
+          <div class="row">
+            <div class="col suggestions">
+              <input id="quickName" placeholder="Type name (will suggest)"/>
+              <div id="nameSuggest" class="list-suggest" style="display:none"></div>
+            </div>
+            <div style="width:90px">
+              <button id="btnNewCustomer" class="primary">New</button>
+            </div>
+          </div>
+
+          <div id="typeSpecific" style="margin-top:8px">
+            <!-- khula/package specific fields show/hide dynamically -->
+            <div id="khulaFields">
+              <label>Item (suggest)</label>
+              <div class="suggestions">
+                <input id="kh_item" placeholder="e.g. Khari, BTC, Indori..."/>
+                <div id="itemSuggest" class="list-suggest" style="display:none"></div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <label>Qty</label>
+                  <input id="kh_qty" type="number" min="0" step="0.01" placeholder="kg or qty">
+                </div>
+                <div class="col">
+                  <label>Rate (per unit)</label>
+                  <input id="kh_rate" type="number" min="0" step="0.01" placeholder="₹">
+                </div>
+              </div>
+
+              <label>Notes</label>
+              <input id="kh_notes" placeholder="optional"/>
+
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button id="saveKhula" class="primary" style="flex:1">Add to Day</button>
+                <button id="saveKhulaAndPay" class="small-cta" style="flex:1">Add + Record Payment</button>
+              </div>
+            </div>
+
+            <div id="packageFields" style="display:none">
+              <label>Item (package)</label>
+              <input id="pkg_item"/>
+
+              <div class="row">
+                <div class="col">
+                  <label>Qty</label>
+                  <input id="pkg_qty" type="number" min="0" step="0.01"/>
+                </div>
+                <div class="col">
+                  <label>Rate</label>
+                  <input id="pkg_rate" type="number" min="0" step="0.01"/>
+                </div>
+              </div>
+
+              <label>Notes</label>
+              <input id="pkg_notes"/>
+
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button id="savePkg" class="primary" style="flex:1">Add Package Item</button>
+              </div>
+            </div>
+
+            <div id="paymentFields" style="display:none">
+              <label>Amount</label>
+              <input id="pay_amount" type="number" min="0" step="0.01"/>
+              <label>Date (optional)</label>
+              <input id="pay_date" type="date"/>
+              <label>Notes</label>
+              <input id="pay_notes"/>
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button id="savePayment" class="primary" style="flex:1">Record Payment</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="quickStatus" class="small" style="margin-top:8px;color:var(--muted)"></div>
+        </div>
+
+        <hr style="margin:14px 0">
+
+        <h2>New Customers (Khula Maal only)</h2>
+        <div id="newCustomersList" class="small" style="max-height:180px;overflow:auto;margin-top:8px">No new customers today.</div>
+
+        <hr style="margin:12px 0">
+
+        <h2>Mini Analytics</h2>
+        <div class="mini-analytics">
+          <div class="mini-card">
+            <div class="small">Today's Sales</div>
+            <div id="mini_sales" style="font-weight:700;margin-top:6px">₹ 0</div>
+          </div>
+          <div class="mini-card">
+            <div class="small">Payments Received</div>
+            <div id="mini_paid" style="font-weight:700;margin-top:6px">₹ 0</div>
+          </div>
+          <div class="mini-card">
+            <div class="small">Net Today</div>
+            <div id="mini_net" style="font-weight:700;margin-top:6px">₹ 0</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Day Grid & Package Section & History -->
+      <div>
+
+        <div class="card" style="margin-bottom:12px">
+          <div class="flex-between">
+            <h2>Khula Maal — Day Grid</h2>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="small">Date</div>
+              <input id="viewDate" type="date" style="width:150px;padding:8px"/>
+              <button id="btnExport" class="small-cta">Export CSV</button>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;overflow:auto">
+            <table id="dayGridTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Customer</th>
+                  <th>Khari</th>
+                  <th>BTC</th>
+                  <th>Indori</th>
+                  <th>Maska Khari</th>
+                  <th>Biscuits</th>
+                  <th>Day Total</th>
+                  <th>Prev Due</th>
+                  <th>Total </th>
+                  <th>Paid </th>
+                  <th>Balance </th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dayGridBody">
+                <tr><td colspan="13" class="small">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <div class="flex-between">
+            <h2>Package Maal (per customer)</h2>
+            <div class="small">Separate list for package items</div>
+          </div>
+          <div style="margin-top:10px;overflow:auto">
+            <table id="pkgTable"><thead><tr><th>Customer</th><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th><th>Prev</th><th>Paid</th><th>Remaining</th><th></th></tr></thead>
+              <tbody id="pkgBody"><tr><td colspan="9" class="small">No packages yet.</td></tr></tbody></table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex-between"><h2>Customer History / Search</h2>
+            <div><input id="histSearch" placeholder="Search name..." style="width:240px"/></div>
+          </div>
+          <div id="custHistory" style="margin-top:10px;max-height:260px;overflow:auto" class="small">Select a customer row to view lifetime history.</div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Firebase + Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore, collection, doc, setDoc, addDoc, getDocs, getDoc,
+      query, where, orderBy, updateDoc, deleteDoc, collectionGroup, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // --- config (use your project) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
+      authDomain: "modernbakery-08.firebaseapp.com",
+      projectId: "modernbakery-08",
+      storageBucket: "modernbakery-08.appspot.com",
+      messagingSenderId: "551391878340",
+      appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // UI refs
+    const userEmail = document.getElementById("userEmail");
+    const backDash = document.getElementById("backDash");
+
+    const mode_khula = document.getElementById("mode_khula");
+    const mode_package = document.getElementById("mode_package");
+    const mode_payment = document.getElementById("mode_payment");
+
+    const quickName = document.getElementById("quickName");
+    const nameSuggest = document.getElementById("nameSuggest");
+    const btnNewCustomer = document.getElementById("btnNewCustomer");
+
+    const kh_item = document.getElementById("kh_item");
+    const itemSuggest = document.getElementById("itemSuggest");
+    const kh_qty = document.getElementById("kh_qty");
+    const kh_rate = document.getElementById("kh_rate");
+    const kh_notes = document.getElementById("kh_notes");
+    const saveKhula = document.getElementById("saveKhula");
+    const saveKhulaAndPay = document.getElementById("saveKhulaAndPay");
+
+    const pkg_item = document.getElementById("pkg_item");
+    const pkg_qty = document.getElementById("pkg_qty");
+    const pkg_rate = document.getElementById("pkg_rate");
+    const pkg_notes = document.getElementById("pkg_notes");
+    const savePkg = document.getElementById("savePkg");
+
+    const pay_amount = document.getElementById("pay_amount");
+    const pay_date = document.getElementById("pay_date");
+    const pay_notes = document.getElementById("pay_notes");
+    const savePayment = document.getElementById("savePayment");
+
+    const quickStatus = document.getElementById("quickStatus");
+    const newCustomersList = document.getElementById("newCustomersList");
+
+    const mini_sales = document.getElementById("mini_sales");
+    const mini_paid = document.getElementById("mini_paid");
+    const mini_net = document.getElementById("mini_net");
+
+    const viewDate = document.getElementById("viewDate");
+    const dayGridBody = document.getElementById("dayGridBody");
+    const pkgBody = document.getElementById("pkgBody");
+    const custHistory = document.getElementById("custHistory");
+    const histSearch = document.getElementById("histSearch");
+
+    const btnExport = document.getElementById("btnExport");
+
+    // constants
+    const DEFAULT_ITEMS = [
+      {key:'khari', label:'Khari', rate:90},
+      {key:'btc', label:'BTC', rate:100},
+      {key:'indori', label:'Indori', rate:100},
+      {key:'maska', label:'Maska Khari', rate:130},
+      {key:'biscuits', label:'Biscuits', rate:120}
+    ];
+
+    // state
+    let MODE = 'khula'; // khula | package | payment
+    let TODAY = new Date();
+    function isoDate(d){ const dt = d ? new Date(d) : new Date(); const y=dt.getFullYear(); const m=String(dt.getMonth()+1).padStart(2,'0'); const dd=String(dt.getDate()).padStart(2,'0'); return `${y}-${m}-${dd}`; }
+    viewDate.value = isoDate(TODAY);
+
+    // UI mode toggles
+    function setMode(m){
+      MODE = m;
+      mode_khula.classList.toggle('selected', m==='khula');
+      mode_package.classList.toggle('selected', m==='package');
+      mode_payment.classList.toggle('selected', m==='payment');
+      document.getElementById('khulaFields').style.display = m==='khula' ? 'block' : 'none';
+      document.getElementById('packageFields').style.display = m==='package' ? 'block' : 'none';
+      document.getElementById('paymentFields').style.display = m==='payment' ? 'block' : 'none';
+    }
+    mode_khula.onclick = ()=> setMode('khula');
+    mode_package.onclick = ()=> setMode('package');
+    mode_payment.onclick = ()=> setMode('payment');
+
+    // auth check
+    onAuthStateChanged(auth, async user=>{
+      if(!user){ userEmail.innerText = "Not logged"; return; }
+      userEmail.innerText = user.email || user.displayName || "Admin";
+      // initial loads
+      await loadDayGrid();
+      await loadPackages();
+      await loadNewCustomers();
+      runMiniAnalytics();
+    });
+
+    backDash.onclick = ()=> window.location.href = 'dashboard.html';
+
+    // === Helpers: Firestore paths & data model ===
+    // We'll store per-day khula grid in collection "daily_grids" with doc id = yyyy-mm-dd:
+    // daily_grids/{date}/rows/{autoId}  -> {customerName, items: {khari:qty, btc:qty, ...}, prevDue, paidToday, notes}
+    // For package items: collection "package_items" with doc {date, customer, item, qty, rate, paid, prev}
+    // For customer lifetime history: "customers" collection with subcollections goods_history & payment_history (we will also add entries on quick add)
+    // new_customers/{date}/{doc} store list of customers added today (for khula only)
+
+    // === Suggest / Search for names & items ===
+    async function suggestNames(q){
+      nameSuggest.innerHTML=''; nameSuggest.style.display='none';
+      if(!q) return;
+      // Search customers collection by nameLower prefix
+      try {
+        const col = collection(db,'customers');
+        const qref = query(col, where('nameLower','>=', q.toLowerCase()), where('nameLower','<', q.toLowerCase() + '\uf8ff'), );
+        const snap = await getDocs(qref);
+        if(snap.empty) return;
+        snap.forEach(s=>{
+          const data = s.data();
+          const d = document.createElement('div');
+          d.innerText = data.name + (data.phone ? ' • '+data.phone : '');
+          d.onclick = ()=> { quickName.value = data.name; nameSuggest.style.display='none'; }
+          nameSuggest.appendChild(d);
+        });
+        nameSuggest.style.display = nameSuggest.children.length ? 'block' : 'none';
+      } catch(e){ console.warn('name suggest failed',e); }
+    }
+
+    quickName.addEventListener('input', (e)=> suggestNames(e.target.value));
+
+    // item suggest from DEFAULT_ITEMS + saved item list from DB (inventory names)
+    async function suggestItems(q){
+      itemSuggest.innerHTML=''; itemSuggest.style.display='none';
+      if(!q) return;
+      // local defaults
+      const results = DEFAULT_ITEMS.filter(it => it.label.toLowerCase().includes(q.toLowerCase()));
+      results.forEach(it=>{
+        const d = document.createElement('div'); d.innerText = `${it.label} • ₹${it.rate}`; d.onclick = ()=> { kh_item.value = it.label; kh_rate.value = it.rate; itemSuggest.style.display='none'; }
+        itemSuggest.appendChild(d);
+      });
+      // also try to fetch inventory items
+      try {
+        const invSnap = await getDocs(query(collection(db,'Inventory'), ));
+        invSnap.forEach(s=> {
+          const it = s.data();
+          if(it.name && it.name.toLowerCase().includes(q.toLowerCase())){
+            const d = document.createElement('div'); d.innerText = `${it.name} • ₹${it.price||''}`; d.onclick = ()=> { kh_item.value = it.name; kh_rate.value = it.price||''; itemSuggest.style.display='none'; }
+            itemSuggest.appendChild(d);
+          }
+        });
+      } catch(e){ console.warn('inv suggest failed',e); }
+      itemSuggest.style.display = itemSuggest.children.length ? 'block' : 'none';
+    }
+    kh_item.addEventListener('input', (e)=> suggestItems(e.target.value));
+
+    // When New customer button -> create in customers collection & add to new_customers/{date}
+    btnNewCustomer.onclick = async ()=>{
+      const name = quickName.value.trim();
+      if(!name) return alert('Type a name to add new customer');
+      try {
+        // create customer if not exists (unique by nameLower)
+        const col = collection(db,'customers');
+        const existing = await getDocs(query(col, where('nameLower','==', name.toLowerCase())));
+        let cid = null;
+        if(existing.empty){
+          const ndoc = doc(col);
+          await setDoc(ndoc, { name, nameLower: name.toLowerCase(), createdAt: serverTimestamp() });
+          cid = ndoc.id;
+        } else {
+          cid = existing.docs[0].id;
+        }
+        // register in new_customers/day
+        const dayCol = collection(db, 'new_customers', viewDate.value || isoDate(new Date()), 'list');
+        await addDoc(dayCol, { name, createdAt: serverTimestamp() });
+        quickStatus.innerText = `New customer added: ${name}`;
+        await loadNewCustomers();
+      } catch(e){ alert('Add customer failed: '+e.message); }
+    };
+
+    // === Core: Save khula item to today's grid ===
+    saveKhula.onclick = async ()=>{
+      await saveKhulaCore(false);
+    };
+    saveKhulaAndPay.onclick = async ()=>{
+      await saveKhulaCore(true);
+    };
+
+    async function saveKhulaCore(doRecordPayment){
+      const name = quickName.value.trim();
+      if(!name) return alert('Enter customer name');
+      const item = kh_item.value.trim();
+      const qty = Number(kh_qty.value || 0);
+      const rate = Number(kh_rate.value || 0);
+      if(!item || qty<=0) return alert('Enter item and qty');
+
+      const dateStr = viewDate.value || isoDate(new Date());
+      try {
+        // find or create daily grid doc for this customer (by name)
+        const dayDocRef = doc(collection(db,'daily_grids', dateStr, 'rows'));
+        // We will create a new row per customer per day if not exists. But to simplify and ensure one row per customer,
+        // first search for existing row with same name
+        const rowsCol = collection(db,'daily_grids', dateStr, 'rows');
+        const q = query(rowsCol, where('customer','==', name));
+        const existing = await getDocs(q);
+
+        if(!existing.empty){
+          // update the found doc (take first)
+          const rdoc = existing.docs[0];
+          const data = rdoc.data();
+          // merge items: increment the matching key if matches DEFAULT_ITEMS label
+          const items = data.items || {};
+          // map label to key (lower)
+          const key = item.toLowerCase().replace(/\s+/g,'_');
+          items[key] = (items[key]||0) + qty;
+          // update prevDue unchanged
+          await updateDoc(doc(db,'daily_grids',dateStr,'rows',rdoc.id), { items, lastUpdated: serverTimestamp() });
+          await ensureCustomerHistoryEntry(name, { type:'goods', item, qty, rate, total: qty*rate, date: dateStr, notes: kh_notes.value || null });
+        } else {
+          // create fresh row
+          const obj = {
+            customer: name,
+            items: {},
+            prevDue: 0,
+            paidToday: 0,
+            notes: '',
+            createdAt: serverTimestamp()
+          };
+          const key = item.toLowerCase().replace(/\s+/g,'_');
+          obj.items[key] = qty;
+          await addDoc(rowsCol, obj);
+          await ensureCustomerHistoryEntry(name, { type:'goods', item, qty, rate, total: qty*rate, date: dateStr, notes: kh_notes.value || null });
+        }
+
+        // if record payment
+        if(doRecordPayment){
+          const amount = qty*rate;
+          await recordPaymentForCustomer(name, amount, viewDate.value);
+        }
+
+        // update UI
+        kh_item.value=''; kh_qty.value=''; kh_rate.value=''; kh_notes.value='';
+        quickStatus.innerText = `Added ${qty} ${item} for ${name} on ${dateStr}`;
+        await loadDayGrid();
+        await runMiniAnalytics();
+      } catch(e){ alert('Save failed: '+e.message); console.error(e); }
+    }
+
+    // Save package item
+    savePkg.onclick = async ()=>{
+      const name = quickName.value.trim();
+      if(!name) return alert('Select customer');
+      const qty = Number(pkg_qty.value || 0);
+      const rate = Number(pkg_rate.value || 0);
+      const item = pkg_item.value.trim();
+      if(!item || qty<=0) return alert('Enter package item and qty');
+      const dateStr = viewDate.value || isoDate(new Date());
+      try{
+        const col = collection(db,'package_items');
+        await addDoc(col, { customer: name, item, qty, rate, total: qty*rate, date: dateStr, prevDue:0, paid:0, notes: pkg_notes.value||null, createdAt: serverTimestamp() });
+        pkg_item.value=''; pkg_qty.value=''; pkg_rate.value=''; pkg_notes.value='';
+        quickStatus.innerText = `Package item added for ${name}`;
+        await loadPackages();
+        await ensureCustomerHistoryEntry(name, { type:'package', item, qty, rate, total: qty*rate, date: dateStr });
+        await runMiniAnalytics();
+      }catch(e){ alert('Save pkg failed: '+e.message); }
+    };
+
+    // Record payment
+    savePayment.onclick = async ()=>{
+      const name = quickName.value.trim();
+      if(!name) return alert('Select customer');
+      const amount = Number(pay_amount.value || 0);
+      if(amount<=0) return alert('Enter amount');
+      const dateStr = pay_date.value || isoDate(new Date());
+      try{
+        await recordPaymentForCustomer(name, amount, dateStr, pay_notes.value||null);
+        pay_amount.value=''; pay_date.value=''; pay_notes.value='';
+        quickStatus.innerText = `Payment ₹${amount.toFixed(2)} recorded for ${name}`;
+        await loadDayGrid();
+        await loadPackages();
+        await runMiniAnalytics();
+      }catch(e){ alert('Record payment failed: '+e.message); }
+    };
+
+    // records a payment into customers/{id}/payment_history and also stores a simple payments collection for analytics
+    async function recordPaymentForCustomer(name, amount, dateStr, notes){
+      // find customer id
+      const cCol = collection(db,'customers');
+      const cSnap = await getDocs(query(cCol, where('nameLower','==', name.toLowerCase())));
+      let custId = null;
+      if(cSnap.empty){
+        // create minimal customer doc
+        const newc = doc(cCol);
+        await setDoc(newc, { name, nameLower: name.toLowerCase(), createdAt: serverTimestamp() });
+        custId = newc.id;
+      } else {
+        custId = cSnap.docs[0].id;
+      }
+      // add to payment_history subcollection
+      await addDoc(collection(db,'customers',custId,'payment_history'), { amount, dateClient: dateStr, notes: notes||null, date: serverTimestamp() });
+      // also add to global payments collection (for analytics)
+      await addDoc(collection(db,'payments'), { customer: name, amount, dateClient: dateStr, notes: notes||null, date: serverTimestamp() });
+
+      // Also apply payment to today's daily grid row if exists for that customer/date
+      const dateKey = dateStr || isoDate(new Date());
+      const rowsCol = collection(db,'daily_grids', dateKey, 'rows');
+      const existing = await getDocs(query(rowsCol, where('customer','==', name)));
+      if(!existing.empty){
+        const rdoc = existing.docs[0];
+        const curr = rdoc.data();
+        const paid = Number(curr.paidToday || 0) + amount;
+        await updateDoc(doc(db,'daily_grids',dateKey,'rows',rdoc.id), { paidToday: paid });
+      }
+    }
+
+    // ensure goods_history / package_history entries for customer lifetime
+    async function ensureCustomerHistoryEntry(name, entry){
+      // get or create customer doc
+      const cCol = collection(db,'customers');
+      const cSnap = await getDocs(query(cCol, where('nameLower','==', name.toLowerCase())));
+      let custId;
+      if(cSnap.empty){
+        const newc = doc(cCol);
+        await setDoc(newc, { name, nameLower: name.toLowerCase(), createdAt: serverTimestamp() });
+        custId = newc.id;
+      } else custId = cSnap.docs[0].id;
+
+      // put into appropriate subcollection
+      const sub = entry.type === 'package' ? 'package_history' : 'goods_history';
+      await addDoc(collection(db,'customers',custId,sub), { ...entry, ts: serverTimestamp() });
+    }
+
+    // === Loaders: Day Grid, Packages, New Customers, History ===
+    async function loadDayGrid(){
+      const dateStr = viewDate.value || isoDate(new Date());
+      dayGridBody.innerHTML = `<tr><td colspan="13" class="small">Loading...</td></tr>`;
+      try{
+        const rowsCol = collection(db,'daily_grids',dateStr,'rows');
+        const snap = await getDocs(query(rowsCol, orderBy('customer','asc')));
+        dayGridBody.innerHTML = '';
+        if(snap.empty){
+          dayGridBody.innerHTML = `<tr><td colspan="13" class="small">No records for ${dateStr}</td></tr>`;
+          return;
+        }
+        let idx = 0;
+        for(const d of snap.docs){
+          idx++;
+          const data = d.data();
+          const customer = data.customer;
+          // compute columns 2-6 using DEFAULT_ITEMS mapping keys (match by label lower)
+          const items = data.items || {};
+          // for consistent ordering use DEFAULT_ITEMS
+          const colVals = DEFAULT_ITEMS.map(it => Number(items[it.label.toLowerCase().replace(/\s+/g,'_')]||0));
+          const colTotals = DEFAULT_ITEMS.map((it,i)=> colVals[i] * Number(it.rate||0));
+          const dayTotal = colTotals.reduce((s,x)=> s + x, 0);
+          const prevDue = Number(data.prevDue || 0);
+          const total79 = dayTotal + prevDue;
+          const paid = Number(data.paidToday || 0);
+          const balance = total79 - paid;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${idx}</td>
+            <td><strong class="cust-link" style="cursor:pointer;color:var(--accent)">${customer}</strong></td>
+            <td>${colVals[0] || ''}</td>
+            <td>${colVals[1] || ''}</td>
+            <td>${colVals[2] || ''}</td>
+            <td>${colVals[3] || ''}</td>
+            <td>${colVals[4] || ''}</td>
+            <td>₹ ${dayTotal.toFixed(2)}</td>
+            <td>₹ ${prevDue.toFixed(2)}</td>
+            <td>₹ ${total79.toFixed(2)}</td>
+            <td>₹ ${paid.toFixed(2)}</td>
+            <td>₹ ${balance.toFixed(2)}</td>
+            <td>
+              <button class="small-cta" data-id="${d.id}" data-cust="${customer}">Edit</button>
+              <button class="small-cta" data-del="${d.id}" style="background:#ffecec">Del</button>
+            </td>
+          `;
+          // attach click for customer history
+          tr.querySelector('.cust-link').onclick = ()=> openCustomerHistory(customer);
+          // edit
+          tr.querySelector('[data-id]').onclick = async (ev)=>{
+            const rid = ev.currentTarget.dataset.id;
+            await openEditRow(dateStr, rid);
+          };
+          // delete
+          tr.querySelector('[data-del]').onclick = async (ev)=>{
+            const rid = ev.currentTarget.dataset.del;
+            if(!confirm('Delete this row?')) return;
+            await deleteDoc(doc(db,'daily_grids',dateStr,'rows',rid));
+            await loadDayGrid();
+          };
+          dayGridBody.appendChild(tr);
+        }
+      }catch(e){ console.error(e); dayGridBody.innerHTML = `<tr><td colspan="13" class="small">Failed to load: ${e.message}</td></tr>`;}
+    }
+
+    async function loadPackages(){
+      pkgBody.innerHTML = `<tr><td colspan="9" class="small">Loading...</td></tr>`;
+      try{
+        const snap = await getDocs(query(collection(db,'package_items'), orderBy('date','desc')));
+        pkgBody.innerHTML = '';
+        if(snap.empty){ pkgBody.innerHTML = `<tr><td colspan="9" class="small">No packages yet.</td></tr>`; return;}
+        snap.forEach(s=>{
+          const d = s.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${d.customer}</td><td>${d.item}</td><td>${d.qty}</td><td>₹ ${Number(d.rate||0).toFixed(2)}</td><td>₹ ${(d.total||0).toFixed(2)}</td>
+            <td>₹ ${(d.prevDue||0).toFixed(2)}</td><td>₹ ${(d.paid||0).toFixed(2)}</td><td>₹ ${((d.total||0)+(d.prevDue||0)-(d.paid||0)).toFixed(2)}</td>
+            <td><button class="small-cta">Edit</button></td>`;
+          pkgBody.appendChild(tr);
+        });
+      }catch(e){ console.error(e); pkgBody.innerHTML = `<tr><td colspan="9" class="small">Failed to load packages</td></tr>`;}
+    }
+
+    async function loadNewCustomers(){
+      const dateStr = viewDate.value || isoDate(new Date());
+      newCustomersList.innerHTML = 'Loading...';
+      try{
+        const snap = await getDocs(query(collection(db,'new_customers', dateStr, 'list')));
+        newCustomersList.innerHTML = '';
+        if(snap.empty) { newCustomersList.innerHTML = '<div class="small">No new customers today.</div>'; return;}
+        snap.forEach(s=>{
+          const d = s.data();
+          const div = document.createElement('div');
+          div.innerText = d.name + ' • ' + (new Date(d.createdAt?.seconds ? d.createdAt.seconds*1000 : Date.now()).toLocaleTimeString());
+          newCustomersList.appendChild(div);
+        });
+      }catch(e){ console.error(e); newCustomersList.innerHTML = '<div class="small">Failed to load</div>'; }
+    }
+
+    // Export CSV of day grid
+    btnExport.onclick = async ()=>{
+      const rows = [];
+      const dateStr = viewDate.value || isoDate(new Date());
+      const snap = await getDocs(query(collection(db,'daily_grids',dateStr,'rows'), orderBy('customer')));
+      snap.forEach(s=>{
+        const d = s.data();
+        const items = d.items || {};
+        const row = {
+          customer: d.customer,
+          ...DEFAULT_ITEMS.reduce((acc,it)=> (acc[it.label]=items[it.label.toLowerCase().replace(/\s+/g,'_')]||0, acc), {}),
+          prevDue: d.prevDue||0,
+          paidToday: d.paidToday||0
+        };
+        rows.push(row);
+      });
+      if(rows.length===0) return alert('No rows to export');
+      // build CSV
+      const headers = ['Customer', ...DEFAULT_ITEMS.map(i=>i.label),'PrevDue','PaidToday'];
+      const csv = [headers.join(',')].concat(rows.map(r=> headers.map(h=> `"${(r[h]||'')}"`).join(','))).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `daily_grid_${viewDate.value||isoDate(new Date())}.csv`; a.click(); URL.revokeObjectURL(url);
+    };
+
+    // Open edit row modal (simple prompt-based editing for speed)
+    async function openEditRow(dateStr, rowId){
+      const rdoc = await getDoc(doc(db,'daily_grids',dateStr,'rows',rowId));
+      if(!rdoc.exists()) return alert('Row missing');
+      const data = rdoc.data();
+      // prompt for prevDue and paid
+      const newPrev = prompt('Prev Due amount', String(data.prevDue||0));
+      if(newPrev === null) return;
+      const newPaid = prompt('Paid today', String(data.paidToday||0));
+      if(newPaid === null) return;
+      await updateDoc(doc(db,'daily_grids',dateStr,'rows',rowId), { prevDue: Number(newPrev||0), paidToday: Number(newPaid||0), lastUpdated: serverTimestamp() });
+      await loadDayGrid();
+      await runMiniAnalytics();
+    }
+
+    // Open customer lifetime history (compile goods_history + payment_history + package_history)
+    async function openCustomerHistory(name){
+      custHistory.innerHTML = 'Loading history...';
+      try{
+        // find customer id
+        const cCol = collection(db,'customers');
+        const cSnap = await getDocs(query(cCol, where('nameLower','==', name.toLowerCase())));
+        if(cSnap.empty){ custHistory.innerHTML = `<div class="small">No history for ${name}</div>`; return;}
+        const cid = cSnap.docs[0].id;
+        const goodsSnap = await getDocs(query(collection(db,'customers',cid,'goods_history'), orderBy('ts','desc'), ));
+        const paySnap = await getDocs(query(collection(db,'customers',cid,'payment_history'), orderBy('date','desc')));
+        const pkgSnap = await getDocs(query(collection(db,'customers',cid,'package_history'), orderBy('ts','desc')));
+        custHistory.innerHTML = `<div style="font-weight:700;margin-bottom:8px">${name} — Lifetime History</div>`;
+        if(!goodsSnap.empty){
+          const h1 = document.createElement('div'); h1.innerHTML = '<div style="font-weight:700">Goods</div>'; custHistory.appendChild(h1);
+          goodsSnap.forEach(s=> { const d=s.data(); const el = document.createElement('div'); el.innerText = `${d.date} • ${d.item} • ${d.qty} • ₹${(d.total||0).toFixed(2)}`; custHistory.appendChild(el);});
+        }
+        if(!pkgSnap.empty){
+          const h2 = document.createElement('div'); h2.innerHTML = '<div style="font-weight:700;margin-top:8px">Package</div>'; custHistory.appendChild(h2);
+          pkgSnap.forEach(s=> { const d=s.data(); const el = document.createElement('div'); el.innerText = `${d.date} • ${d.item} • ${d.qty} • ₹${(d.total||0).toFixed(2)}`; custHistory.appendChild(el);});
+        }
+        if(!paySnap.empty){
+          const h3 = document.createElement('div'); h3.innerHTML = '<div style="font-weight:700;margin-top:8px">Payments</div>'; custHistory.appendChild(h3);
+          paySnap.forEach(s=> { const d=s.data(); const el = document.createElement('div'); el.innerText = `${d.dateClient||''} • ₹${(d.amount||0).toFixed(2)} • ${d.notes||''}`; custHistory.appendChild(el);});
+        }
+      }catch(e){ console.error(e); custHistory.innerHTML = '<div class="small">Failed to load history</div>'; }
+    }
+
+    // Search history quickly
+    histSearch.addEventListener('input', async (e)=>{
+      const q = e.target.value.trim();
+      if(!q) return;
+      // try find matching customer docs
+      const snap = await getDocs(query(collection(db,'customers'), where('nameLower','>=', q.toLowerCase()), where('nameLower','<', q.toLowerCase()+'\uf8ff'), limit(20) ));
+      custHistory.innerHTML = '';
+      if(snap.empty) { custHistory.innerHTML = '<div class="small">No matches</div>'; return; }
+      snap.forEach(s=> {
+        const d = s.data();
+        const div = document.createElement('div'); div.style.padding='8px'; div.style.cursor='pointer';
+        div.innerText = d.name + (d.phone ? ' • '+d.phone : '');
+        div.onclick = ()=> openCustomerHistory(d.name);
+        custHistory.appendChild(div);
+      });
+    });
+
+    // === Mini Analytics (today) ===
+    async function runMiniAnalytics(){
+      try{
+        const dateStr = viewDate.value || isoDate(new Date());
+        // sales: sum of goods in daily_grids for date
+        let sales = 0, paid = 0;
+        const rowsCol = collection(db,'daily_grids',dateStr,'rows');
+        const snap = await getDocs(rowsCol);
+        snap.forEach(s=>{
+          const d = s.data();
+          const items = d.items || {};
+          // compute using DEFAULT_ITEMS rates (if rate not available we fallback to 0)
+          DEFAULT_ITEMS.forEach(it=>{
+            const qty = Number(items[it.label.toLowerCase().replace(/\s+/g,'_')]||0);
+            sales += qty * Number(it.rate||0);
+          });
+          paid += Number(d.paidToday||0);
+        });
+        // add package totals for date as sales
+        const pkgSnap = await getDocs(query(collection(db,'package_items'), where('date','==', dateStr)));
+        pkgSnap.forEach(s=> sales += Number(s.data().total||0));
+
+        mini_sales.innerText = `₹ ${sales.toFixed(2)}`;
+        mini_paid.innerText = `₹ ${paid.toFixed(2)}`;
+        mini_net.innerText = `₹ ${(sales - paid).toFixed(2)}`;
+      }catch(e){ console.error('mini analytics failed', e); }
+    }
+
+    // reload when date changed
+    viewDate.addEventListener('change', async ()=>{
+      await loadDayGrid();
+      await loadPackages();
+      await loadNewCustomers();
+      await runMiniAnalytics();
+    });
+
+    // initial suggestions prefill default items as rates (optional)
+    (function initDefaults(){ /* nothing to do here for now */ })();
+
+    // run initial loads periodically (safety)
+    setInterval(()=> { loadNewCustomers(); runMiniAnalytics(); }, 60*1000);
+
+    // Ensure UI reacts: hide suggestion when click outside
+    document.addEventListener('click', (ev)=>{
+      if(!ev.target.closest('.suggestions')) { itemSuggest.style.display='none'; nameSuggest.style.display='none'; }
+    });
+
+    // small helper to refresh all
+    async function refreshAll(){ await loadDayGrid(); await loadPackages(); await loadNewCustomers(); await runMiniAnalytics(); }
+    window.refreshDailyCustomers = refreshAll;
+
+    // final: load
+    await refreshAll();
+
+  </script>
+</body>
+</html>

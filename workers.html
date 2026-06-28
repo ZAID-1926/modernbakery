@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Workers — Modern Bakery</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #f3f7ff;
+      --card: #ffffff;
+      --accent: #0b5ed7;
+      --muted: #6b7280;
+      --radius: 14px;
+      --success: #16a34a;
+      --danger: #ef4444;
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background: linear-gradient(180deg, #eaf2ff, #f6f9ff);
+      color:#0f1724;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* Topbar */
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px 28px;
+      background:linear-gradient(90deg,#042c6b,#0b5ed7);
+      color:white;
+      box-shadow:0 10px 30px rgba(7,20,60,0.12);
+    }
+    .logo{font-weight:700;font-size:18px}
+    .actions{display:flex;gap:12px;align-items:center}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.15);color:white;padding:8px 12px;border-radius:10px;cursor:pointer}
+
+    .wrap{max-width:1200px;margin:22px auto;padding:18px}
+    .month-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .month-title{font-weight:700;font-size:18px}
+    .month-controls{display:flex;gap:8px;align-items:center}
+    .month-btn{background:white;border-radius:10px;padding:8px 12px;border:none;cursor:pointer;font-weight:700}
+
+    .grid{display:grid;grid-template-columns:420px 1fr;gap:20px}
+
+    .card{background:var(--card);padding:18px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(15,23,42,0.06)}
+    .h1{font-size:18px;font-weight:700;margin:0 0 12px}
+    label{display:block;margin-top:10px;color:var(--muted);font-size:13px}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #eef2ff;margin-top:8px;font-size:14px;background:#fbfdff}
+    .row{display:flex;gap:10px}
+    .col{flex:1}
+    .primary{background:var(--accent);color:white;padding:10px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .muted{color:var(--muted);font-size:13px}
+    .danger{background:var(--danger);color:white}
+
+    .summary{display:flex;gap:12px;align-items:stretch}
+    .sum-card{flex:1;padding:14px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);box-shadow:0 6px 20px rgba(10,20,60,0.04)}
+    .sum-title{font-size:12px;color:var(--muted)}
+    .sum-value{font-size:20px;font-weight:700;margin-top:6px}
+
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid #f3f6ff;text-align:left;font-size:13px}
+    th{background:#fbfdff;font-weight:700}
+    .small{font-size:13px;color:var(--muted)}
+
+    .worker-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;border:1px solid #f3f6ff;margin-bottom:8px}
+    .worker-name{font-weight:700}
+    .mini-btn{padding:6px 8px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+    .mini-danger{background:var(--danger);color:white}
+    .mini-grey{background:#f3f4f6;color:#111}
+
+    .calendar { display:grid; grid-template-columns: repeat(7, 1fr); gap:6px; margin-top:12px; }
+    .day { padding:8px; border-radius:8px; background:#fbfdff; text-align:center; font-size:13px; border:1px solid #f3f6ff; cursor:pointer; }
+    .day.present{background: #e6fff0; border-color: #b6f2c8;}
+    .day.half{background:#fff9e6; border-color:#f0d89a;}
+    .day.absent{background:#fff2f2; border-color:#f6c3c3;}
+
+    /* Bulk attendance UI */
+    .bulk-card{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:10px;background:#fff;border:1px solid #eef2ff}
+    .bulk-controls{display:flex;gap:8px;align-items:center}
+    .worker-att-row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;border:1px solid #f3f6ff}
+    .att-options{display:flex;gap:8px;align-items:center}
+
+    @media(max-width:980px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="logo">Modern Bakery — Workers</div>
+    <div class="actions">
+      <div id="userEmail" class="small">Checking...</div>
+      <button class="btn-ghost" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="month-bar">
+      <div class="month-title" id="monthTitle">Loading month...</div>
+      <div class="month-controls">
+        <button id="prevMonth" class="month-btn">◀ Prev</button>
+        <button id="nextMonth" class="month-btn">Next ▶</button>
+        <button id="todayMonth" class="month-btn">This month</button>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- LEFT: Add / Select Worker + Bulk attendance + Quick expense -->
+      <div class="card">
+        <div class="h1">Workers — Add / Select</div>
+
+        <label>Search worker (name or phone)</label>
+        <input id="workerSearch" placeholder="Type name or phone...">
+
+        <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+          <select id="workerSelect" style="flex:1;padding:10px;border-radius:8px">
+            <option value="">— Select existing worker —</option>
+          </select>
+          <button id="newWorkerBtn" class="primary" style="padding:8px 12px">New</button>
+        </div>
+
+        <div id="workerForm" style="margin-top:12px;display:none">
+          <label>Worker Name</label>
+          <input id="wName">
+
+          <label>Phone (optional)</label>
+          <input id="wPhone">
+
+          <label>Daily Wage (₹)</label>
+          <input id="wDaily" type="number" min="0">
+
+          <div style="display:flex;gap:10px;margin-top:12px">
+            <button id="saveWorker" class="primary" style="flex:1">Save Worker</button>
+            <button id="cancelWorker" class="mini-grey" style="flex:1;border-radius:8px">Cancel</button>
+          </div>
+        </div>
+
+        <hr style="margin:14px 0">
+
+        <div class="h1">Workers this month</div>
+        <div id="workersList" style="margin-top:10px"></div>
+
+        <hr style="margin:14px 0">
+
+        <!-- BULK ATTENDANCE -->
+        <div class="h1">Bulk Attendance</div>
+        <div class="bulk-card" id="bulkCard">
+          <div class="bulk-controls">
+            <div class="small">Quick set:</div>
+            <button id="setAllFull" class="mini-grey">Full</button>
+            <button id="setAllHalf" class="mini-grey">Half</button>
+            <button id="setAllAbsent" class="mini-grey">Absent</button>
+            <div style="flex:1"></div>
+            <label style="font-size:13px" class="small">Date:</label>
+            <input id="bulkDate" type="date" style="width:160px;">
+          </div>
+
+          <div id="bulkList" style="max-height:260px;overflow:auto;padding-top:6px"></div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="saveBulkBtn" class="primary" style="flex:1">Save Attendance</button>
+            <button id="clearBulkBtn" class="mini-grey" style="flex:1">Clear</button>
+          </div>
+          <div id="bulkStatus" class="small" style="margin-top:8px;color:var(--muted)"></div>
+        </div>
+
+        <hr style="margin:14px 0">
+
+        <!-- QUICK EXPENSE -->
+        <div class="h1">Quick Expense (without opening profile)</div>
+        <label>Select worker</label>
+        <select id="quickWorker"><option value="">— select worker —</option></select>
+        <div class="row">
+          <div class="col">
+            <label>Amount (₹)</label>
+            <input id="quickAmt" type="number" min="0">
+          </div>
+          <div class="col">
+            <label>Date</label>
+            <input id="quickDate" type="date">
+          </div>
+        </div>
+        <label>Note</label>
+        <input id="quickNote" placeholder="e.g. advance / transport">
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="quickAddBtn" class="primary" style="flex:1">Add Expense</button>
+          <button id="quickClearBtn" class="mini-grey" style="flex:1">Clear</button>
+        </div>
+        <div id="quickStatus" class="small" style="margin-top:8px;color:var(--muted)"></div>
+
+      </div>
+
+      <!-- RIGHT: Selected worker details -->
+      <div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="h1" id="selectedTitle">Select a worker</div>
+              <div class="small" id="selectedMeta"></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button id="deleteWorkerBtn" class="mini-danger" style="display:none">Delete Worker</button>
+              <button id="refreshBtn" class="mini-grey">Refresh</button>
+            </div>
+          </div>
+
+          <div id="workerBody" style="margin-top:12px;display:none">
+            <div class="summary">
+              <div class="sum-card">
+                <div class="sum-title">Total Days Present</div>
+                <div class="sum-value" id="totalPresent">0</div>
+              </div>
+              <div class="sum-card">
+                <div class="sum-title">Total Kharcha (Expenses)</div>
+                <div class="sum-value" id="totalExpenses">₹ 0</div>
+              </div>
+              <div class="sum-card">
+                <div class="sum-title">Estimated Salary</div>
+                <div class="sum-value" id="estSalary">₹ 0</div>
+              </div>
+            </div>
+
+            <hr style="margin:12px 0">
+
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="flex:1">
+                <div class="small">Attendance (click day to toggle P/H/A)</div>
+                <div id="calendar" class="calendar"></div>
+              </div>
+              <div style="width:360px">
+                <div class="small">Add Expense / Kharcha</div>
+                <label>Amount (₹)</label>
+                <input id="expAmount" type="number" min="0">
+                <label>Notes</label>
+                <input id="expNotes" placeholder="reason (e.g. advance / transport)">
+                <label>Date</label>
+                <input id="expDate" type="date">
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button id="addExpenseBtn" class="primary" style="flex:1">Add Expense</button>
+                  <button id="clearExpenseBtn" class="mini-grey" style="flex:1">Clear</button>
+                </div>
+
+                <hr style="margin:12px 0">
+
+                <div class="small">Expenses History</div>
+                <table id="expensesTable"><thead><tr><th>Amt</th><th>Date</th><th>Notes</th><th></th></tr></thead>
+                <tbody id="expensesBody"><tr><td colspan="4" class="small">No expenses yet.</td></tr></tbody></table>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FIREBASE + LOGIC -->
+  <script type="module">
+    // Firebase modular imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore, collection, doc, setDoc, addDoc, getDocs, getDoc,
+      query, where, orderBy, updateDoc, deleteDoc, serverTimestamp, limit
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // ---------- FIREBASE CONFIG (use your own if needed) ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
+      authDomain: "modernbakery-08.firebaseapp.com",
+      projectId: "modernbakery-08",
+      storageBucket: "modernbakery-08.appspot.com",
+      messagingSenderId: "551391878340",
+      appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // DOM
+    const userEmail = document.getElementById("userEmail");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const monthTitle = document.getElementById("monthTitle");
+    const prevMonth = document.getElementById("prevMonth");
+    const nextMonth = document.getElementById("nextMonth");
+    const todayMonth = document.getElementById("todayMonth");
+
+    const workerSearch = document.getElementById("workerSearch");
+    const workerSelect = document.getElementById("workerSelect");
+    const newWorkerBtn = document.getElementById("newWorkerBtn");
+    const workerForm = document.getElementById("workerForm");
+    const wName = document.getElementById("wName");
+    const wPhone = document.getElementById("wPhone");
+    const wDaily = document.getElementById("wDaily");
+    const saveWorker = document.getElementById("saveWorker");
+    const cancelWorker = document.getElementById("cancelWorker");
+    const workersList = document.getElementById("workersList");
+
+    const selectedTitle = document.getElementById("selectedTitle");
+    const selectedMeta = document.getElementById("selectedMeta");
+    const deleteWorkerBtn = document.getElementById("deleteWorkerBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    const workerBody = document.getElementById("workerBody");
+    const calendarEl = document.getElementById("calendar");
+    const totalPresent = document.getElementById("totalPresent");
+    const totalExpenses = document.getElementById("totalExpenses");
+    const estSalary = document.getElementById("estSalary");
+
+    const expAmount = document.getElementById("expAmount");
+    const expNotes = document.getElementById("expNotes");
+    const expDate = document.getElementById("expDate");
+    const addExpenseBtn = document.getElementById("addExpenseBtn");
+    const clearExpenseBtn = document.getElementById("clearExpenseBtn");
+    const expensesBody = document.getElementById("expensesBody");
+
+    // Bulk UI
+    const bulkList = document.getElementById("bulkList");
+    const bulkDate = document.getElementById("bulkDate");
+    const setAllFull = document.getElementById("setAllFull");
+    const setAllHalf = document.getElementById("setAllHalf");
+    const setAllAbsent = document.getElementById("setAllAbsent");
+    const saveBulkBtn = document.getElementById("saveBulkBtn");
+    const clearBulkBtn = document.getElementById("clearBulkBtn");
+    const bulkStatus = document.getElementById("bulkStatus");
+
+    // Quick expense
+    const quickWorker = document.getElementById("quickWorker");
+    const quickAmt = document.getElementById("quickAmt");
+    const quickDate = document.getElementById("quickDate");
+    const quickNote = document.getElementById("quickNote");
+    const quickAddBtn = document.getElementById("quickAddBtn");
+    const quickClearBtn = document.getElementById("quickClearBtn");
+    const quickStatus = document.getElementById("quickStatus");
+
+    // State
+    let current = new Date(); // will hold the month being viewed
+    let YEAR, MONTH_NAME, MONTH_INDEX, DAYS_IN_MONTH;
+    let selectedWorkerId = null;
+    let selectedWorkerData = null;
+    let workersCache = []; // [{id, data}...]
+
+    // Utility
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    function setCurrentFromDate(d){
+      current = new Date(d.getFullYear(), d.getMonth(), 1);
+      YEAR = String(current.getFullYear());
+      MONTH_INDEX = current.getMonth();
+      MONTH_NAME = monthNames[MONTH_INDEX];
+      DAYS_IN_MONTH = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
+      monthTitle.innerText = `${MONTH_NAME} ${YEAR}`;
+      // default bulk date to today (in ISO)
+      const todayISO = new Date();
+      const iso = `${todayISO.getFullYear()}-${String(todayISO.getMonth()+1).padStart(2,'0')}-${String(todayISO.getDate()).padStart(2,'0')}`;
+      bulkDate.value = iso;
+    }
+    setCurrentFromDate(new Date()); // initial
+
+    // Auth check
+    onAuthStateChanged(auth, (user)=>{
+      if(!user){ window.location.href = "index.html"; return; }
+      userEmail.innerText = user.email || user.displayName || "Admin";
+      // initial load
+      loadWorkersList();
+    });
+    logoutBtn.addEventListener("click", ()=> signOut(auth).then(()=> location.href="index.html"));
+
+    // Month navigation
+    prevMonth.addEventListener("click", ()=> { current.setMonth(current.getMonth()-1); setCurrentFromDate(current); resetSelectionAndReload(); });
+    nextMonth.addEventListener("click", ()=> { current.setMonth(current.getMonth()+1); setCurrentFromDate(current); resetSelectionAndReload(); });
+    todayMonth.addEventListener("click", ()=> { setCurrentFromDate(new Date()); resetSelectionAndReload(); });
+
+    function resetSelectionAndReload(){
+      selectedWorkerId = null; selectedWorkerData = null;
+      selectedTitle.innerText = "Select a worker"; selectedMeta.innerText = "";
+      workerBody.style.display = "none"; deleteWorkerBtn.style.display="none";
+      clearWorkerSelectionUI();
+      loadWorkersList();
+      renderBulkList(); // rebuild bulk UI
+      populateQuickWorkers();
+    }
+
+    // Load workers list for current month
+    async function loadWorkersList(){
+      workersList.innerHTML = "<div class='small'>Loading...</div>";
+      workerSelect.innerHTML = `<option value="">— Select existing worker —</option>`;
+      quickWorker.innerHTML = `<option value="">— select worker —</option>`;
+      workersCache = [];
+      try {
+        const col = collection(db, "workers", YEAR, MONTH_NAME); // collection path: workers/YEAR/MONTH_NAME
+        const snap = await getDocs(query(col, orderBy("name","asc")));
+        workersList.innerHTML = "";
+        snap.forEach(docSnap=>{
+          const id = docSnap.id; const d = docSnap.data();
+          workersCache.push({id, data:d});
+          // add to select
+          const opt = document.createElement("option");
+          opt.value = id;
+          opt.innerText = `${d.name} ${d.phone ? "• "+d.phone : ""}`;
+          workerSelect.appendChild(opt);
+          // quick worker dropdown
+          const opt2 = opt.cloneNode(true);
+          quickWorker.appendChild(opt2);
+          // add to list UI
+          const div = document.createElement("div");
+          div.className = "worker-row";
+          div.innerHTML = `<div><div class="worker-name">${d.name}</div><div class="small">${d.phone||""}</div></div>
+                           <div style="display:flex;gap:8px">
+                             <button class="mini-grey" onclick="openWorker('${id}')">Open</button>
+                           </div>`;
+          workersList.appendChild(div);
+        });
+        if(snap.empty){
+          workersList.innerHTML = `<div class="small">No workers added for ${MONTH_NAME} ${YEAR}. Add using 'New' button.</div>`;
+        }
+        renderBulkList(); // rebuild bulk UI
+      } catch(e){
+        console.error(e);
+        workersList.innerHTML = `<div class="small">Failed to load workers: ${e.message}</div>`;
+      }
+    }
+
+    // populate quick worker dropdown (used after loads)
+    function populateQuickWorkers(){
+      quickWorker.innerHTML = `<option value="">— select worker —</option>`;
+      workersCache.forEach(w=>{
+        const opt = document.createElement("option");
+        opt.value = w.id;
+        opt.innerText = `${w.data.name} ${w.data.phone ? "• "+w.data.phone : ""}`;
+        quickWorker.appendChild(opt);
+      });
+    }
+
+    // search small helper
+    workerSearch.addEventListener("input", async (e) => {
+      const txt = e.target.value.trim();
+      if(!txt){ workerSelect.value=""; return; }
+      // simple local search using cache
+      workerSelect.innerHTML = `<option value="">— Select —</option>`;
+      workersCache.filter(w => (w.data.name || "").toLowerCase().includes(txt.toLowerCase()) || (w.data.phone||"").includes(txt))
+        .forEach(w=>{
+          const opt = document.createElement("option");
+          opt.value = w.id;
+          opt.innerText = `${w.data.name} ${w.data.phone ? "• "+w.data.phone : ""}`;
+          workerSelect.appendChild(opt);
+        });
+    });
+
+    // New worker UI
+    newWorkerBtn.addEventListener("click", ()=> {
+      workerForm.style.display = "block";
+      wName.value = workerSearch.value || "";
+      wPhone.value = ""; wDaily.value = "";
+    });
+    cancelWorker.addEventListener("click", ()=> { workerForm.style.display = "none"; wName.value=""; wPhone.value=""; wDaily.value=""; });
+
+    // Save worker (create doc inside workers/YEAR/MONTH_NAME)
+    saveWorker.addEventListener("click", async ()=>{
+      const name = wName.value.trim();
+      if(!name) return alert("Enter worker name");
+      const phone = wPhone.value.trim();
+      const daily = Number(wDaily.value || 0);
+
+      try {
+        const col = collection(db, "workers", YEAR, MONTH_NAME);
+        const newDocRef = doc(col);
+        await setDoc(newDocRef, {
+          name,
+          nameLower: name.toLowerCase(),
+          phone: phone || null,
+          dailyWage: daily || 0,
+          createdAt: serverTimestamp()
+        });
+        workerForm.style.display = "none";
+        wName.value = ""; wPhone.value = ""; wDaily.value = "";
+        await loadWorkersList();
+        openWorker(newDocRef.id);
+      } catch(e){
+        alert("Save failed: "+e.message);
+      }
+    });
+
+    // select from dropdown
+    workerSelect.addEventListener("change", ()=> {
+      if(workerSelect.value) openWorker(workerSelect.value);
+    });
+
+    // open worker by id
+    window.openWorker = async function(id){
+      selectedWorkerId = id;
+      try {
+        const docRef = doc(db, "workers", YEAR, MONTH_NAME, id);
+        const snap = await getDoc(docRef);
+        if(!snap.exists()){
+          alert("Worker not found.");
+          return;
+        }
+        selectedWorkerData = snap.data();
+        selectedTitle.innerText = selectedWorkerData.name;
+        selectedMeta.innerText = `Phone: ${selectedWorkerData.phone||"-"} • Daily ₹ ${selectedWorkerData.dailyWage||0}`;
+        deleteWorkerBtn.style.display = "inline-block";
+        workerBody.style.display = "block";
+        deleteWorkerBtn.onclick = ()=> confirmDeleteWorker(id);
+        await loadWorkerMonthData(id);
+      } catch(e){
+        console.error(e);
+        alert("Failed to open worker: "+e.message);
+      }
+    };
+
+    // Delete worker (and its subcollections)
+    async function confirmDeleteWorker(id){
+      if(!confirm("Delete this worker and ALL its records for this month?")) return;
+      try {
+        // delete attendance docs
+        const attCol = collection(db, "workers", YEAR, MONTH_NAME, id, "attendance");
+        const attSnap = await getDocs(attCol);
+        for(const a of attSnap.docs) await deleteDoc(doc(db, "workers", YEAR, MONTH_NAME, id, "attendance", a.id));
+
+        // delete expenses docs
+        const expCol = collection(db, "workers", YEAR, MONTH_NAME, id, "expenses");
+        const expSnap = await getDocs(expCol);
+        for(const e of expSnap.docs) await deleteDoc(doc(db, "workers", YEAR, MONTH_NAME, id, "expenses", e.id));
+
+        // delete worker doc
+        await deleteDoc(doc(db, "workers", YEAR, MONTH_NAME, id));
+
+        alert("Worker deleted.");
+        resetSelectionAndReload();
+      } catch(e){
+        console.error(e);
+        alert("Delete failed: "+e.message);
+      }
+    }
+
+    // refresh button
+    refreshBtn.addEventListener("click", ()=> { if(selectedWorkerId) loadWorkerMonthData(selectedWorkerId); });
+
+    // load a worker's attendance & expenses for current month
+    async function loadWorkerMonthData(workerId){
+      // 1) attendance map
+      const attCol = collection(db, "workers", YEAR, MONTH_NAME, workerId, "attendance");
+      const attSnap = await getDocs(attCol);
+      const attendance = {};
+      attSnap.forEach(d=> {
+        attendance[d.id] = d.data().status; // using day as doc id (1..31)
+      });
+
+      // 2) expenses list
+      const expCol = collection(db, "workers", YEAR, MONTH_NAME, workerId, "expenses");
+      const expSnap = await getDocs(query(expCol, orderBy("date","desc")));
+      const expenses = [];
+      expSnap.forEach(d=> {
+        const data = d.data(); data._id = d.id; expenses.push(data);
+      });
+
+      renderCalendar(attendance);
+      renderExpenses(expenses);
+      computeSummary(attendance, expenses);
+    }
+
+    // render calendar (days)
+    function renderCalendar(attObj){
+      calendarEl.innerHTML = "";
+      for(let day=1; day<=DAYS_IN_MONTH; day++){
+        const el = document.createElement("div");
+        el.className = "day";
+        el.innerText = day;
+        const key = String(day);
+        if(attObj[key] === "P") el.classList.add("present");
+        else if(attObj[key] === "H") el.classList.add("half");
+        else if(attObj[key] === "A") el.classList.add("absent");
+        el.onclick = ()=> toggleDayStatus(selectedWorkerId, day, el);
+        calendarEl.appendChild(el);
+      }
+    }
+
+    // toggle attendance for a day (P <-> H <-> A -> none)
+    async function toggleDayStatus(workerId, day, el){
+      if(!workerId) return alert("Select worker first.");
+      const docRef = doc(db, "workers", YEAR, MONTH_NAME, workerId, "attendance", String(day));
+      try {
+        const snap = await getDoc(docRef);
+        if(!snap.exists()){
+          await setDoc(docRef, { status: "P", timestamp: serverTimestamp() });
+          el.classList.remove("absent","half"); el.classList.add("present");
+        } else {
+          const cur = snap.data().status;
+          if(cur === "P"){
+            await setDoc(docRef, { status: "H", timestamp: serverTimestamp() });
+            el.classList.remove("present","absent"); el.classList.add("half");
+          } else if(cur === "H"){
+            await setDoc(docRef, { status: "A", timestamp: serverTimestamp() });
+            el.classList.remove("present","half"); el.classList.add("absent");
+          } else {
+            // remove attendance doc
+            await deleteDoc(docRef);
+            el.classList.remove("present","half","absent");
+          }
+        }
+        await loadWorkerMonthData(workerId);
+      } catch(e){
+        console.error(e);
+        alert("Attendance update failed: "+e.message);
+      }
+    }
+
+    // add expense from profile
+    addExpenseBtn.addEventListener("click", async ()=>{
+      if(!selectedWorkerId) return alert("Select worker first");
+      const amount = Number(expAmount.value || 0);
+      if(amount <= 0) return alert("Enter valid amount");
+      const notes = expNotes.value.trim();
+      const dateVal = expDate.value ? new Date(expDate.value) : new Date();
+      try {
+        const expCol = collection(db, "workers", YEAR, MONTH_NAME, selectedWorkerId, "expenses");
+        await addDoc(expCol, {
+          amount,
+          notes: notes || null,
+          dateClient: dateVal.toISOString(),
+          date: serverTimestamp()
+        });
+        expAmount.value=""; expNotes.value=""; expDate.value="";
+        await loadWorkerMonthData(selectedWorkerId);
+      } catch(e){
+        alert("Add expense failed: "+e.message);
+      }
+    });
+    clearExpenseBtn.addEventListener("click", ()=> { expAmount.value=""; expNotes.value=""; expDate.value=""; });
+
+    // render expenses table
+    function renderExpenses(expArr){
+      if(!expArr || expArr.length === 0){
+        expensesBody.innerHTML = `<tr><td colspan="4" class="small">No expenses yet.</td></tr>`;
+        return;
+      }
+      expensesBody.innerHTML = "";
+      expArr.forEach(e=>{
+        const tr = document.createElement("tr");
+        const dateStr = e.dateClient ? new Date(e.dateClient).toLocaleDateString() : "-";
+        tr.innerHTML = `<td>₹ ${(e.amount||0).toFixed(2)}</td>
+                        <td>${dateStr}</td>
+                        <td>${e.notes||""}</td>
+                        <td><button class="mini-danger" onclick="deleteExpense('${e._id}')">Delete</button></td>`;
+        expensesBody.appendChild(tr);
+      });
+    }
+
+    // delete expense by id
+    window.deleteExpense = async function(expId){
+      if(!confirm("Delete this expense?")) return;
+      try {
+        await deleteDoc(doc(db, "workers", YEAR, MONTH_NAME, selectedWorkerId, "expenses", expId));
+        await loadWorkerMonthData(selectedWorkerId);
+      } catch(e){
+        alert("Delete failed: "+e.message);
+      }
+    };
+
+    // compute summary
+    async function computeSummary(attObj, expensesArr){
+      const presentCount = Object.values(attObj).filter(s=>s==="P").length;
+      const halfCount = Object.values(attObj).filter(s=>s==="H").length;
+      let totalExp = 0;
+      if(Array.isArray(expensesArr)) totalExp = expensesArr.reduce((s,it)=> s + Number(it.amount||0), 0);
+
+      const daily = Number(selectedWorkerData?.dailyWage || 0);
+      // count half as 0.5 day
+      const est = daily * (presentCount + 0.5*halfCount);
+
+      totalPresent.innerText = `${presentCount} (+${halfCount} half)`;
+      totalExpenses.innerText = "₹ " + totalExp.toFixed(2);
+      estSalary.innerText = "₹ " + est.toFixed(2);
+    }
+
+    // helper: clear UI selection
+    function clearWorkerSelectionUI(){
+      calendarEl.innerHTML = "";
+      expensesBody.innerHTML = `<tr><td colspan="4" class="small">No worker selected.</td></tr>`;
+      totalPresent.innerText = "0";
+      totalExpenses.innerText = "₹ 0";
+      estSalary.innerText = "₹ 0";
+    }
+    clearWorkerSelectionUI();
+
+    // -------------------- BULK ATTENDANCE LOGIC --------------------
+    function renderBulkList(){
+      bulkList.innerHTML = "";
+      if(!workersCache || workersCache.length === 0){
+        bulkList.innerHTML = `<div class="small">No workers for this month.</div>`;
+        populateQuickWorkers();
+        return;
+      }
+      // build rows with default 'none' status
+      workersCache.forEach(w=>{
+        const row = document.createElement("div");
+        row.className = "worker-att-row";
+        row.dataset.id = w.id;
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:700">${w.data.name}</div>
+            <div class="small">${w.data.phone||""}</div>
+          </div>
+          <div class="att-options">
+            <label><input type="radio" name="att_${w.id}" value="P"> Full</label>
+            <label><input type="radio" name="att_${w.id}" value="H"> Half</label>
+            <label><input type="radio" name="att_${w.id}" value="A"> Absent</label>
+            <label><input type="radio" name="att_${w.id}" value="" checked> None</label>
+          </div>
+        `;
+        bulkList.appendChild(row);
+      });
+      populateQuickWorkers();
+    }
+
+    // quick set all
+    setAllFull.addEventListener("click", ()=> setAllRadios("P"));
+    setAllHalf.addEventListener("click", ()=> setAllRadios("H"));
+    setAllAbsent.addEventListener("click", ()=> setAllRadios("A"));
+    clearBulkBtn.addEventListener("click", ()=> setAllRadios(""));
+
+    function setAllRadios(val){
+      const rows = bulkList.querySelectorAll("[data-id]");
+      rows.forEach(r=>{
+        const id = r.dataset.id;
+        const radios = document.getElementsByName("att_"+id);
+        radios.forEach(rd=>{
+          rd.checked = (rd.value === val);
+        });
+      });
+    }
+
+    // Save bulk attendance
+    saveBulkBtn.addEventListener("click", async ()=>{
+      const dateVal = bulkDate.value;
+      if(!dateVal) return alert("Select date first.");
+      // derive day of month from dateVal
+      const dt = new Date(dateVal);
+      const day = String(dt.getDate());
+      bulkStatus.innerText = "Saving...";
+      saveBulkBtn.disabled = true;
+      try {
+        const rows = bulkList.querySelectorAll("[data-id]");
+        const promises = [];
+        rows.forEach(r=>{
+          const id = r.dataset.id;
+          const radios = document.getElementsByName("att_"+id);
+          let val = "";
+          radios.forEach(rd=>{ if(rd.checked) val = rd.value; });
+          // write: if val empty -> delete doc (remove attendance for that day)
+          const docRef = doc(db, "workers", YEAR, MONTH_NAME, id, "attendance", day);
+          if(!val){
+            // try delete (if exists) - safe to ignore errors
+            promises.push(deleteDoc(docRef).catch(()=>{}));
+          } else {
+            promises.push(setDoc(docRef, { status: val, timestamp: serverTimestamp() }));
+          }
+        });
+        await Promise.all(promises);
+        bulkStatus.innerText = "Attendance saved ✔";
+        // if current selected worker included, reload its data
+        if(selectedWorkerId) await loadWorkerMonthData(selectedWorkerId);
+      } catch(e){
+        console.error(e);
+        bulkStatus.innerText = "Save failed: "+(e.message||e);
+      } finally {
+        saveBulkBtn.disabled = false;
+        setTimeout(()=> bulkStatus.innerText = "", 3000);
+      }
+    });
+
+    // -------------------- QUICK EXPENSE LOGIC --------------------
+    quickAddBtn.addEventListener("click", async ()=>{
+      const wid = quickWorker.value;
+      if(!wid) return alert("Select a worker");
+      const amt = Number(quickAmt.value || 0);
+      if(amt <= 0) return alert("Enter valid amount");
+      const note = quickNote.value.trim();
+      const dateVal = quickDate.value ? new Date(quickDate.value) : new Date();
+      quickStatus.innerText = "Saving...";
+      quickAddBtn.disabled = true;
+      try {
+        const col = collection(db, "workers", YEAR, MONTH_NAME, wid, "expenses");
+        await addDoc(col, {
+          amount: amt,
+          notes: note || null,
+          dateClient: dateVal.toISOString(),
+          date: serverTimestamp()
+        });
+        quickStatus.innerText = "Expense added ✔";
+        quickAmt.value = ""; quickNote.value = ""; quickDate.value = "";
+        // if same worker currently open, reload
+        if(selectedWorkerId === wid) await loadWorkerMonthData(wid);
+      } catch(e){
+        quickStatus.innerText = "Error: "+(e.message||e);
+      } finally {
+        quickAddBtn.disabled = false;
+        setTimeout(()=> quickStatus.innerText = "", 2500);
+      }
+    });
+    quickClearBtn.addEventListener("click", ()=> { quickWorker.value=""; quickAmt.value=""; quickNote.value=""; quickDate.value=""; quickStatus.innerText=""; });
+
+    // initial render
+    renderBulkList();
+
+    // Expose deleteExpense and openWorker to global (they're used in HTML)
+    window.deleteExpense = window.deleteExpense;
+    window.openWorker = window.openWorker;
+
+    // Update quick worker list whenever workersCache changes: already done in loadWorkersList()
+  </script>
+</body>
+</html>
