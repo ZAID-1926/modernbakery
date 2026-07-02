@@ -7,108 +7,141 @@
   <style>
     body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; display:flex; align-items:center; justify-content:center; height:100vh; }
     .box { background:#fff; padding:24px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.08); width:360px; }
-    input { width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; }
-    button { width:100%; padding:11px; background:#111; color:#fff; border:none; border-radius:6px; cursor:pointer; }
-    .links { margin-top:12px; display:flex; justify-content:space-between; font-size:14px; }
-    a { color:#111; text-decoration:none; }
-.navbar {
-    background: white;
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-.logo-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+    
+    .form-input { width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; }
+    
+    /* Wrapper for putting the checkbox inside the password field */
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    /* Adding right padding so text doesn't overlap the checkbox */
+    .password-wrapper .form-input {
+      padding-right: 125px; 
+    }
+    
+    /* Absolute positioning to place it INSIDE the input box */
+    .show-password-inside {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: #666;
+      cursor: pointer;
+      user-select: none;
+    }
+    .show-password-inside input {
+      cursor: pointer;
+      margin: 0;
+      width: 14px;
+      height: 14px;
+    }
 
-.logo-img {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-}
-
-.logo-text {
-    font-size: 22px;
-    font-weight: 600;
-    color: #333;
-}
-
-.nav-right {
-    font-size: 15px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-.logout-btn {
-    background: #ff4d4d;
-    color: white;
-    padding: 6px 14px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    border: none;
-}
-.header {
-    width: 100%;
-    padding: 10px 20px;
-    position: fixed;
-    top: 0;
-    right: 0;
-    background: #ffffff;
-    display: flex;
-    justify-content: flex-end; /* RIGHT */
-    align-items: center;
-    z-index: 999;
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
-}
-
-.logo {
-    height: 55px;
-    object-fit: contain;
-}
+    button { width:100%; padding:11px; background:#111; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:600; margin-top:10px; }
+    
+    .navbar {
+        background: white;
+        padding: 15px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .logo-img {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+    }
+    .logo-text {
+        font-size: 22px;
+        font-weight: 600;
+        color: #333;
+    }
+    .nav-right {
+        font-size: 15px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+    .logout-btn {
+        background: #ff4d4d;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        border: none;
+    }
+    .header {
+        width: 100%;
+        padding: 10px 20px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        background: #ffffff;
+        display: flex;
+        justify-content: flex-end; /* RIGHT */
+        align-items: center;
+        z-index: 999;
+        box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+    }
+    .logo {
+        height: 55px;
+        object-fit: contain;
+    }
   </style>
 </head>
 <body>
+
 <div class="header">
     <img src="logo.png" class="logo" alt="Bakery Logo">
 </div>
 
   <div class="box">
-    <h2 style="margin:0 0 12px 0; text-align:center;">Modern Bakery — Login</h2>
+    <h2 style="margin:0 0 16px 0; text-align:center;">Modern Bakery — Login</h2>
 
     <form id="loginForm">
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
+      <input type="email" id="email" class="form-input" placeholder="Email" required />
+      
+      <!-- Password Field Wrapper -->
+      <div class="password-wrapper">
+        <input type="password" id="password" class="form-input" placeholder="Password" required />
+        
+        <!-- Checkbox inside the input box -->
+        <label class="show-password-inside">
+          <input type="checkbox" id="togglePassword" />
+          
+        </label>
+      </div>
+
       <button type="submit">Login</button>
     </form>
-
-    <div class="links">
-    
-      <a href="#" id="forgotLink">Forgot Password?</a>
-    </div>
   </div>
-
 
   <!-- Firebase + Login logic -->
   <script type="module">
     // IMPORTS
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // FIREBASE CONFIG (same as your project)
+    // FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
       authDomain: "modernbakery-08.firebaseapp.com",
       projectId: "modernbakery-08",
-      storageBucket: "modernbakery-08.appspot.com",
+      storageBucket: "modernbakery-08.firebasestorage.app",
       messagingSenderId: "551391878340",
       appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
     };
@@ -117,7 +150,19 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // LOGIN
+    // TOGGLE PASSWORD VISIBILITY
+    const passwordInput = document.getElementById("password");
+    const togglePasswordCheckbox = document.getElementById("togglePassword");
+
+    togglePasswordCheckbox.addEventListener("change", function() {
+      if (this.checked) {
+        passwordInput.type = "text";
+      } else {
+        passwordInput.type = "password";
+      }
+    });
+
+    // LOGIN FUNCTIONALITY
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = document.getElementById("email").value.trim();
@@ -125,24 +170,11 @@
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        // success -> go to home
+        // Success -> Redirect to home.html
         window.location.href = "home.html";
       } catch (err) {
         alert("Login failed: " + (err.message || err));
         console.error(err);
-      }
-    });
-
-    // FORGOT
-    document.getElementById("forgotLink").addEventListener("click", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value.trim();
-      if (!email) return alert("Please type your email in the email field and then click Forgot Password.");
-      try {
-        await sendPasswordResetEmail(auth, email);
-        alert("Password reset link sent to your email.");
-      } catch (err) {
-        alert("Error: " + (err.message || err));
       }
     });
   </script>
