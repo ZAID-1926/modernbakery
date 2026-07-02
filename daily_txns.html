@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Transactions Central Ledger — Modern Bakery</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* PREVENT REDESIGN — EXACT BLUE THEME VARIABLES */
+    :root {
+      --bg: #f3f7ff;
+      --card: #ffffff;
+      --accent: #0b5ed7;
+      --accent-grad: linear-gradient(135deg, #042c6b, #0b5ed7);
+      --text: #0f1724;
+      --muted: #6b7280;
+      --success: #16a34a;
+      --danger: #ef4444;
+      --warning: #ca8a04;
+      --shadow: 0 12px 40px rgba(12,34,80,0.06);
+      --radius: 12px;
+      --border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Poppins", sans-serif; background: var(--bg); color: var(--text); padding-bottom: 60px; }
+
+    /* Match Existing Topbar Navbar Exactly */
+    .topbar { background: var(--accent-grad); color: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .topbar .title { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+    .topbar .user-info { font-size: 12px; opacity: 0.8; text-align: right; margin-right: 15px; }
+    .back-btn { background: rgba(255,255,255,0.15); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid rgba(255,255,255,0.2); transition: 0.2s; font-size: 13px; }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .wrap { max-width: 1500px; margin: 20px auto; padding: 0 16px; display: grid; gap: 20px; }
+
+    /* Prominent Business Cash Card Design */
+    .hero-cash-card { background: linear-gradient(135deg, #021d49, #063985); color: white; border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(4,44,107,0.15); }
+    .hero-cash-card::after { content: "\f156"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -20px; bottom: -30px; font-size: 160px; opacity: 0.06; }
+    .hero-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; font-weight: 600; }
+    .hero-amount { font-size: 36px; font-weight: 700; margin: 8px 0; font-family: monospace; }
+    .hero-actions { display: flex; gap: 10px; margin-top: 10px; z-index: 2; }
+
+    /* Grid Layouts for Metrics */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .card { background: var(--card); padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; }
+    .card-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; }
+    .card-value { font-size: 20px; font-weight: 700; margin-top: 4px; color: #062b63; font-family: monospace; }
+    .card-value.income { color: var(--success); }
+    .card-value.expense { color: var(--danger); }
+
+    /* Live Statement Formula Banner */
+    .live-statement-banner { background: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 16px; border-radius: 8px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; color: #0369a1; gap: 10px; }
+    .statement-formula { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+    /* Main Section Splits */
+    .dashboard-split { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 1024px) { .dashboard-split { grid-template-columns: 2fr 1fr; } }
+
+    /* Forms & Controls Box Layout */
+    .control-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: #fff; padding: 16px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+    .search-input-wrap { flex: 1; min-width: 250px; position: relative; }
+    .search-input-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .search-input-wrap input { width: 100%; padding: 10px 12px 10px 38px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; font-family: inherit; }
+    
+    .filter-item { display: flex; flex-direction: column; gap: 4px; }
+    select, input[type="date"] { padding: 9px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; outline: none; background: #fff; font-family: inherit; min-width: 130px; }
+    select:focus, input:focus { border-color: var(--accent); }
+
+    /* Compact Excel Style Grid Data Table */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: white; box-shadow: var(--shadow); }
+    table { width: 100%; border-collapse: collapse; min-width: 1100px; text-align: left; }
+    th, td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    th { background: #f8faff; color: #062b63; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; border-bottom: 2px solid var(--border); }
+    tr:hover td { background: #fafdff; }
+    
+    /* Audit Snapshot Typography */
+    .audit-trail { font-size: 11px; color: var(--muted); line-height: 1.3; }
+    
+    /* Badges */
+    .badge { padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; text-align: center; }
+    .badge-sale { background: #e0f2fe; color: #0369a1; }
+    .badge-payment { background: #dcfce7; color: #15803d; }
+    .badge-expense { background: #fee2e2; color: #b91c1c; }
+    .badge-cashin { background: #fef9c3; color: #a16207; }
+
+    /* Action Buttons */
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { opacity: 0.9; }
+    .btn-sm { padding: 4px 8px; font-size: 11px; border-radius: 4px; }
+    .btn-success { background: var(--success); }
+    .btn-danger { background: var(--danger); }
+    .btn-warning { background: var(--warning); }
+    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+    /* Chart Layout System */
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .chart-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); min-height: 260px; }
+    .chart-header { font-size: 13px; font-weight: 700; color: #062b63; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+
+    /* Monthly Aggregates Mini Grids */
+    .monthly-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .sub-metric { background: #f8fafc; padding: 8px; border-radius: 6px; border: 1px solid #f1f5f9; }
+    .sub-label { font-size: 11px; color: var(--muted); }
+    .sub-value { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* Modal Overlay */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+    .modal-card { background: white; border-radius: var(--radius); padding: 24px; width: 100%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+    .modal-title { font-size: 16px; font-weight: 700; color: #062b63; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); }
+    
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="title"><i class="fa-solid fa-scale-balanced"></i> Modern Bakery Ledger</div>
+    <div style="display: flex; align-items: center;">
+      <div class="user-info">
+        <div style="font-weight: 600;">Main Account Central Hub</div>
+        <div>shaikhzaid190826@gmail.com</div>
+      </div>
+      <a class="back-btn" href="daily_customers.html"><i class="fa-solid fa-circle-chevron-left"></i> Customer Grid</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    
+    <div class="hero-cash-card">
+      <div>
+        <span class="hero-title">💰 Live Rolling Business Cash Drawer Balance</span>
+        <div class="hero-amount" id="mainBusinessCash">₹ 0.00</div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-outline btn-sm" onclick="openModal('settingsModal')"><i class="fa-solid fa-sliders"></i> Configure Opening Cash</button>
+        <button class="btn btn-success btn-sm" onclick="openModal('cashInModal')"><i class="fa-solid fa-circle-plus"></i> Manual Cash In</button>
+        <button class="btn btn-danger btn-sm" onclick="openModal('expenseModal')"><i class="fa-solid fa-circle-minus"></i> Add Expense</button>
+      </div>
+    </div>
+
+    <div class="live-statement-banner">
+      <div style="font-weight:700;"><i class="fa-solid fa-calculator"></i> Real-time Balance Formula:</div>
+      <div class="statement-formula">
+        <span class="sub-metric">Opening: <b id="formulaOpening">₹0</b></span> <span>+</span>
+        <span class="sub-metric" style="color:var(--success)">Cust Payments: <b id="formulaPayments">₹0</b></span> <span>+</span>
+        <span class="sub-metric" style="color:var(--success)">Manual Cash In: <b id="formulaCashIn">₹0</b></span> <span>−</span>
+        <span class="sub-metric" style="color:var(--danger)">Expenses: <b id="formulaExpenses">₹0</b></span> <span>=</span>
+        <span class="sub-metric" style="background:var(--accent); color:white;">Closing: <b id="formulaClosing">₹0</b></span>
+      </div>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="card">
+        <div class="card-label">Today's Total Sales</div>
+        <div class="card-value" id="mSales">₹ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Today's Cash Received</div>
+        <div class="card-value income" id="mCash">₹ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Today's UPI Received</div>
+        <div class="card-value income" id="mUpi">₹ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Today's Bank Received</div>
+        <div class="card-value income" id="mBank">₹ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Today's Gross Money In</div>
+        <div class="card-value income" id="mMoneyIn">₹ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Today's Total Expenses</div>
+        <div class="card-value expense" id="mExpenses">₹ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Today's Net Cash Flow</div>
+        <div class="card-value" id="mNetFlow">₹ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Today's Net Profit</div>
+        <div class="card-value" id="mNetProfit" style="color:var(--accent);">₹ 0.00</div>
+      </div>
+      <div class="card" style="background:#fff7ed; border-color:#ffedd5;">
+        <div class="card-label" style="color:var(--warning);">Outstanding Customer Due</div>
+        <div class="card-value" id="mOutstanding" style="color:var(--warning);">₹ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Today's Closing Cash</div>
+        <div class="card-value" id="mClosingCash">₹ 0.00</div>
+      </div>
+    </div>
+
+    <div class="control-row">
+      <div class="search-input-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="ledgerSearch" placeholder="Filter by Name, Vendor, ID, Description..." oninput="filterAndRenderAll()">
+      </div>
+      <div class="filter-item">
+        <select id="datePresetFilter" onchange="handlePresetDateChange()">
+          <option value="today" selected>Today</option>
+          <option value="yesterday">Yesterday</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="custom">Custom Calendar Date</option>
+        </select>
+      </div>
+      <div class="filter-item" id="customDateWrap" style="display: none;">
+        <input type="date" id="customDateSelect" onchange="filterAndRenderAll()">
+      </div>
+      <div class="filter-item">
+        <select id="typeFilter" onchange="filterAndRenderAll()">
+          <option value="all">All Transactions</option>
+          <option value="Sale">Sales Logs Only</option>
+          <option value="Payment">Payments Only</option>
+          <option value="Expense">Expenses Only</option>
+          <option value="CashIn">Manual Cash In</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <select id="methodFilter" onchange="filterAndRenderAll()">
+          <option value="all">All Methods</option>
+          <option value="Cash">Cash</option>
+          <option value="UPI">UPI</option>
+          <option value="Bank">Bank</option>
+          <option value="Card">Card</option>
+          <option value="Mixed">Mixed</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="dashboard-split">
+      
+      <div>
+        <div class="table-wrap">
+          <table id="masterLedgerTable">
+            <thead>
+              <tr>
+                <th width="90">Date & Time</th>
+                <th width="100">Transaction Type</th>
+                <th width="180">Customer / Vendor / Category</th>
+                <th>Narrative / Description</th>
+                <th width="100" style="color:var(--success);">Cash In (+)</th>
+                <th width="100" style="color:var(--danger);">Cash Out (-)</th>
+                <th width="210">Cash Balance Rolling Tracker Audit</th>
+                <th width="90">Mode</th>
+                <th width="110" style="text-center">Manage</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerTableBody">
+              <tr><td colspan="9" style="text-align:center; color:var(--muted); padding:30px;"><i class="fa-solid fa-spinner fa-spin"></i> Compiling cross-functional real-time transactions...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        
+        <div class="card">
+          <div class="chart-header"><i class="fa-solid fa-calendar-check"></i> Monthly Cumulative Analytics</div>
+          <div class="monthly-box">
+            <div class="sub-metric"><div class="sub-label">Total Month Sales</div><div class="sub-value" id="moSales">₹0</div></div>
+            <div class="sub-metric"><div class="sub-label">Total Month Expenses</div><div class="sub-value" id="moExpenses" style="color:var(--danger)">₹0</div></div>
+            <div class="sub-metric"><div class="sub-label">Net Month Profit</div><div class="sub-value" id="moProfit" style="color:var(--success)">₹0</div></div>
+            <div class="sub-metric"><div class="sub-label">Cash Collected</div><div class="sub-value" id="moCollected">₹0</div></div>
+            <div class="sub-metric"><div class="sub-label">Daily Avg Sale</div><div class="sub-value" id="moAvgSale">₹0</div></div>
+            <div class="sub-metric"><div class="sub-label">Highest Sale Day</div><div class="sub-value" id="moHighDay">-</div></div>
+            <div class="sub-metric" style="grid-column: span 2;"><div class="sub-label">Top Client Champion</div><div class="sub-value" id="moTopCustomer">-</div></div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">Sales vs Expenses Line Matrix</div>
+            <canvas id="chartSalesExpense"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">Payment Mode Diversification</div>
+            <canvas id="chartPaymentMethods"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span><i class="fa-solid fa-gears"></i> Business Vault Baseline Settings</span>
+        <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
+      </div>
+      <form id="settingsForm" onsubmit="saveOpeningCashConfig(event)">
+        <div class="form-group">
+          <label>Permanent Base Opening Cash Balance (₹)</label>
+          <input type="number" step="0.01" id="configOpeningCash" required placeholder="e.g. 20000">
+        </div>
+        <div class="form-group">
+          <label>Accounting Configuration Setup Date</label>
+          <input type="date" id="configOpeningDate" required>
+        </div>
+        <button type="submit" class="btn btn-success" style="width:100%; justify-content:center;"><i class="fa-solid fa-floppy-disk"></i> Commit Ledger Base Balance</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="cashInModal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span><i class="fa-solid fa-circle-down" style="color:var(--success)"></i> Record Capital Manual Cash In</span>
+        <button class="modal-close" onclick="closeModal('cashInModal')">&times;</button>
+      </div>
+      <form id="cashInForm" onsubmit="submitManualCashIn(event)">
+        <input type="hidden" id="cashInEditId" value="">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Amount Transferred (₹)</label>
+            <input type="number" step="0.01" id="ciAmount" required placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Payment Method Category</label>
+            <select id="ciMethod" required>
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank">Bank</option>
+              <option value="Card">Card</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Inflow Classification Type</label>
+          <select id="ciCategory" required>
+            <option value="Owner Investment">Owner Investment</option>
+            <option value="Loan Received">Loan Received</option>
+            <option value="Bank Withdrawal">Bank Withdrawal (Cash In Drawer)</option>
+            <option value="Previous Balance Added">Previous Balance Added</option>
+            <option value="Refund Received">Refund Received</option>
+            <option value="Other Income">Other Income</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Description Narrative Notes</label>
+          <input type="text" id="ciDescription" placeholder="Provide tracking reference context...">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="ciDate" required>
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <input type="time" id="ciTime" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-success" style="width:100%; justify-content:center;"><i class="fa-solid fa-square-check"></i> Post Capital Transaction</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="expenseModal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span><i class="fa-solid fa-circle-up" style="color:var(--danger)"></i> Log Business Outflow Expense</span>
+        <button class="modal-close" onclick="closeModal('expenseModal')">&times;</button>
+      </div>
+      <form id="expenseForm" onsubmit="submitExpenseForm(event)">
+        <input type="hidden" id="expenseEditId" value="">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Amount Disbursed (₹)</label>
+            <input type="number" step="0.01" id="expAmount" required placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Payment Mode Method</label>
+            <select id="expMethod" required>
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank">Bank</option>
+              <option value="Card">Card</option>
+              <option value="Mixed">Mixed</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Expense Classification Type</label>
+          <select id="expCategory" required>
+            <option value="Raw Material">Raw Material</option>
+            <option value="Packaging">Packaging</option>
+            <option value="Transport">Transport</option>
+            <option value="Fuel">Fuel</option>
+            <option value="Salary">Salary</option>
+            <option value="Electricity">Electricity</option>
+            <option value="Rent">Rent</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Tea">Tea</option>
+            <option value="Office Expense">Office Expense</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Vendor / Recipient Title</label>
+          <input type="text" id="expVendor" placeholder="e.g. Flour Mill Supplier, Electric Board...">
+        </div>
+        <div class="form-group">
+          <label>Detailed Description</label>
+          <input type="text" id="expDescription" placeholder="Itemization tracking specifics...">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="expDate" required>
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <input type="time" id="expTime" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-danger" style="width:100%; justify-content:center;"><i class="fa-solid fa-receipt"></i> Post Expenditure Entry</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="editCustomerTxnModal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span><i class="fa-solid fa-user-pen"></i> Alter Primary Sales/Payment Stream</span>
+        <button class="modal-close" onclick="closeModal('editCustomerTxnModal')">&times;</button>
+      </div>
+      <form id="editCustomerTxnForm" onsubmit="submitCustomerTxnEdit(event)">
+        <input type="hidden" id="custTxnId" value="">
+        <div class="form-group">
+          <label>Customer Name</label>
+          <input type="text" id="ctName" readonly style="background:#f1f5f9; color:var(--muted)">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Sale Bill Total (₹)</label>
+            <input type="number" step="0.01" id="ctTodayTotal" required>
+          </div>
+          <div class="form-group">
+            <label>Payment Received (₹)</label>
+            <input type="number" step="0.01" id="ctPayment" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Payment Mode Method</label>
+          <select id="ctMethod" required>
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Bank">Bank</option>
+            <option value="Card">Card</option>
+            <option value="Mixed">Mixed</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;"><i class="fa-solid fa-square-poll-horizontal"></i> Save Customer Revision</button>
+      </form>
+    </div>
+  </div>
+
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, addDoc, getDocs, getDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    // Unmodified Verified Database Connection Profile Token Parameters
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
+      authDomain: "modernbakery-08.firebaseapp.com",
+      projectId: "modernbakery-08",
+      storageBucket: "modernbakery-08.firebasestorage.app",
+      messagingSenderId: "551391878340",
+      appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Global Registry Arrays containing System Records
+    let baseSettings = { opening_cash: 0, opening_date: "2026-01-01" };
+    let rawDailyEntries = [];
+    let rawExpenses = [];
+    let rawManualCashIn = [];
+    let processedChronologicalLedger = [];
+    
+    // Chart References
+    let chartInstanceSE = null;
+    let chartInstancePM = null;
+
+    // Set Defaults Form Controls Timestamps
+    const isoDateString = new Date().toISOString().split('T')[0];
+    const timeString = new Date().toTimeString().slice(0,5);
+    
+    function resetFormDefaults() {
+      document.getElementById('ciDate').value = isoDateString;
+      document.getElementById('ciTime').value = timeString;
+      document.getElementById('expDate').value = isoDateString;
+      document.getElementById('expTime').value = timeString;
+    }
+
+    // Modal Visibility Utilities
+    window.openModal = function(id) {
+      document.getElementById(id).style.display = 'flex';
+      if(id==='settingsModal') {
+        document.getElementById('configOpeningCash').value = baseSettings.opening_cash;
+        document.getElementById('configOpeningDate').value = baseSettings.opening_date;
+      }
+    };
+    window.closeModal = function(id) {
+      document.getElementById(id).style.display = 'none';
+      if(id === 'cashInModal') {
+        document.getElementById('cashInForm').reset();
+        document.getElementById('cashInEditId').value = "";
+      }
+      if(id === 'expenseModal') {
+        document.getElementById('expenseForm').reset();
+        document.getElementById('expenseEditId').value = "";
+      }
+      resetFormDefaults();
+    };
+
+    window.handlePresetDateChange = function() {
+      const selection = document.getElementById('datePresetFilter').value;
+      const customWrap = document.getElementById('customDateWrap');
+      if(selection === 'custom') {
+        customWrap.style.display = 'inline-block';
+        document.getElementById('customDateSelect').value = isoDateString;
+      } else {
+        customWrap.style.display = 'none';
+      }
+      filterAndRenderAll();
+    };
+
+    // ========================================================
+    // BACKEND CORES: READ ENGINE DEPLOYMENTS
+    // ========================================================
+    
+    function initializeRealtimeStreams() {
+      // Stream 1: Listen to base account configuration
+      onSnapshot(doc(db, "accounting_settings", "cash_config"), (docSnap) => {
+        if(docSnap.exists()) {
+          baseSettings = docSnap.data();
+        } else {
+          baseSettings = { opening_cash: 0, opening_date: "2026-01-01" };
+        }
+        evaluateAndCompileMasterLedger();
+      });
+
+      // Stream 2: Listen to daily customer items entries
+      onSnapshot(collection(db, "daily_entries"), (snapshot) => {
+        rawDailyEntries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        evaluateAndCompileMasterLedger();
+        updateOutstandingClientDues();
+      });
+
+      // Stream 3: Listen to standalone expense outlays
+      onSnapshot(collection(db, "expenses"), (snapshot) => {
+        rawExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        evaluateAndCompileMasterLedger();
+      });
+
+      // Stream 4: Listen to capital manual cash input records
+      onSnapshot(collection(db, "manual_cash_in"), (snapshot) => {
+        rawManualCashIn = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        evaluateAndCompileMasterLedger();
+      });
+    }
+
+    async function updateOutstandingClientDues() {
+      try {
+        const snap = await getDocs(collection(db, "customers"));
+        let totalDue = 0;
+        snap.forEach(d => { totalDue += parseFloat(d.data().balance || 0); });
+        document.getElementById('mOutstanding').innerText = `重量 ₹${totalDue.toFixed(2)}`;
+      } catch(e) { console.error("Outstanding calculation execution failed", e); }
+    }
+
+    // ========================================================
+    // CRITICAL LEDGER ARCHITECTURE AUTOMATION REGISTRY
+    // ========================================================
+    function evaluateAndCompileMasterLedger() {
+      let unifiedRegistry = [];
+
+      // Loop and format stream arrays into canonical ledger items
+      rawDailyEntries.forEach(item => {
+        const timestampRaw = item.date + " " + (item.time || "00:00");
+        const billingAmount = parseFloat(item.todayTotal || 0);
+        const cashInbound = parseFloat(item.payment || 0);
+        const payMethod = item.paymentMethod || "Cash";
+
+        if (billingAmount > 0) {
+          unifiedRegistry.push({
+            id: item.id,
+            originCollection: "daily_entries",
+            timestamp: timestampRaw,
+            date: item.date,
+            time: item.time || "00:00",
+            type: "Sale",
+            entity: item.customerName || "Walk-In Customer",
+            narrative: `Product Sales Inflow [${item.type || "Invoice"}]`,
+            cashIn: cashInbound,
+            cashOut: 0,
+            saleBill: billingAmount,
+            method: payMethod,
+            rawObj: item
+          });
+        } else if (cashInbound > 0) {
+          unifiedRegistry.push({
+            id: item.id,
+            originCollection: "daily_entries",
+            timestamp: timestampRaw,
+            date: item.date,
+            time: item.time || "00:00",
+            type: "Payment",
+            entity: item.customerName || "Customer",
+            narrative: "Customer Standalone Account Settlement Payment Received",
+            cashIn: cashInbound,
+            cashOut: 0,
+            saleBill: 0,
+            method: payMethod,
+            rawObj: item
+          });
+        }
+      });
+
+      rawExpenses.forEach(item => {
+        const timestampRaw = item.date + " " + (item.time || "12:00");
+        unifiedRegistry.push({
+          id: item.id,
+          originCollection: "expenses",
+          timestamp: timestampRaw,
+          date: item.date,
+          time: item.time || "12:00",
+          type: "Expense",
+          entity: `${item.category} → ${item.vendor || 'General Vendor'}`,
+          narrative: item.description || "Business Operation Resource Cost Discharge",
+          cashIn: 0,
+          cashOut: parseFloat(item.amount || 0),
+          saleBill: 0,
+          method: item.method || "Cash",
+          rawObj: item
+        });
+      });
+
+      rawManualCashIn.forEach(item => {
+        const timestampRaw = item.date + " " + (item.time || "12:00");
+        unifiedRegistry.push({
+          id: item.id,
+          originCollection: "manual_cash_in",
+          timestamp: timestampRaw,
+          date: item.date,
+          time: item.time || "12:00",
+          type: "CashIn",
+          entity: item.category || "Capital Investment",
+          narrative: item.description || "External Non-Sale Funds Addition Drawer",
+          cashIn: parseFloat(item.amount || 0),
+          cashOut: 0,
+          saleBill: 0,
+          method: item.method || "Cash",
+          rawObj: item
+        });
+      });
+
+      // Chronological Ascending Sort for accurate audit trail calculations
+      unifiedRegistry.sort((alpha, beta) => {
+        if(alpha.date !== beta.date) return alpha.date.localeCompare(beta.date);
+        return alpha.time.localeCompare(beta.time);
+      });
+
+      // Sequence Audit Trails dynamically from baseline config cash metrics
+      let ongoingCashState = parseFloat(baseSettings.opening_cash || 0);
+      
+      processedChronologicalLedger = unifiedRegistry.map(item => {
+        let prevBal = ongoingCashState;
+        
+        // Modulate cash state based on accounting framework variables
+        ongoingCashState += (item.cashIn - item.cashOut);
+        
+        return {
+          ...item,
+          previousCashState: prevBal,
+          updatedCashState: ongoingCashState
+        };
+      });
+
+      // Update Prominent Permanent Live Cash Deck Element Immediately
+      document.getElementById('mainBusinessCash').innerText = `₹ ${ongoingCashState.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+      filterAndRenderAll();
+    }
+
+    // ========================================================
+    // ANALYTICAL AND QUERY RENDER ENGINES
+    // ========================================================
+    window.filterAndRenderAll = function() {
+      const searchKey = document.getElementById('ledgerSearch').value.toLowerCase();
+      const presetType = document.getElementById('typeFilter').value;
+      const presetMethod = document.getElementById('methodFilter').value;
+      const dateRangeMode = document.getElementById('datePresetFilter').value;
+      const targetCustomDate = document.getElementById('customDateSelect').value;
+
+      // Extract filter date parameters bounds
+      let filterStartDate = isoDateString;
+      let filterEndDate = isoDateString;
+
+      if(dateRangeMode === 'yesterday') {
+        const yesterdayObj = new Date();
+        yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+        const yString = yesterdayObj.toISOString().split('T')[0];
+        filterStartDate = yString; filterEndDate = yString;
+      } else if (dateRangeMode === 'week') {
+        const curr = new Date();
+        const first = curr.getDate() - curr.getDay(); 
+        filterStartDate = new Date(curr.setDate(first)).toISOString().split('T')[0];
+        filterEndDate = isoDateString;
+      } else if (dateRangeMode === 'month') {
+        filterStartDate = isoDateString.slice(0,8) + "01";
+        filterEndDate = isoDateString;
+      } else if (dateRangeMode === 'custom') {
+        filterStartDate = targetCustomDate;
+        filterEndDate = targetCustomDate;
+      }
+
+      // 1. Structural metrics calculations context variables (Specific to Selected Filter Scope Window)
+      let metrics = { sales:0, cashRec:0, upiRec:0, bankRec:0, moneyIn:0, expenses:0, netFlow:0, netProfit:0, opening:0, closing:0 };
+      
+      // Compute Baseline Opening for filter frame scope
+      if(processedChronologicalLedger.length > 0) {
+        const itemsBeforeScope = processedChronologicalLedger.filter(i => i.date < filterStartDate);
+        metrics.opening = itemsBeforeScope.length > 0 ? itemsBeforeScope[itemsBeforeScope.length - 1].updatedCashState : parseFloat(baseSettings.opening_cash || 0);
+      } else {
+        metrics.opening = parseFloat(baseSettings.opening_cash || 0);
+      }
+
+      // Filter rows dynamically across all matrices
+      let subsetFilteredRows = processedChronologicalLedger.filter(row => {
+        // Evaluate chronological bounds range constraints
+        if (row.date < filterStartDate || row.date > filterEndDate) return false;
+        
+        // Match Search Query terms Lookups
+        if(searchKey) {
+          const matchTarget = (row.entity + row.narrative + row.id + row.method).toLowerCase();
+          if(!matchTarget.includes(searchKey)) return false;
+        }
+
+        // Handle Type Category Switches
+        if(presetType !== 'all' && row.type !== presetType) return false;
+
+        // Filter by Payment Mode Method
+        if(presetMethod !== 'all' && row.method !== presetMethod) return false;
+
+        return true;
+      });
+
+      // Accumulate context stats values metrics for the active frame context scope window
+      subsetFilteredRows.forEach(row => {
+        if(row.type === 'Sale') metrics.sales += row.saleBill;
+        if(row.type === 'Sale' || row.type === 'Payment' || row.type === 'CashIn') {
+          metrics.moneyIn += row.cashIn;
+          if(row.method === 'Cash') metrics.cashRec += row.cashIn;
+          if(row.method === 'UPI') metrics.upiRec += row.cashIn;
+          if(row.method === 'Bank') metrics.bankRec += row.cashIn;
+        }
+        if(row.type === 'Expense') metrics.expenses += row.cashOut;
+      });
+
+      metrics.netFlow = metrics.moneyIn - metrics.expenses;
+      metrics.netProfit = metrics.sales - metrics.expenses;
+      metrics.closing = metrics.opening + metrics.moneyIn - metrics.expenses;
+
+      // Update Screen Document elements values metrics UI
+      document.getElementById('mSales').innerText = `₹ ${metrics.sales.toFixed(2)}`;
+      document.getElementById('mCash').innerText = `₹ ${metrics.cashRec.toFixed(2)}`;
+      document.getElementById('mUpi').innerText = `₹ ${metrics.upiRec.toFixed(2)}`;
+      document.getElementById('mBank').innerText = `₹ ${metrics.bankRec.toFixed(2)}`;
+      document.getElementById('mMoneyIn').innerText = `₹ ${metrics.moneyIn.toFixed(2)}`;
+      document.getElementById('mExpenses').innerText = `₹ ${metrics.expenses.toFixed(2)}`;
+      document.getElementById('mNetFlow').innerText = `₹ ${metrics.netFlow.toFixed(2)}`;
+      document.getElementById('mNetProfit').innerText = `₹ ${metrics.netProfit.toFixed(2)}`;
+      document.getElementById('mClosingCash').innerText = `₹ ${metrics.closing.toFixed(2)}`;
+
+      // Update Live Formula Equation Banner Values
+      document.getElementById('formulaOpening').innerText = `₹${metrics.opening.toFixed(0)}`;
+      document.getElementById('formulaPayments').innerText = `₹${metrics.moneyIn.toFixed(0)}`;
+      document.getElementById('formulaCashIn').innerText = `₹${rawManualCashIn.filter(c=>c.date>=filterStartDate && c.date<=filterEndDate).reduce((s,c)=>s+parseFloat(c.amount||0),0).toFixed(0)}`;
+      document.getElementById('formulaExpenses').innerText = `₹${metrics.expenses.toFixed(0)}`;
+      document.getElementById('formulaClosing').innerText = `₹${metrics.closing.toFixed(0)}`;
+
+      // Render Primary Data Table Grid rows reversed order (Newest first)
+      const renderTableRows = [...subsetFilteredRows].reverse();
+      const tbody = document.getElementById('ledgerTableBody');
+      
+      if(renderTableRows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--muted); padding:20px;">No operational ledger logs located inside filter parameter scopes.</td></tr>`;
+      } else {
+        tbody.innerHTML = renderTableRows.map(row => {
+          const timeFormatted = new Date(row.date + "T" + row.time).toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) + " " + row.time;
+          return `
+            <tr>
+              <td style="font-size:11px; font-weight:500;">${timeFormatted}</td>
+              <td><span class="badge badge-${row.type.toLowerCase()}">${row.type === 'CashIn' ? 'Manual In' : row.type}</span></td>
+              <td style="font-weight:600; color:#062b63;">${row.entity}</td>
+              <td style="font-size:12px; color:var(--muted);">${row.narrative}</td>
+              <td style="color:var(--success); font-weight:700;">${row.cashIn > 0 ? '₹'+row.cashIn.toFixed(2) : '-'}</td>
+              <td style="color:var(--danger); font-weight:700;">${row.cashOut > 0 ? '₹'+row.cashOut.toFixed(2) : '-'}</td>
+              <td>
+                <div class="audit-trail">Prev: ₹${row.previousCashState.toFixed(2)}</div>
+                <div class="audit-trail" style="font-weight:700; color:var(--accent);">New: ₹${row.updatedCashState.toFixed(2)}</div>
+              </td>
+              <td><span style="font-size:11px; font-weight:600;">${row.method}</span></td>
+              <td>
+                <button class="btn btn-sm btn-warning" onclick="initiateRowUpdateEngine('${row.id}', '${row.type}', '${row.originCollection}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="executeRowDeletionEngine('${row.id}', '${row.type}', '${row.originCollection}')"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      // Execute Auxiliary Analysis calculations maps
+      renderExtendedMonthAnalyticsAndCharts(subsetFilteredRows);
+    }
+
+    // ========================================================
+    // DATA ANALYSIS AND CHARTING ENGINE
+    // ========================================================
+    function renderExtendedMonthAnalyticsAndCharts(filteredScopeData) {
+      // 1. Core Monthly Statistics Box Logic
+      let currentMonthStr = isoDateString.slice(0,7); // YYYY-MM
+      let monthlyRows = processedChronologicalLedger.filter(i => i.date.startsWith(currentMonthStr));
+      
+      let moStats = { sales:0, exp:0, collected:0, highSale:0, highSaleDay: '-', clients:{} };
+      let dailyGroupSales = {};
+
+      monthlyRows.forEach(r => {
+        if(r.type === 'Sale') {
+          moStats.sales += r.saleBill;
+          dailyGroupSales[r.date] = (dailyGroupSales[r.date] || 0) + r.saleBill;
+          moStats.clients[r.entity] = (moStats.clients[r.entity] || 0) + r.saleBill;
+        }
+        if(r.type === 'Expense') moStats.exp += r.cashOut;
+        if(r.type === 'Sale' || r.type === 'Payment' || r.type === 'CashIn') moStats.collected += r.cashIn;
+      });
+
+      // Calculate Peak Days & Champions
+      for(const [d, v] of Object.entries(dailyGroupSales)) {
+        if(v > moStats.highSale) { moStats.highSale = v; moStats.highSaleDay = d.slice(8) + " " + new Date(d).toLocaleDateString('en', {month:'short'}); }
+      }
+      let topCustomerName = "-"; let topCustVal = 0;
+      for(const [c, v] of Object.entries(moStats.clients)) {
+        if(v > topCustVal) { topCustVal = v; topCustomerName = c; }
+      }
+
+      const distinctDaysCount = Object.keys(dailyGroupSales).length || 1;
+
+      document.getElementById('moSales').innerText = `₹${moStats.sales.toFixed(0)}`;
+      document.getElementById('moExpenses').innerText = `₹${moStats.exp.toFixed(0)}`;
+      document.getElementById('moProfit').innerText = `₹${(moStats.sales - moStats.exp).toFixed(0)}`;
+      document.getElementById('moCollected').innerText = `₹${moStats.collected.toFixed(0)}`;
+      document.getElementById('moAvgSale').innerText = `₹${(moStats.sales / distinctDaysCount).toFixed(0)}`;
+      document.getElementById('moHighDay').innerText = moStats.highSaleDay;
+      document.getElementById('moTopCustomer').innerText = topCustomerName;
+
+      // 2. Charts Matrix Deployments Rendering Logic via Chart.js profiles
+      let paymentMethodsMap = { Cash: 0, UPI: 0, Bank: 0, Card: 0, Mixed: 0 };
+      let timelineChartData = {};
+
+      filteredScopeData.forEach(item => {
+        paymentMethodsMap[item.method] = (paymentMethodsMap[item.method] || 0) + (item.cashIn + item.cashOut);
+        
+        if(!timelineChartData[item.date]) timelineChartData[item.date] = { sales: 0, expenses: 0 };
+        if(item.type === 'Sale') timelineChartData[item.date].sales += item.saleBill;
+        if(item.type === 'Expense') timelineChartData[item.date].expenses += item.cashOut;
+      });
+
+      const datesLabels = Object.keys(timelineChartData).sort();
+      const salesLineDataset = datesLabels.map(d => timelineChartData[d].sales);
+      const expenseLineDataset = datesLabels.map(d => timelineChartData[d].expenses);
+
+      // Render Line Framework Matrix
+      if(chartInstanceSE) chartInstanceSE.destroy();
+      chartInstanceSE = new Chart(document.getElementById('chartSalesExpense'), {
+        type: 'line',
+        data: {
+          labels: datesLabels.map(d => d.slice(8)),
+          datasets: [
+            { label: 'Sales', data: salesLineDataset, borderColor: '#16a34a', tension: 0.2, fill: false },
+            { label: 'Expenses', data: expenseLineDataset, borderColor: '#ef4444', tension: 0.2, fill: false }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+
+      // Render Doughnut Framework Matrix
+      if(chartInstancePM) chartInstancePM.destroy();
+      chartInstancePM = new Chart(document.getElementById('chartPaymentMethods'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(paymentMethodsMap),
+          datasets: [{ data: Object.values(paymentMethodsMap), backgroundColor: ['#0b5ed7', '#10b981', '#ca8a04', '#6b7280', '#ec4899'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth:10, font:{size:10} } } } }
+      });
+    }
+
+    // ========================================================
+    // BACKEND WRITE MODES OPERATIONAL FUNCTIONS
+    // ========================================================
+    
+    window.saveOpeningCashConfig = async function(e) {
+      e.preventDefault();
+      const amt = parseFloat(document.getElementById('configOpeningCash').value) || 0;
+      const date = document.getElementById('configOpeningDate').value;
+      try {
+        await setDoc(doc(db, "accounting_settings", "cash_config"), { opening_cash: amt, opening_date: date });
+        closeModal('settingsModal');
+      } catch(ex) { alert("Baseline Error: " + ex.message); }
+    };
+
+    window.submitManualCashIn = async function(e) {
+      e.preventDefault();
+      const editId = document.getElementById('cashInEditId').value;
+      const dataPayload = {
+        amount: parseFloat(document.getElementById('ciAmount').value),
+        method: document.getElementById('ciMethod').value,
+        category: document.getElementById('ciCategory').value,
+        description: document.getElementById('ciDescription').value,
+        date: document.getElementById('ciDate').value,
+        time: document.getElementById('ciTime').value,
+        timestamp: serverTimestamp()
+      };
+
+      try {
+        if(editId) {
+          await updateDoc(doc(db, "manual_cash_in", editId), dataPayload);
+        } else {
+          await addDoc(collection(db, "manual_cash_in"), dataPayload);
+        }
+        closeModal('cashInModal');
+      } catch(ex) { alert("Inflow writing fault: " + ex.message); }
+    };
+
+    window.submitExpenseForm = async function(e) {
+      e.preventDefault();
+      const editId = document.getElementById('expenseEditId').value;
+      const dataPayload = {
+        amount: parseFloat(document.getElementById('expAmount').value),
+        method: document.getElementById('expMethod').value,
+        category: document.getElementById('expCategory').value,
+        vendor: document.getElementById('expVendor').value,
+        description: document.getElementById('expDescription').value,
+        date: document.getElementById('expDate').value,
+        time: document.getElementById('expTime').value,
+        timestamp: serverTimestamp()
+      };
+
+      try {
+        if(editId) {
+          await updateDoc(doc(db, "expenses", editId), dataPayload);
+        } else {
+          await addDoc(collection(db, "expenses"), dataPayload);
+        }
+        closeModal('expenseModal');
+      } catch(ex) { alert("Expense writing fault: " + ex.message); }
+    };
+
+    // ========================================================
+    // MODULAR CRUD INTERFACE HANDLERS
+    // ========================================================
+    
+    window.initiateRowUpdateEngine = function(id, type, collectionOrigin) {
+      const match = processedChronologicalLedger.find(i => i.id === id);
+      if(!match) return;
+
+      if(type === 'CashIn') {
+        document.getElementById('cashInEditId').value = id;
+        document.getElementById('ciAmount').value = match.cashIn;
+        document.getElementById('ciMethod').value = match.method;
+        document.getElementById('ciCategory').value = match.entity;
+        document.getElementById('ciDescription').value = match.narrative;
+        document.getElementById('ciDate').value = match.date;
+        document.getElementById('ciTime').value = match.time;
+        openModal('cashInModal');
+      } else if (type === 'Expense') {
+        document.getElementById('expenseEditId').value = id;
+        document.getElementById('expAmount').value = match.cashOut;
+        document.getElementById('expMethod').value = match.method;
+        document.getElementById('expCategory').value = match.rawObj.category;
+        document.getElementById('expVendor').value = match.rawObj.vendor || '';
+        document.getElementById('expDescription').value = match.narrative;
+        document.getElementById('expDate').value = match.date;
+        document.getElementById('expTime').value = match.time;
+        openModal('expenseModal');
+      } else {
+        // Handle integrated core customer adjustments values
+        document.getElementById('custTxnId').value = id;
+        document.getElementById('ctName').value = match.entity;
+        document.getElementById('ctTodayTotal').value = match.saleBill;
+        document.getElementById('ctPayment').value = match.cashIn;
+        document.getElementById('ctMethod').value = match.method;
+        openModal('editCustomerTxnModal');
+      }
+    };
+
+    window.submitCustomerTxnEdit = async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('custTxnId').value;
+      const targetBill = parseFloat(document.getElementById('ctTodayTotal').value) || 0;
+      const targetPay = parseFloat(document.getElementById('ctPayment').value) || 0;
+      const targetMethod = document.getElementById('ctMethod').value;
+
+      try {
+        const docRef = doc(db, "daily_entries", id);
+        const snapshot = await getDoc(docRef);
+        if(snapshot.exists()) {
+          const oldData = snapshot.data();
+          const oldNetImpact = parseFloat(oldData.todayTotal || 0) - parseFloat(oldData.payment || 0);
+          const newNetImpact = targetBill - targetPay;
+          const deltaDiff = newNetImpact - oldNetImpact;
+
+          // Re-adjust customer base account running profile due balance metrics safely
+          if(oldData.customerId) {
+            const customerRef = doc(db, "customers", oldData.customerId);
+            const cSnap = await getDoc(customerRef);
+            if(cSnap.exists()) {
+              await updateDoc(customerRef, { balance: (parseFloat(cSnap.data().balance || 0) + deltaDiff) });
+            }
+          }
+
+          // Compile update modification package arrays onto entry
+          await updateDoc(docRef, {
+            todayTotal: targetBill,
+            payment: targetPay,
+            paymentMethod: targetMethod,
+            balance: (parseFloat(oldData.prevDue || 0) + targetBill - targetPay)
+          });
+          
+          closeModal('editCustomerTxnModal');
+        }
+      } catch(ex) { alert("Customer profile core mutation fault: " + ex.message); }
+    };
+
+    window.executeRowDeletionEngine = async function(id, type, collectionOrigin) {
+      if(!confirm(`Are you certain you intend to permanently wipe out this ${type} entry record block? Balance tracking histories will adjust immediately.`)) return;
+      try {
+        if(collectionOrigin === 'daily_entries') {
+          const docRef = doc(db, "daily_entries", id);
+          const snapshot = await getDoc(docRef);
+          if(snapshot.exists()) {
+            const data = snapshot.data();
+            const netImpact = parseFloat(data.todayTotal || 0) - parseFloat(data.payment || 0);
+            
+            if(data.customerId) {
+              const customerRef = doc(db, "customers", data.customerId);
+              const cSnap = await getDoc(customerRef);
+              if(cSnap.exists()) {
+                await updateDoc(customerRef, { balance: (parseFloat(cSnap.data().balance || 0) - netImpact) });
+              }
+            }
+          }
+        }
+        await deleteDoc(doc(db, collectionOrigin, id));
+      } catch(ex) { alert("Deletion core processing failure: " + ex.message); }
+    };
+
+    // Global Initialization Initialization Sequence Entry Point
+    window.onload = function() {
+      resetFormDefaults();
+      initializeRealtimeStreams();
+    };
+
+  </script>
+</body>
+</html>
