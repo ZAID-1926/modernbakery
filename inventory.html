@@ -5,99 +5,267 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Inventory — Modern Bakery</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg:#f5f6fa;
-      --card:#fff;
-      --accent:#1C1C1C;
-      --accent-2:#F1C40F;
-      --muted:#777;
-      --radius:14px;
-    }
-    body{
-      margin:0;
-      font-family:"Poppins",sans-serif;
-      background:var(--bg);
-      color:#222;
+    /* MODERN BAKERY CORE PREMIUM ECOSYSTEM DESIGN LANGUAGE */
+    :root {
+      --bg: linear-gradient(180deg, #e9f1ff 0%, #f8fbff 100%);
+      --panel: #ffffff;
+      --glass: rgba(255,255,255,0.6);
+      --accent: #0b5ed7;
+      --accent-2: #0a3ea8;
+      --muted: #6b7280;
+      --success: #16a34a;
+      --danger: #ef4444;
+      --shadow: 0 12px 40px rgba(12,34,80,0.08);
+      --radius: 14px;
+      --border-color: #eaf2ff;
     }
 
-    /* Topbar */
-    .topbar{
-    width: 100vw !important;
-    max-width: 100% !important;
-    background: linear-gradient(135deg, #1C1C1C, #262626);
-    color: white;
-    padding: 18px 28px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    box-shadow:0 4px 12px rgba(0,0,0,0.12);
-    border-bottom:4px solid var(--accent-2);
-}
-    .topbar .title{ font-size:20px; font-weight:700; letter-spacing:0.3px; }
-    .topbar .actions { display:flex; gap:12px; align-items:center; }
-    .back-btn { background:var(--accent-2); color:#000; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:600; }
-
-    /* Layout */
-    .wrap{ max-width:1200px; margin:22px auto; padding:0 18px; }
-    .grid{ display:grid; grid-template-columns: 440px 1fr; gap:22px; align-items:start; }
-
-    /* Left card (form) */
-    .card{
-      background:var(--card);
-      padding:20px;
-      border-radius:var(--radius);
-      box-shadow:0 8px 30px rgba(20,20,20,0.06);
+    * { 
+      box-sizing: border-box; 
     }
-    .section-title{ font-size:20px; font-weight:700; margin:0 0 12px; color:var(--accent); }
-    label{ display:block; margin-top:12px; font-size:13px; color:var(--muted); }
+
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      font-family: "Poppins", sans-serif; 
+      background: var(--bg); 
+      background-attachment: fixed;
+      color: #0f1724; 
+      -webkit-font-smoothing: antialiased; 
+    }
+
+    /* Topbar - Styled exactly as per premium design tokens */
+    .topbar {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(90deg, #062b63, #0b5ed7);
+      color: #fff;
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .topbar .title { 
+      font-size: 20px; 
+      font-weight: 700; 
+      letter-spacing: 0.3px; 
+    }
+    .topbar .actions { 
+      display: flex; 
+      gap: 16px; 
+      align-items: center; 
+    }
+    
+    .back-btn { 
+      background: rgba(255, 255, 255, 0.2); 
+      color: #fff; 
+      padding: 8px 16px; 
+      border-radius: 8px; 
+      text-decoration: none; 
+      font-weight: 600; 
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: background 0.2s, transform 0.1s; 
+    }
+    .back-btn:hover { 
+      background: rgba(255, 255, 255, 0.3); 
+    }
+
+    /* Layout System */
+    .wrap { 
+      max-width: 1400px; 
+      margin: 25px auto; 
+      padding: 0 20px; 
+    }
+    .grid { 
+      display: grid; 
+      grid-template-columns: 440px 1fr; 
+      gap: 24px; 
+      align-items: start; 
+    }
+
+    /* Premium Modern Dashboard Panel Cards */
+    .card {
+      background: var(--panel);
+      padding: 24px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(11, 94, 215, 0.05);
+      margin-bottom: 24px;
+    }
+    .section-title { 
+      font-size: 19px; 
+      font-weight: 700; 
+      margin: 0 0 16px; 
+      color: #062b63; 
+    }
+    
+    label { 
+      display: block; 
+      margin-top: 14px; 
+      font-size: 13px; 
+      font-weight: 500;
+      color: var(--muted); 
+    }
+    
     input, select, textarea {
-      width:100%;
-      padding:12px 12px;
-      margin-top:8px;
-      border-radius:10px;
-      border:1px solid #e6e6e6;
-      font-size:15px;
-      box-sizing:border-box;
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+      background: #fff;
+      color: #0f1724;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    textarea { min-height:80px; resize:vertical; }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(11, 94, 215, 0.15);
+    }
+    textarea { 
+      min-height: 80px; 
+      resize: vertical; 
+    }
 
-    .row { display:flex; gap:10px; }
-    .row .col{ flex:1; }
+    .row { 
+      display: flex; 
+      gap: 12px; 
+    }
+    .row .col { 
+      flex: 1; 
+    }
 
+    /* Unified Button Interface Matrix */
     .btn {
-      background:var(--accent);
-      color:var(--accent-2);
-      border:none;
-      padding:12px 16px;
-      border-radius:10px;
-      font-weight:700;
-      cursor:pointer;
-      margin-top:14px;
-      width:100%;
-      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      width: 100%;
+      font-family: inherit;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(11, 94, 215, 0.2);
+      transition: background 0.2s, transform 0.1s;
     }
-    .btn.secondary { background:#eee; color:var(--accent); font-weight:600; box-shadow:none; }
-
-    /* Right: table */
-    .table-wrap{ overflow:auto; }
-    table{ width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.05); }
-    th, td { padding:12px 14px; text-align:left; font-size:14px; border-bottom:1px solid #f0f0f0; }
-    th { background:#fafafa; color:var(--accent); font-weight:700; }
-    tr:last-child td { border-bottom:0; }
-    .small { font-size:13px; color:var(--muted); }
-
-    /* badges */
-    .badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; color:#111; background:var(--accent-2); }
-
-    /* responsive */
-    @media (max-width: 880px){
-      .grid{ grid-template-columns: 1fr; }
-      .wrap{ padding:10px; }
+    .btn:hover { 
+      background: var(--accent-2); 
+    }
+    .btn:active { 
+      transform: scale(0.98); 
+    }
+    .btn.secondary { 
+      background: #f1f5f9; 
+      color: #475569; 
+      font-weight: 500; 
+      box-shadow: none; 
+      border: 1px solid #e2e8f0; 
+    }
+    .btn.secondary:hover { 
+      background: #e2e8f0; 
+    }
+    .btn.danger { 
+      background: var(--danger); 
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); 
+    }
+    .btn.danger:hover { 
+      background: #dc2626; 
     }
 
+    /* Table Wrappers and Stylesheet Controls */
+    .table-wrap { 
+      overflow-x: auto; 
+      border-radius: 12px; 
+      border: 1px solid #eaf2ff; 
+    }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      background: var(--panel); 
+    }
+    th, td { 
+      padding: 14px 16px; 
+      text-align: left; 
+      font-size: 14px; 
+      border-bottom: 1px solid #f1f5f9; 
+    }
+    th { 
+      background: #f8faff; 
+      color: #062b63; 
+      font-weight: 600; 
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tr:last-child td { 
+      border-bottom: 0; 
+    }
+    tr:hover td { 
+      background-color: #fafdff; 
+    }
+    
+    .small { 
+      font-size: 13px; 
+      color: var(--muted); 
+    }
+    .badge { 
+      display: inline-block; 
+      padding: 4px 10px; 
+      border-radius: 999px; 
+      font-weight: 600; 
+      font-size: 13px;
+      color: #fff; 
+      background: var(--accent); 
+    }
+
+    /* Premium Design Layout for Vendor Elements */
+    .vendor-item {
+      padding: 14px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.2s;
+    }
+    .vendor-item:last-child {
+      border-bottom: 0;
+    }
+    .vendor-item:hover {
+      background: #f8faff;
+    }
+    .vendor-item strong {
+      color: #062b63;
+      font-size: 15px;
+    }
+    .vendor-item .details {
+      font-size: 14px;
+      margin: 4px 0;
+      color: #334155;
+    }
+    .vendor-item small {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* Responsive Adaptation System */
+    @media (max-width: 1024px) {
+      .grid { 
+        grid-template-columns: 1fr; 
+      }
+      .wrap { 
+        padding: 12px; 
+      }
+    }
   </style>
 </head>
 <body>
@@ -105,405 +273,451 @@
   <div class="topbar">
     <div class="title">Inventory — Modern Bakery</div>
     <div class="actions">
-      <div id="userEmail" class="small">Checking...</div>
-      <a class="back-btn" href="home.html">Back</a>
+      <div id="userEmail" class="small">Checking auth state...</div>
+      <a class="back-btn" href="home.html">Back Dashboard</a>
     </div>
   </div>
 
   <div class="wrap">
     <div class="grid">
 
-      <!-- LEFT: Add Item + Vendor -->
-      <div class="card" id="leftCard">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="section-title">Add Item & Vendor</div>
-          <div class="small">Inventory / Vendor record</div>
-        </div>
-
-        <!-- Item Fields -->
-        <label>Item Name</label>
-        <input id="itemName" placeholder="e.g. Maida / Rusk / Packaging Box" />
-
-        <div class="row">
-          <div class="col">
-            <label>Quantity</label>
-            <input id="itemQty" type="number" min="0" step="0.01" placeholder="numeric (kg or pcs)" />
+      <div class="sidebar-wrapper">
+        
+        <div class="card" id="leftCard">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+            <div class="section-title" style="margin:0;">Add Item & Vendor</div>
+            <div class="small">Master Console</div>
           </div>
-          <div class="col">
-            <label>Unit</label>
-            <select id="itemUnit">
-              <option value="kg">kg</option>
-              <option value="pcs">pcs</option>
-              <option value="packet">packet</option>
-            </select>
-          </div>
-        </div>
 
-        <label>Category</label>
-        <select id="itemCategory">
-          <option value="Raw">Raw Material</option>
-          <option value="Finished">Finished Product</option>
-          <option value="Packaging">Packaging</option>
-        </select>
+          <label>Item Name</label>
+          <input id="itemName" placeholder="e.g. Maida / Rusk / Packaging Box" />
 
-        <label>Price (per unit) — optional</label>
-        <input id="itemPrice" type="number" min="0" step="0.01" placeholder="e.g. 40" />
-
-        <hr style="margin:18px 0;border:none;border-top:1px solid #f0f0f0" />
-
-        <!-- Vendor Fields -->
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="section-title" style="font-size:16px">Vendor Details</div>
-          <div class="small">optional</div>
-        </div>
-
-        <label>Vendor Name</label>
-        <input id="vendorName" placeholder="e.g. ABC Traders" />
-
-        <label>Vendor Phone</label>
-        <input id="vendorPhone" placeholder="10 digit mobile" />
-
-        <label>Delivered Quantity (same unit)</label>
-        <input id="deliveredQty" type="number" min="0" step="0.01" placeholder="how much vendor delivered" />
-
-        <div class="row">
-          <div class="col">
-            <label>Purchase Date</label>
-            <input id="purchaseDate" type="date" />
-          </div>
-          <div class="col">
-            <label>Notes</label>
-            <input id="vendorNotes" placeholder="notes (quality/payment etc)" />
-          </div>
-        </div>
-
-        <button class="btn" id="saveBtn">Save Item + Vendor Record</button>
-        <button class="btn secondary" id="clearBtn" style="margin-top:8px">Clear</button>
-
-        <div id="status" class="small" style="margin-top:12px;color:var(--muted)"></div>
-      </div>
-
-      <!-- RIGHT: Inventory list -->
-
-      <div>
-        <div class="card" style="margin-bottom:16px">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="section-title">Inventory List</div>
-            <div>
-              <span class="small">Total items: </span><span id="totalCount" class="badge">0</span>
+          <div class="row">
+            <div class="col">
+              <label>Quantity</label>
+              <input id="itemQty" type="number" min="0" step="0.01" placeholder="Quantity value" />
+            </div>
+            <div class="col">
+              <label>Unit System</label>
+              <select id="itemUnit">
+                <option value="kg">kg</option>
+                <option value="pcs">pcs</option>
+                <option value="packet">packet</option>
+              </select>
             </div>
           </div>
 
+          <label>Category Group</label>
+          <select id="itemCategory">
+            <option value="Raw">Raw Material</option>
+            <option value="Finished">Finished Product</option>
+            <option value="Packaging">Packaging Material</option>
+          </select>
 
-          <div class="table-wrap" style="margin-top:12px">
+          <label>Price (Per Unit) — Optional</label>
+          <input id="itemPrice" type="number" min="0" step="0.01" placeholder="e.g. 40" />
+
+          <hr style="margin:24px 0 12px 0; border:none; border-top:1px solid #f1f5f9" />
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+            <div class="section-title" style="font-size:16px; margin:0;">Vendor Logistics Details</div>
+            <div class="small" style="color:var(--accent);">Optional tracking</div>
+          </div>
+
+          <label>Vendor Entity Name</label>
+          <input id="vendorName" placeholder="e.g. ABC Traders" />
+
+          <label>Vendor Phone Contact</label>
+          <input id="vendorPhone" placeholder="10 digit contact mobile" />
+
+          <label>Delivered Quantity (Matches unit context)</label>
+          <input id="deliveredQty" type="number" min="0" step="0.01" placeholder="How much volume vendor delivered" />
+
+          <div class="row">
+            <div class="col">
+              <label>Procurement Date</label>
+              <input id="purchaseDate" type="date" />
+            </div>
+            <div class="col">
+              <label>Logistics Notes</label>
+              <input id="vendorNotes" placeholder="Quality/Payment ledger metrics" />
+            </div>
+          </div>
+
+          <button class="btn" id="saveBtn">Save Item + Vendor Record</button>
+          <button class="btn secondary" id="clearBtn">Clear Input Fields</button>
+
+          <div id="status" class="small" style="margin-top:14px; text-align:center; font-weight:500;"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Reduce Stock Engine</div>
+          <p class="small" style="margin-top:-10px; margin-bottom:15px;">Deduct inventory volumes synchronously</p>
+          
+          <label>Item Identifier Name</label>
+          <input id="reduceName" type="text" placeholder="Enter item name exact match" />
+
+          <label>Deduction Quantity Volume</label>
+          <input id="reduceQty" type="number" placeholder="Qty value to reduce" />
+
+          <button class="btn" onclick="reduceQty()" style="background:#0f1724;">
+            Execute Reduce Stock
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="section-title" style="color:var(--danger);">Destructive Operations</div>
+          <p class="small" style="margin-top:-10px; margin-bottom:15px;">Permanently wipe components from the database architecture</p>
+          
+          <label>Target Item Name to Delete</label>
+          <input id="deleteName" placeholder="Enter target item name exactly" />
+          
+          <button class="btn danger" onclick="deleteItem()">
+            Delete Document Permanently
+          </button>
+        </div>
+
+      </div>
+
+      <div class="main-content-wrapper">
+        
+        <div class="card" style="margin-bottom:24px">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div class="section-title" style="margin:0;">Live Database Inventory Ledger</div>
+            <div>
+              <span class="small" style="font-weight:500;">Active Matrix Scope: </span><span id="totalCount" class="badge">0</span>
+            </div>
+          </div>
+
+          <div class="table-wrap">
             <table id="itemsTable">
               <thead>
-                <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Category</th><th>Price/Unit</th><th>Total price</th><th>Last Updated</th></tr>
+                <tr>
+                  <th>Item Entity</th>
+                  <th>Stock Volume</th>
+                  <th>Unit Type</th>
+                  <th>Categorization</th>
+                  <th>Price/Unit</th>
+                  <th>Valuation Cost</th>
+                  <th>Last Sync Timestamp</th>
+                </tr>
               </thead>
               <tbody id="itemsBody">
-
-                <!-- rows -->
-              </tbody>
+                </tbody>
             </table>
           </div>
         </div>
 
         <div class="card">
-          <div class="section-title">Latest Vendor Records</div>
-          <div id="vendorList" style="margin-top:12px"></div>
+          <div class="section-title">Latest Vendor Ledger System Records</div>
+          <p class="small" style="margin-top:-10px; margin-bottom:15px;">Historical transactional verification metrics logs</p>
+          <div id="vendorList"></div>
         </div>
+
       </div>
 
     </div>
   </div>
-<div style="margin-top:20px;">
-    <h3>Reduce Stock</h3>
 
-    <input id="reduceName" type="text" placeholder="Enter item name"
-        style="padding:10px;width:70%;border-radius:6px;border:1px solid #ccc;margin-bottom:10px;">
-
-    <input id="reduceQty" type="number" placeholder="Qty to reduce"
-        style="padding:10px;width:70%;border-radius:6px;border:1px solid #ccc;margin-bottom:10px;">
-
-    <button onclick="reduceQty()"
-        style="padding:10px 20px;border:none;border-radius:6px;background:black;color:white;">
-        Reduce Qty
-    </button>
-</div>
-<div style="margin-top: 20px;">
-  <input id="deleteName" 
-         placeholder="Enter item name to delete" 
-         style="padding:10px;width:70%;border-radius:6px;border:1px solid #ccc;">
-  
-  <button onclick="deleteItem()" 
-          style="padding:10px 20px;border:none;border-radius:6px;background:black;color:white;">
-    Delete Item
-  </button>
-
-</div>
-
-  <!-- FIREBASE + LOGIC -->
   <script type="module">
-    // -------------------- FIREBASE IMPORTS --------------------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import {
-  getFirestore, collection, doc, setDoc, getDocs,
-  query, where, updateDoc, deleteDoc, orderBy, limit, addDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+    // -------------------- FIREBASE FRAMEWORK PRODUCTION IMPORTS --------------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import {
+      getFirestore, collection, doc, setDoc, getDocs,
+      query, where, updateDoc, deleteDoc, orderBy, limit, addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-import {
-  getAuth, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import {
+      getAuth, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-// -------------------- FIREBASE CONFIG --------------------
-const firebaseConfig = {
-  apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
-  authDomain: "modernbakery-08.firebaseapp.com",
-  projectId: "modernbakery-08",
-  storageBucket: "modernbakery-08.firebasestorage.app",
-  messagingSenderId: "551391878340",
-  appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
-};
+    // -------------------- PRODUCTION FIREBASE LEDGER CONFIG MATRIX --------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
+      authDomain: "modernbakery-08.firebaseapp.com",
+      projectId: "modernbakery-08",
+      storageBucket: "modernbakery-08.firebasestorage.app",
+      messagingSenderId: "551391878340",
+      appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+    // Initialize System Layers Securely
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-// -------------------- ELEMENTS --------------------
-const itemName = document.getElementById("itemName");
-const itemQty = document.getElementById("itemQty");
-const itemUnit = document.getElementById("itemUnit");
-const itemCategory = document.getElementById("itemCategory");
-const itemPrice = document.getElementById("itemPrice");
+    // -------------------- INTERACTIVE ELEMENT ACCESS MATRIX --------------------
+    const itemName = document.getElementById("itemName");
+    const itemQty = document.getElementById("itemQty");
+    const itemUnit = document.getElementById("itemUnit");
+    const itemCategory = document.getElementById("itemCategory");
+    const itemPrice = document.getElementById("itemPrice");
 
-const vendorName = document.getElementById("vendorName");
-const vendorPhone = document.getElementById("vendorPhone");
-const deliveredQty = document.getElementById("deliveredQty");
-const purchaseDate = document.getElementById("purchaseDate");
-const vendorNotes = document.getElementById("vendorNotes");
+    const vendorName = document.getElementById("vendorName");
+    const vendorPhone = document.getElementById("vendorPhone");
+    const deliveredQty = document.getElementById("deliveredQty");
+    const purchaseDate = document.getElementById("purchaseDate");
+    const vendorNotes = document.getElementById("vendorNotes");
 
-const saveBtn = document.getElementById("saveBtn");
-const clearBtn = document.getElementById("clearBtn");
-const status = document.getElementById("status");
+    const saveBtn = document.getElementById("saveBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const status = document.getElementById("status");
 
-const itemsBody = document.getElementById("itemsBody");
-const totalCount = document.getElementById("totalCount");
-const vendorList = document.getElementById("vendorList");
-const userEmailSpan = document.getElementById("userEmail");
+    const itemsBody = document.getElementById("itemsBody");
+    const totalCount = document.getElementById("totalCount");
+    const vendorList = document.getElementById("vendorList");
+    const userEmailSpan = document.getElementById("userEmail");
 
-// -------------------- AUTH CHECK --------------------
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.href = "index.html";
-  } else {
-    userEmailSpan.innerText = user.email;
-    loadInventory();
-    loadVendorRecords();
-  }
-});
+    // -------------------- SECURE AUTH STATUS VALIDATION ROUTINE --------------------
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        userEmailSpan.innerText = user.email;
+        loadInventory();
+        loadVendorRecords();
+      }
+    });
 
-// -------------------- DATE FORMAT --------------------
-function formatDate(ts) {
-  if (!ts) return "-";
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
-// -------------------- CLEAR FORM --------------------
-function clearForm() {
-  itemName.value = "";
-  itemQty.value = "";
-  itemUnit.value = "kg";
-  itemCategory.value = "Raw";
-  itemPrice.value = "";
-  vendorName.value = "";
-  vendorPhone.value = "";
-  deliveredQty.value = "";
-  purchaseDate.value = "";
-  vendorNotes.value = "";
-  status.innerText = "";
-}
-
-clearBtn.addEventListener("click", clearForm);
-
-// -------------------- SAVE ITEM --------------------
-saveBtn.addEventListener("click", async () => {
-  const name = itemName.value.trim();
-  const qtyVal = Number(itemQty.value);
-  const unit = itemUnit.value;
-  const category = itemCategory.value;
-  const price = itemPrice.value ? Number(itemPrice.value) : null;
-
-  if (!name || qtyVal <= 0) {
-    status.innerText = "Enter valid item and quantity";
-    return;
-  }
-
-  saveBtn.disabled = true;
-  status.innerText = "Saving...";
-
-  try {
-    // Check if item exists
-    const q = query(collection(db, "Inventory"), where("nameLower", "==", name.toLowerCase()));
-    const snap = await getDocs(q);
-
-    let docRef;
-
-    if (!snap.empty) {
-      const existing = snap.docs[0];
-      docRef = existing.ref;
-      const oldQty = existing.data().qty || 0;
-
-      await updateDoc(docRef, {
-        qty: oldQty + qtyVal,
-        unit,
-        category,
-        price: price ?? existing.data().price ?? null,
-        lastUpdated: serverTimestamp()
-      });
-
-    } else {
-      docRef = doc(collection(db, "Inventory"));
-      await setDoc(docRef, {
-        name,
-        nameLower: name.toLowerCase(),
-        qty: qtyVal,
-        unit,
-        category,
-        price: price ?? null,
-        createdAt: serverTimestamp(),
-        lastUpdated: serverTimestamp()
-      });
+    // -------------------- METRIC STAMP DATE FORMATTING ENGINE --------------------
+    function formatDate(ts) {
+      if (!ts) return "-";
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
-    // Vendor record saving
-    if (vendorName.value.trim() || deliveredQty.value) {
-      await addDoc(collection(db, "vendor_records"), {
-        vendorName: vendorName.value || "Unknown",
-        phone: vendorPhone.value || null,
-        itemName: name,
-        deliveredQty: Number(deliveredQty.value) || qtyVal,
-        unit,
-        date: serverTimestamp(),
-        notes: vendorNotes.value || "",
-        inventoryRef: docRef.path
-      });
+    // -------------------- RESET INPUT STORAGE SCHEMATICS --------------------
+    function clearForm() {
+      itemName.value = "";
+      itemQty.value = "";
+      itemUnit.value = "kg";
+      itemCategory.value = "Raw";
+      itemPrice.value = "";
+      vendorName.value = "";
+      vendorPhone.value = "";
+      deliveredQty.value = "";
+      purchaseDate.value = "";
+      vendorNotes.value = "";
+      status.innerText = "";
     }
 
-    status.innerText = "Saved ✔";
-    clearForm();
-    loadInventory();
-    loadVendorRecords();
+    clearBtn.addEventListener("click", clearForm);
 
-  } catch (e) {
-    status.innerText = "Error: " + e.message;
-  }
+    // -------------------- WRITE / UPDATE RECORD ENTRY POINT --------------------
+    saveBtn.addEventListener("click", async () => {
+      const name = itemName.value.trim();
+      const qtyVal = Number(itemQty.value);
+      const unit = itemUnit.value;
+      const category = itemCategory.value;
+      const price = itemPrice.value ? Number(itemPrice.value) : null;
 
-  saveBtn.disabled = false;
-  setTimeout(() => (status.innerText = ""), 3000);
-});
+      if (!name || qtyVal <= 0) {
+        status.style.color = "var(--danger)";
+        status.innerText = "Enter valid item and quantity values.";
+        return;
+      }
 
-// -------------------- LOAD INVENTORY --------------------
-async function loadInventory() {
-  itemsBody.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
+      saveBtn.disabled = true;
+      status.style.color = "var(--accent)";
+      status.innerText = "Syncing with cloud registry...";
 
-  const snap = await getDocs(query(collection(db, "Inventory"), orderBy("lastUpdated", "desc")));
+      try {
+        // Query to assert existence thresholds matrix
+        const q = query(collection(db, "Inventory"), where("nameLower", "==", name.toLowerCase()));
+        const snap = await getDocs(q);
 
-  itemsBody.innerHTML = "";
-  let total = 0;
+        let docRef;
 
-  snap.forEach((d) => {
-    const item = d.data();
+        if (!snap.empty) {
+          const existing = snap.docs[0];
+          docRef = existing.ref;
+          const oldQty = existing.data().qty || 0;
 
-    const tr = document.createElement("tr");
+          await updateDoc(docRef, {
+            qty: oldQty + qtyVal,
+            unit,
+            category,
+            price: price ?? existing.data().price ?? null,
+            lastUpdated: serverTimestamp()
+          });
 
-    tr.innerHTML = `
-      <td><strong>${item.name}</strong></td>
-      <td>${item.qty}</td>
-      <td>${item.unit}</td>
-      <td>${item.category}</td>
-      <td>${item.price ?? "-"}</td>
-      <td>${item.price ? item.qty * item.price : "-"}</td>
-      <td>${item.lastUpdated ? formatDate(item.lastUpdated) : "-"}</td>
-    `;
+        } else {
+          docRef = doc(collection(db, "Inventory"));
+          await setDoc(docRef, {
+            name,
+            nameLower: name.toLowerCase(),
+            qty: qtyVal,
+            unit,
+            category,
+            price: price ?? null,
+            createdAt: serverTimestamp(),
+            lastUpdated: serverTimestamp()
+          });
+        }
 
-    itemsBody.appendChild(tr);
-    total++;
-  });
+        // Dependent conditional execution block for vendor ledger logging logic
+        if (vendorName.value.trim() || deliveredQty.value) {
+          await addDoc(collection(db, "vendor_records"), {
+            vendorName: vendorName.value || "Unknown Supply Node",
+            phone: vendorPhone.value || null,
+            itemName: name,
+            deliveredQty: Number(deliveredQty.value) || qtyVal,
+            unit,
+            date: serverTimestamp(),
+            notes: vendorNotes.value || "",
+            inventoryRef: docRef.path
+          });
+        }
 
-  totalCount.innerText = total;
+        status.style.color = "var(--success)";
+        status.innerText = "Database Synchronization Successful ✔";
+        clearForm();
+        loadInventory();
+        loadVendorRecords();
 
-  if (total === 0) {
-    itemsBody.innerHTML = "<tr><td colspan='7'>No items found</td></tr>";
-  }
-}
+      } catch (e) {
+        status.style.color = "var(--danger)";
+        status.innerText = "Execution Exception Error: " + e.message;
+      }
 
-// -------------------- LOAD VENDOR RECORDS --------------------
-async function loadVendorRecords() {
-  vendorList.innerHTML = "Loading...";
+      saveBtn.disabled = false;
+      setTimeout(() => (status.innerText = ""), 4000);
+    });
 
-  const snap = await getDocs(
-    query(collection(db, "vendor_records"), orderBy("date", "desc"), limit(8))
-  );
+    // -------------------- RENDER LIVE COMPONENT MATRICES --------------------
+    async function loadInventory() {
+      itemsBody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:var(--muted); padding:20px;'>Fetching ledger registry nodes...</td></tr>";
 
-  vendorList.innerHTML = "";
+      try {
+        const snap = await getDocs(query(collection(db, "Inventory"), orderBy("lastUpdated", "desc")));
+        itemsBody.innerHTML = "";
+        let total = 0;
 
-  snap.forEach((d) => {
-    const v = d.data();
-    const div = document.createElement("div");
-    div.style.padding = "10px";
-    div.style.borderBottom = "1px solid #ddd";
+        snap.forEach((d) => {
+          const item = d.data();
+          const tr = document.createElement("tr");
 
-    div.innerHTML = `
-      <strong>${v.vendorName}</strong>  
-      <div>${v.itemName} • ${v.deliveredQty} ${v.unit}</div>
-      <small>${v.notes || ""}</small>
-    `;
+          // Programmatic layout integration matrices calculation logic variables
+          const calculationCost = item.price ? (item.qty * item.price).toFixed(2) : "-";
+          const precisePrice = item.price ? item.price.toFixed(2) : "-";
 
-    vendorList.appendChild(div);
-  });
-}
+          tr.innerHTML = `
+            <td><strong>${item.name}</strong></td>
+            <td><span style="font-weight:600; color: ${item.qty < 5 ? 'var(--danger)' : 'inherit'};">${item.qty}</span></td>
+            <td><span class="small" style="text-transform:lowercase; font-weight:500;">${item.unit}</span></td>
+            <td><span class="badge" style="background:#f1f5f9; color:#334155; border:1px solid #e2e8f0;">${item.category}</span></td>
+            <td>₹ ${precisePrice}</td>
+            <td style="font-weight:600; color:#062b63;">${item.price ? '₹ ' + calculationCost : '-'}</td>
+            <td class="small" style="color:var(--muted);">${item.lastUpdated ? formatDate(item.lastUpdated) : "-"}</td>
+          `;
 
-// -------------------- REDUCE ITEM --------------------
-window.reduceQty = async function () {
-  const name = document.getElementById("reduceName").value.trim().toLowerCase();
-  const qty = Number(document.getElementById("reduceQty").value);
+          itemsBody.appendChild(tr);
+          total++;
+        });
 
-  if (!name || qty <= 0) return alert("Enter valid details");
+        totalCount.innerText = total;
 
-  const q = query(collection(db, "Inventory"), where("nameLower", "==", name));
-  const snap = await getDocs(q);
+        if (total === 0) {
+          itemsBody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:var(--muted); padding:20px;'>No inventory structures mapped inside the current cluster workspace.</td></tr>";
+        }
+      } catch (err) {
+        itemsBody.innerHTML = `<tr><td colspan='7' style='text-align:center; color:var(--danger); font-weight:500;'>Failed to compile dataset stream: ${err.message}</td></tr>`;
+      }
+    }
 
-  if (snap.empty) return alert("Item not found");
+    // -------------------- COMPILING RECENT TRADING OPERATIONS LOGS --------------------
+    async function loadVendorRecords() {
+      vendorList.innerHTML = "<div style='color:var(--muted); padding:10px;'>Loading ledger logs stream...</div>";
 
-  const ref = snap.docs[0].ref;
-  const data = snap.docs[0].data();
+      try {
+        const snap = await getDocs(
+          query(collection(db, "vendor_records"), orderBy("date", "desc"), limit(8))
+        );
 
-  if (data.qty - qty < 0) return alert("Not enough stock");
+        vendorList.innerHTML = "";
+        let logsCounter = 0;
 
-  await updateDoc(ref, { qty: data.qty - qty, lastUpdated: serverTimestamp() });
+        snap.forEach((d) => {
+          const v = d.data();
+          const div = document.createElement("div");
+          div.className = "vendor-item";
 
-  alert("Reduced successfully");
-  loadInventory();
-};
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong>${v.vendorName}</strong>
+              <span class="small" style="color:var(--accent); font-weight:500;">${v.date ? formatDate(v.date) : ''}</span>
+            </div>
+            <div class="details">Procured Resource: <span style="font-weight:600; color:#0f1724;">${v.itemName}</span> • Delivery Volume: <span class="badge" style="background:#eef2f6; color:var(--accent-2); padding:2px 8px; font-size:12px;">${v.deliveredQty} ${v.unit}</span></div>
+            ${v.notes ? `<small style="font-style:italic; background:#fff7ed; padding:4px 8px; border-radius:4px; border:1px solid #ffedd5; display:inline-block; margin-top:4px;">Memo: ${v.notes}</small>` : ''}
+          `;
 
-// -------------------- DELETE ITEM --------------------
-window.deleteItem = async function () {
-  const name = document.getElementById("deleteName").value.trim().toLowerCase();
-  if (!name) return alert("Enter item name");
+          vendorList.appendChild(div);
+          logsCounter++;
+        });
 
-  const q = query(collection(db, "Inventory"), where("nameLower", "==", name));
-  const snap = await getDocs(q);
+        if(logsCounter === 0){
+          vendorList.innerHTML = "<div style='color:var(--muted); padding:12px; font-size:14px;'>No historical procurement logs documented yet inside dataset grid.</div>";
+        }
+      } catch (err) {
+        vendorList.innerHTML = `<div style='color:var(--danger); padding:10px; font-weight:500;'>Ledger compiling pipeline exception: ${err.message}</div>`;
+      }
+    }
 
-  if (snap.empty) return alert("Item not found");
+    // -------------------- DECREMENT MATRIX VOLUMES OPERATION --------------------
+    window.reduceQty = async function () {
+      const name = document.getElementById("reduceName").value.trim().toLowerCase();
+      const qty = Number(document.getElementById("reduceQty").value);
 
-  await deleteDoc(snap.docs[0].ref);
+      if (!name || qty <= 0) return alert("Enter valid and verified item context matching records details.");
 
-  alert("Deleted");
-  loadInventory();
-};
+      try {
+        const q = query(collection(db, "Inventory"), where("nameLower", "==", name));
+        const snap = await getDocs(q);
 
+        if (snap.empty) return alert("Requested database structural item reference lookup failed: Item not found.");
+
+        const ref = snap.docs[0].ref;
+        const data = snap.docs[0].data();
+
+        if (data.qty - qty < 0) return alert("Critical Threshold Abort: Not enough volumetric balance pool stock to process decrement request.");
+
+        await updateDoc(ref, { 
+          qty: data.qty - qty, 
+          lastUpdated: serverTimestamp() 
+        });
+
+        alert("Inventory resource block size reduced successfully.");
+        document.getElementById("reduceName").value = "";
+        document.getElementById("reduceQty").value = "";
+        loadInventory();
+      } catch (err) {
+        alert("Transaction operational failure encountered: " + err.message);
+      }
+    };
+
+    // -------------------- DOCUMENT REMOVAL PIPELINE --------------------
+    window.deleteItem = async function () {
+      const name = document.getElementById("deleteName").value.trim().toLowerCase();
+      if (!name) return alert("Enter structural tracking item identity label context.");
+
+      if (!confirm("Are you absolutely certain you want to purge this data row item entity? This operation parameter cannot be undone.")) return;
+
+      try {
+        const q = query(collection(db, "Inventory"), where("nameLower", "==", name));
+        const snap = await getDocs(q);
+
+        if (snap.empty) return alert("Requested cloud database context layer entity mismatch: Item target not found.");
+
+        await deleteDoc(snap.docs[0].ref);
+
+        alert("Entity collection mapping purged completely from data array stack structures successfully.");
+        document.getElementById("deleteName").value = "";
+        loadInventory();
+      } catch (err) {
+        alert("Destructive transactional operation pipeline failure: " + err.message);
+      }
+    };
   </script>
 </body>
 </html>
