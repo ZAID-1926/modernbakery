@@ -1,828 +1,1110 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Daily Customers — Modern Bakery</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg: linear-gradient(180deg,#e9f1ff 0%, #f8fbff 100%);
-      --panel:#fff; --accent:#0b5ed7; --muted:#6b7280; --radius:12px; --shadow:0 12px 40px rgba(12,34,80,0.06);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg);color:#0f1724;-webkit-font-smoothing:antialiased}
-    .topbar{position:sticky;top:0;background:linear-gradient(90deg,#062b63,#0b5ed7);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;z-index:50}
-    .brand{display:flex;gap:12px;align-items:center}
-    .brand .logo{height:42px;width:42px;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center}
-    .wrap{max-width:1200px;margin:20px auto;padding:0 18px}
-    .grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
-    .card{background:var(--panel);padding:16px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(11,94,215,0.06)}
-    h2{margin:0 0 8px;font-size:18px}
-    label{display:block;margin-top:10px;color:var(--muted);font-size:13px}
-    input,select,button,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #eef4ff;margin-top:8px;font-size:14px;background:#fbfdff}
-    .row{display:flex;gap:8px}
-    .col{flex:1}
-    .primary{background:var(--accent);color:white;border:none;padding:10px;border-radius:10px;font-weight:700;cursor:pointer}
-    .muted{color:var(--muted);font-size:13px}
-    .small{font-size:13px;color:var(--muted)}
-    table{width:100%;border-collapse:collapse;margin-top:12px}
-    th,td{padding:8px;border-bottom:1px solid #f3f6ff;text-align:left;font-size:13px}
-    th{background:#fafcff;font-weight:700}
-    .mini-analytics{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-    .mini-card{flex:1;padding:10px;border-radius:8px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef6ff;box-shadow:0 8px 20px rgba(6,22,60,0.03)}
-    .tabs{display:flex;gap:8px;margin-top:8px}
-    .tab{padding:8px 10px;border-radius:8px;background:#f3f6ff;cursor:pointer;font-weight:700}
-    .selected{background:var(--accent);color:white}
-    .suggestions{position:relative}
-    .list-suggest{position:absolute;left:0;right:0;z-index:60;background:white;border:1px solid #eef3ff;border-radius:8px;max-height:180px;overflow:auto;margin-top:6px}
-    .list-suggest div{padding:8px;cursor:pointer;border-bottom:1px solid #f3f6ff}
-    .list-suggest div:hover{background:#f5f8ff}
-    .small-cta{padding:6px 10px;border-radius:8px;background:#f3f6ff;border:none;cursor:pointer}
-    .flex-between{display:flex;justify-content:space-between;align-items:center}
-    @media(max-width:980px){.grid{grid-template-columns:1fr}}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Daily Customers — Modern Bakery</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== ROOT — exact existing theme (unchanged) ===== */
+:root{
+  --bg:linear-gradient(180deg,#e9f1ff 0%,#f8fbff 100%);
+  --panel:#fff;
+  --accent:#0b5ed7;
+  --accent-2:#062b63;
+  --muted:#6b7280;
+  --radius:12px;
+  --shadow:0 12px 40px rgba(12,34,80,0.06);
+  --border:rgba(11,94,215,0.08);
+  --success:#16a34a;
+  --danger:#ef4444;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Poppins",sans-serif;background:var(--bg);color:#0f1724;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* ===== TOPBAR — mobile-first 2-row layout ===== */
+.topbar{position:sticky;top:0;z-index:50;background:linear-gradient(90deg,#062b63,#0b5ed7);color:#fff;padding:12px 16px;box-shadow:0 4px 16px rgba(4,20,60,0.12)}
+.topbar-row1{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.topbar-row2{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+.brand{display:flex;gap:10px;align-items:center;min-width:0}
+.brand-logo{width:34px;height:34px;border-radius:9px;overflow:hidden;border:2px solid rgba(255,255,255,0.2);flex-shrink:0;background:rgba(255,255,255,0.1)}
+.brand-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.brand-logo.logo-fallback{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:.3px;color:#fff}
+.brand-text{min-width:0}
+.brand-text .name{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-text .sub{font-size:11px;opacity:.82;white-space:nowrap}
+.top-email{font-size:12px;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.btn-top{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.22);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit;transition:background .14s;white-space:nowrap;flex-shrink:0}
+.btn-top:hover{background:rgba(255,255,255,0.18)}
+
+/* ===== LAYOUT ===== */
+.wrap{max-width:1300px;margin:0 auto;padding:18px 16px 60px}
+
+/* ===== ANALYTICS ===== */
+.analytics-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stat{flex:1 1 130px;background:var(--panel);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.stat .s-label{font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.stat .s-value{font-size:19px;font-weight:800;color:var(--accent-2);margin-top:6px}
+
+/* ===== DATE BAR ===== */
+.date-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.date-bar-title{font-weight:700;font-size:16px}
+.date-bar-right{display:flex;gap:8px;align-items:center}
+input[type=date]{padding:8px 11px;border-radius:8px;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:13.5px;color:#0f1724}
+
+/* ===== MAIN GRID ===== */
+.main-grid{display:grid;grid-template-columns:370px 1fr;gap:16px;align-items:start}
+
+/* ===== CARD ===== */
+.card{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:18px;margin-bottom:14px}
+.card-title{margin:0 0 14px;font-size:16px;font-weight:700;color:#0f1724}
+
+/* ===== TABS ===== */
+.tabs{display:flex;gap:4px;background:#f0f4fc;border-radius:10px;padding:4px;margin-bottom:16px}
+.tab{flex:1;text-align:center;padding:8px 6px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);transition:all .18s;white-space:nowrap}
+.tab.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(11,94,215,0.22)}
+
+/* ===== TAB CONTENT ===== */
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ===== FIELDS ===== */
+.field{margin-bottom:11px}
+.field-label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.inp{width:100%;padding:10px 12px;border-radius:9px;border:1px solid rgba(11,94,215,0.14);background:#fbfdff;font-family:inherit;font-size:14px;color:#0f1724;transition:border-color .15s,box-shadow .15s}
+.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,94,215,0.09)}
+textarea.inp{resize:none;min-height:60px}
+.inp-sm{padding:8px 10px;font-size:13px}
+
+/* ===== AUTOCOMPLETE ===== */
+.ac-wrap{position:relative}
+.ac-list{position:absolute;left:0;right:0;top:100%;z-index:80;background:#fff;border:1px solid rgba(11,94,215,0.12);border-radius:10px;box-shadow:0 16px 40px rgba(11,94,215,0.1);max-height:190px;overflow-y:auto;margin-top:4px;display:none}
+.ac-item{padding:9px 12px;cursor:pointer;font-size:13.5px;border-bottom:1px solid #f3f6ff;transition:background .12s}
+.ac-item:last-child{border:none}
+.ac-item:hover{background:#f5f8ff}
+
+/* ===== PRODUCT ROWS (Khula) ===== */
+.prod-rows{margin:10px 0}
+.prod-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:#f8fbff;border:1px solid #eef3ff;margin-bottom:7px}
+.prod-row .pr-label{flex:0 0 96px;font-size:13px;font-weight:600;color:#0f1724}
+.prod-row .pr-input{flex:1;padding:7px 9px;border-radius:7px;border:1px solid rgba(11,94,215,0.12);background:#fff;font-family:inherit;font-size:13.5px;text-align:center;transition:border-color .14s}
+.prod-row .pr-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,94,215,0.08)}
+.prod-row .pr-unit{font-size:11.5px;color:var(--muted);font-weight:600;flex:0 0 22px;text-align:center}
+.prod-row .pr-amt{flex:0 0 68px;text-align:right;font-weight:700;font-size:13px;color:var(--accent-2)}
+
+/* ===== SUMMARY ===== */
+.summary{background:linear-gradient(180deg,#f0f6ff,#f8fbff);border:1px solid rgba(11,94,215,0.1);border-radius:10px;padding:12px 14px;margin:10px 0}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13.5px}
+.sum-row .sl{color:var(--muted)}
+.sum-row .sv{font-weight:700;color:#0f1724}
+.sum-divider{border:none;border-top:1px solid rgba(11,94,215,0.1);margin:6px 0}
+.sum-row.big{font-size:15px;font-weight:700;padding-top:8px}
+.bal-neg{color:var(--danger)}
+.bal-ok{color:var(--success)}
+
+/* ===== BASKET ===== */
+.basket{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:8px 0}
+.basket-item{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13px;border-bottom:1px solid #f3f6ff;animation:fadeIn .2s ease}
+.basket-item:last-child{border:none}
+.bi-name{flex:1;font-weight:600}
+.bi-info{color:var(--muted);font-size:12px;flex:1}
+.bi-amt{font-weight:700;color:var(--accent-2);flex:0 0 68px;text-align:right}
+.bi-rm{background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px;line-height:1;padding:0 2px;flex:0 0 auto}
+.basket-empty{padding:14px;text-align:center;color:var(--muted);font-size:13px}
+
+/* ===== BALANCE INFO (Payment tab) ===== */
+.bal-info{background:#fff5ed;border:1px solid #f6d5b0;border-radius:9px;padding:11px 13px;margin:8px 0;display:none}
+.bal-info .bi-label{font-size:11.5px;color:#92400e;font-weight:600}
+.bal-info .bi-val{font-size:20px;font-weight:800;color:#c2410c;margin-top:3px}
+
+/* ===== STATUS ===== */
+.status-msg{margin-top:8px;font-size:13px;padding:8px 12px;border-radius:8px;display:none}
+.status-msg.show{display:block}
+.s-ok{background:#eafbf1;color:#15803d;border:1px solid #bbf7d0}
+.s-err{background:#fff1f1;color:var(--danger);border:1px solid #fecaca}
+
+/* ===== BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;font-weight:700;cursor:pointer;border:none;border-radius:9px;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff;padding:12px 18px;width:100%;font-size:14.5px;box-shadow:0 6px 16px rgba(11,94,215,0.22);margin-top:6px}
+.btn-primary:hover{background:var(--accent-2);transform:translateY(-2px);box-shadow:0 10px 22px rgba(11,94,215,0.28)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{background:#c5d6f5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-sec{background:#f3f6fd;color:#0f1724;padding:9px 14px;font-size:13px;border:1px solid var(--border)}
+.btn-sec:hover{background:#eaf0ff}
+.btn-add{background:#eaf1ff;color:var(--accent);padding:8px 13px;font-size:13px;border:1px solid rgba(11,94,215,0.12);border-radius:8px}
+.btn-add:hover{background:#dbeafe}
+.btn-edit{background:#f3f6fd;color:var(--accent);padding:5px 10px;font-size:12px;border:1px solid rgba(11,94,215,0.12);border-radius:6px}
+.btn-edit:hover{background:#eaf1ff}
+.btn-del{background:#fff1f1;color:var(--danger);padding:5px 10px;font-size:12px;border:1px solid #fecaca;border-radius:6px}
+.btn-del:hover{background:#fee2e2}
+.btn-export{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;color:#0f1724;transition:all .14s}
+.btn-export:hover{background:#f3f8ff;border-color:var(--accent)}
+
+/* ===== TABLES ===== */
+.tbl-wrap{overflow-x:auto}
+table.gtbl{width:100%;border-collapse:collapse;min-width:860px}
+.gtbl th{background:#fafcff;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:10px;border-bottom:2px solid #eef3ff;white-space:nowrap}
+.gtbl td{padding:10px;border-bottom:1px solid #f3f6ff;font-size:13.5px;vertical-align:middle}
+.gtbl tbody tr{transition:background .12s}
+.gtbl tbody tr:hover{background:#f8fbff}
+.cust-link{font-weight:700;color:var(--accent);cursor:pointer}
+.cust-link:hover{text-decoration:underline}
+.neg{color:var(--danger);font-weight:700}
+.pos{color:var(--success);font-weight:700}
+.row-actions{display:flex;gap:5px}
+
+/* ===== HISTORY ===== */
+.hist-dates{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.hist-date-block{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.hist-date-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:#fafcff;transition:background .13s;user-select:none}
+.hist-date-hdr:hover{background:#f0f5ff}
+.hdh-title{font-weight:700;font-size:14px}
+.hdh-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.hdh-chev{font-size:15px;color:var(--muted);transition:transform .2s}
+.hdh-chev.open{transform:rotate(90deg)}
+.hist-date-body{display:none;padding:10px 12px;border-top:1px solid var(--border)}
+.hist-cust-row{display:flex;justify-content:space-between;align-items:center;padding:9px 10px;border-radius:8px;margin-bottom:5px;background:#f9fbff;border:1px solid #eef3ff;cursor:pointer;transition:background .12s}
+.hist-cust-row:hover{background:#eef5ff}
+.hcr-name{font-weight:700;font-size:13.5px}
+.hcr-sub{font-size:12px;color:var(--muted)}
+.hcr-amt{font-weight:800;color:var(--accent-2);font-size:14px}
+
+/* ===== LIFETIME HISTORY ===== */
+.lifetime{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:10px}
+.lt-sec{margin-bottom:14px}
+.lt-sec-title{font-weight:700;font-size:13px;color:var(--accent-2);border-bottom:1px solid #eef3ff;padding-bottom:6px;margin-bottom:8px}
+.lt-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:7px 0;border-bottom:1px solid #f8faff;font-size:13px}
+.lt-row:last-child{border:none}
+.lt-date{color:var(--muted);font-size:12px;flex:0 0 78px}
+.lt-item{flex:1}
+.lt-amt{font-weight:700;flex:0 0 76px;text-align:right}
+
+/* ===== MODALS ===== */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(4,20,60,0.45);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-ov.open{display:flex}
+.modal-box{background:#fff;border-radius:16px;padding:22px 24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 30px 80px rgba(4,20,60,0.2)}
+.modal-title{font-size:17px;font-weight:700;margin:0 0 14px}
+.modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
+.modal-actions .btn{min-width:90px;width:auto;padding:10px 18px}
+.modal-text{color:var(--muted);font-size:14px;margin:0 0 4px}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== MOBILE: TABLES → CARDS (no horizontal scroll) ===== */
+@media(max-width:699px){
+  .gtbl thead{display:none}
+  .gtbl, .gtbl tbody, .gtbl tr, .gtbl td{display:block;width:100%}
+  .tbl-wrap{overflow-x:visible}
+  table.gtbl{min-width:0}
+  .gtbl tbody tr{
+    background:#fff;border:1px solid var(--border);border-radius:12px;
+    padding:14px 14px 12px;margin-bottom:12px;box-shadow:0 4px 14px rgba(11,60,150,0.06);
+  }
+  .gtbl tbody tr:hover{background:#fff}
+  .gtbl td{border:none;padding:5px 0}
+  .gtbl td:empty{display:none}
+  .gtbl td[data-label="#"]{display:none}
+
+  /* Customer name = card title, bold, no label */
+  .gtbl td[data-label="Customer"]{font-size:15.5px;font-weight:700;padding-bottom:8px;border-bottom:1px solid #f0f4fc;margin-bottom:6px}
+  .gtbl td[data-label="Customer"]::before{content:none}
+
+  /* Generic labeled rows: label left, value right */
+  .gtbl td[data-label]:not([data-label="Customer"]):not([data-label="Actions"]):not([data-label="Items"]){
+    display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:10px;
+  }
+  .gtbl td[data-label]:not([data-label="Customer"]):not([data-label="Actions"]):not([data-label="Items"])::before{
+    content:attr(data-label);color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px;flex-shrink:0;
+  }
+
+  /* Items (Package Maal) — full width block, wraps naturally */
+  .gtbl td[data-label="Items"]{font-size:12.5px;color:#334155;padding:4px 0 8px;max-width:none!important;line-height:1.5}
+  .gtbl td[data-label="Items"]::before{content:"Items";display:block;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
+
+  /* Emphasize key totals */
+  .gtbl td[data-label="Grand Total"],.gtbl td[data-label="Total"]{font-weight:700;font-size:14px}
+  .gtbl td[data-label="Balance"]{font-weight:800;font-size:14.5px;padding-top:7px;border-top:1px solid #f0f4fc;margin-top:4px}
+
+  /* Actions — full width equal buttons, larger touch target */
+  .gtbl td[data-label="Actions"]{padding-top:10px}
+  .gtbl td[data-label="Actions"] .row-actions{display:flex;gap:8px}
+  .gtbl td[data-label="Actions"] .row-actions .btn{flex:1;padding:10px 0;font-size:13px;text-align:center}
+}
+
+/* ===== RESPONSIVE: general layout ===== */
+@media(max-width:980px){
+  .main-grid{grid-template-columns:1fr}
+  .sticky-left{position:static!important}
+}
+@media(max-width:600px){
+  .analytics-row{flex-wrap:wrap}
+  .stat{flex:1 1 calc(50% - 5px)}
+  .tabs .tab{font-size:11px;padding:7px 4px}
+  .wrap{padding:12px 12px 60px}
+  .prod-row .pr-label{flex:0 0 76px;font-size:12px}
+}
+</style>
 </head>
 <body>
 
-  <div class="topbar">
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-row1">
     <div class="brand">
-      <div class="logo" aria-hidden>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="3" fill="#fff" opacity="0.06"/><path d="M6 10c.5-2 2-3 4-3s3.5 1 4 3" stroke="#fff" stroke-opacity="0.9" stroke-width="1.2"/></svg>
-      </div>
-      <div>
-        <div style="font-weight:700">Modern Bakery</div>
-        <div style="font-size:12px;opacity:.9">Daily Customers</div>
-      </div>
+      <div class="brand-logo" id="logoBox"><img src="logo.png" alt="MB" id="logoImg" onerror="this.remove();var b=document.getElementById('logoBox');b.classList.add('logo-fallback');b.textContent='MB';"></div>
+      <div class="brand-text"><div class="name">Modern Bakery</div><div class="sub">Daily Customers</div></div>
     </div>
-    <div class="flex-between" style="gap:10px">
-      <div id="userEmail" class="small">Checking...</div>
-      <button id="backDash" class="small-cta">Dashboard</button>
+  </div>
+  <div class="topbar-row2">
+    <span id="userEmail" class="top-email">Checking…</span>
+    <button id="backDash" class="btn-top">Dashboard</button>
+    <button id="logoutBtn" class="btn-top">Logout</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ANALYTICS -->
+  <div class="analytics-row">
+    <div class="stat"><div class="s-label">Today's Sales</div><div class="s-value" id="aSales">₹0</div></div>
+    <div class="stat"><div class="s-label">Payments Received</div><div class="s-value" id="aPaid">₹0</div></div>
+    <div class="stat"><div class="s-label">Net (Sales−Paid)</div><div class="s-value" id="aNet">₹0</div></div>
+    <div class="stat"><div class="s-label">Customers Today</div><div class="s-value" id="aCount">0</div></div>
+  </div>
+
+  <!-- DATE BAR -->
+  <div class="date-bar">
+    <div class="date-bar-title">Daily Records</div>
+    <div class="date-bar-right">
+      <input type="date" id="viewDate">
+      <button id="btnExport" class="btn-export">Export CSV</button>
     </div>
   </div>
 
-  <div class="wrap">
-    <div class="grid">
+  <!-- MAIN GRID -->
+  <div class="main-grid">
 
-      <!-- LEFT: Quick add / New customers / Package -->
-      <div class="card">
-        <h2>Quick Add</h2>
-        <div class="small">Pick category, select existing name or add new, add item/qty/rate or payment</div>
+    <!-- LEFT: QUICK ADD -->
+    <div class="sticky-left" style="position:sticky;top:12px">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-title">Quick Add</div>
 
-        <label>Mode</label>
         <div class="tabs">
-          <div id="mode_khula" class="tab selected">Khula Maal</div>
-          <div id="mode_package" class="tab">Package Maal</div>
-          <div id="mode_payment" class="tab">Add Payment</div>
+          <div class="tab active" data-tab="khula">Khula Maal</div>
+          <div class="tab" data-tab="package">Package</div>
+          <div class="tab" data-tab="payment">Payment</div>
+          <div class="tab" data-tab="newcust">New Customer</div>
         </div>
 
-        <div id="quickArea" style="margin-top:10px">
-          <!-- Category + customer select/new -->
-          <label>Customer (select or type new)</label>
-          <div class="row">
-            <div class="col suggestions">
-              <input id="quickName" placeholder="Type name (will suggest)"/>
-              <div id="nameSuggest" class="list-suggest" style="display:none"></div>
-            </div>
-            <div style="width:90px">
-              <button id="btnNewCustomer" class="primary">New</button>
-            </div>
-          </div>
+        <div id="quickStatus" class="status-msg"></div>
 
-          <div id="typeSpecific" style="margin-top:8px">
-            <!-- khula/package specific fields show/hide dynamically -->
-            <div id="khulaFields">
-              <label>Item (suggest)</label>
-              <div class="suggestions">
-                <input id="kh_item" placeholder="e.g. Khari, BTC, Indori..."/>
-                <div id="itemSuggest" class="list-suggest" style="display:none"></div>
-              </div>
-
-              <div class="row">
-                <div class="col">
-                  <label>Qty</label>
-                  <input id="kh_qty" type="number" min="0" step="0.01" placeholder="kg or qty">
-                </div>
-                <div class="col">
-                  <label>Rate (per unit)</label>
-                  <input id="kh_rate" type="number" min="0" step="0.01" placeholder="₹">
-                </div>
-              </div>
-
-              <label>Notes</label>
-              <input id="kh_notes" placeholder="optional"/>
-
-              <div style="display:flex;gap:8px;margin-top:10px">
-                <button id="saveKhula" class="primary" style="flex:1">Add to Day</button>
-                <button id="saveKhulaAndPay" class="small-cta" style="flex:1">Add + Record Payment</button>
-              </div>
-            </div>
-
-            <div id="packageFields" style="display:none">
-              <label>Item (package)</label>
-              <input id="pkg_item"/>
-
-              <div class="row">
-                <div class="col">
-                  <label>Qty</label>
-                  <input id="pkg_qty" type="number" min="0" step="0.01"/>
-                </div>
-                <div class="col">
-                  <label>Rate</label>
-                  <input id="pkg_rate" type="number" min="0" step="0.01"/>
-                </div>
-              </div>
-
-              <label>Notes</label>
-              <input id="pkg_notes"/>
-
-              <div style="display:flex;gap:8px;margin-top:10px">
-                <button id="savePkg" class="primary" style="flex:1">Add Package Item</button>
-              </div>
-            </div>
-
-            <div id="paymentFields" style="display:none">
-              <label>Amount</label>
-              <input id="pay_amount" type="number" min="0" step="0.01"/>
-              <label>Date (optional)</label>
-              <input id="pay_date" type="date"/>
-              <label>Notes</label>
-              <input id="pay_notes"/>
-              <div style="display:flex;gap:8px;margin-top:10px">
-                <button id="savePayment" class="primary" style="flex:1">Record Payment</button>
-              </div>
+        <!-- ── KHULA MAAL ── -->
+        <div id="tab-khula" class="tab-pane active">
+          <div class="field">
+            <label class="field-label">Customer Name</label>
+            <div class="ac-wrap">
+              <input id="kh_cust" class="inp" placeholder="Type to search or add new…" autocomplete="off">
+              <div id="kh_cust_list" class="ac-list"></div>
             </div>
           </div>
 
-          <div id="quickStatus" class="small" style="margin-top:8px;color:var(--muted)"></div>
+          <div class="prod-rows">
+            <div class="prod-row"><span class="pr-label">Khari</span><input type="number" id="kh_khari" class="pr-input" placeholder="0" min="0" step="0.001" data-rate="90"><span class="pr-unit">KG</span><span class="pr-amt" id="am_khari"></span></div>
+            <div class="prod-row"><span class="pr-label">BTC</span><input type="number" id="kh_btc" class="pr-input" placeholder="0" min="0" step="0.001" data-rate="100"><span class="pr-unit">KG</span><span class="pr-amt" id="am_btc"></span></div>
+            <div class="prod-row"><span class="pr-label">Indori</span><input type="number" id="kh_indori" class="pr-input" placeholder="0" min="0" step="0.001" data-rate="105"><span class="pr-unit">KG</span><span class="pr-amt" id="am_indori"></span></div>
+            <div class="prod-row"><span class="pr-label">Maska Khari</span><input type="number" id="kh_maska" class="pr-input" placeholder="0" min="0" step="0.001" data-rate="130"><span class="pr-unit">KG</span><span class="pr-amt" id="am_maska"></span></div>
+            <div class="prod-row"><span class="pr-label">Biscuits</span><input type="number" id="kh_biscuits" class="pr-input" placeholder="0" min="0" step="0.001" data-rate="123"><span class="pr-unit">KG</span><span class="pr-amt" id="am_biscuits"></span></div>
+          </div>
+
+          <div class="summary">
+            <div class="sum-row"><span class="sl">Day Total</span><span class="sv" id="kh_dayTotal">₹0.00</span></div>
+            <div class="sum-row"><span class="sl">Previous Due</span><span class="sv" id="kh_prevDue">₹0.00</span></div>
+            <hr class="sum-divider">
+            <div class="sum-row big"><span>Grand Total</span><span id="kh_grandTotal">₹0.00</span></div>
+          </div>
+
+          <div class="field" style="margin-bottom:6px">
+            <label class="field-label">Payment Received (₹)</label>
+            <input type="number" id="kh_payment" class="inp" placeholder="0.00" min="0" step="0.01">
+          </div>
+          <div class="summary" style="margin-bottom:12px">
+            <div class="sum-row big" style="padding-top:0"><span>Balance</span><span id="kh_balance" class="bal-neg">₹0.00</span></div>
+          </div>
+
+          <button class="btn btn-primary" id="btnSaveKhula">Save Entry</button>
         </div>
 
-        <hr style="margin:14px 0">
-
-        <h2>New Customers (Khula Maal only)</h2>
-        <div id="newCustomersList" class="small" style="max-height:180px;overflow:auto;margin-top:8px">No new customers today.</div>
-
-        <hr style="margin:12px 0">
-
-        <h2>Mini Analytics</h2>
-        <div class="mini-analytics">
-          <div class="mini-card">
-            <div class="small">Today's Sales</div>
-            <div id="mini_sales" style="font-weight:700;margin-top:6px">₹ 0</div>
+        <!-- ── PACKAGE MAAL ── -->
+        <div id="tab-package" class="tab-pane">
+          <div class="field">
+            <label class="field-label">Customer Name</label>
+            <div class="ac-wrap">
+              <input id="pkg_cust" class="inp" placeholder="Type to search…" autocomplete="off">
+              <div id="pkg_cust_list" class="ac-list"></div>
+            </div>
           </div>
-          <div class="mini-card">
-            <div class="small">Payments Received</div>
-            <div id="mini_paid" style="font-weight:700;margin-top:6px">₹ 0</div>
+
+          <div class="field">
+            <label class="field-label">Item Name</label>
+            <div class="ac-wrap">
+              <input id="pkg_item" class="inp inp-sm" placeholder="Product name" autocomplete="off">
+              <div id="pkg_item_list" class="ac-list"></div>
+            </div>
           </div>
-          <div class="mini-card">
-            <div class="small">Net Today</div>
-            <div id="mini_net" style="font-weight:700;margin-top:6px">₹ 0</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <div style="flex:1"><label class="field-label">Qty</label><input type="number" id="pkg_qty" class="inp inp-sm" placeholder="0" min="0" step="0.001"></div>
+            <div style="flex:1"><label class="field-label">Rate (₹)</label><input type="number" id="pkg_rate" class="inp inp-sm" placeholder="0.00" min="0" step="0.01"></div>
+            <div style="flex:0 0 auto;align-self:flex-end"><button class="btn btn-add" id="btnAddItem">+ Add</button></div>
           </div>
+
+          <div class="basket" id="basketEl"><div class="basket-empty" id="basketEmpty">No items yet. Add items above.</div></div>
+          <div class="summary" style="margin:8px 0 12px"><div class="sum-row big" style="padding-top:0"><span>Basket Total</span><span id="basketTotal">₹0.00</span></div></div>
+          <button class="btn btn-primary" id="btnSavePkg">Save All Items</button>
+        </div>
+
+        <!-- ── PAYMENT ── -->
+        <div id="tab-payment" class="tab-pane">
+          <div class="field">
+            <label class="field-label">Customer Name</label>
+            <div class="ac-wrap">
+              <input id="pay_cust" class="inp" placeholder="Type to search…" autocomplete="off">
+              <div id="pay_cust_list" class="ac-list"></div>
+            </div>
+          </div>
+
+          <div id="payBalCard" class="bal-info">
+            <div class="bi-label">Current Balance Due</div>
+            <div class="bi-val" id="payBalAmt">₹0.00</div>
+          </div>
+
+          <div class="field"><label class="field-label">Amount Received (₹)</label><input type="number" id="pay_amount" class="inp" placeholder="0.00" min="0" step="0.01"></div>
+          <div class="field"><label class="field-label">Date (optional)</label><input type="date" id="pay_date" class="inp"></div>
+          <div class="field"><label class="field-label">Notes (optional)</label><input id="pay_notes" class="inp" placeholder="Cash / UPI / Cheque…"></div>
+          <button class="btn btn-primary" id="btnSavePay">Record Payment</button>
+        </div>
+
+        <!-- ── NEW CUSTOMER ── -->
+        <div id="tab-newcust" class="tab-pane">
+          <div class="field"><label class="field-label">Customer Name *</label><input id="nc_name" class="inp" placeholder="Full name"></div>
+          <div class="field"><label class="field-label">Phone Number</label><input id="nc_phone" class="inp" placeholder="Mobile number" type="tel"></div>
+          <div class="field"><label class="field-label">Address</label><textarea id="nc_addr" class="inp" placeholder="Delivery / home address"></textarea></div>
+          <button class="btn btn-primary" id="btnCreateCust">Create Customer</button>
         </div>
 
       </div>
+    </div>
 
-      <!-- RIGHT: Day Grid & Package Section & History -->
-      <div>
+    <!-- RIGHT PANEL -->
+    <div>
 
-        <div class="card" style="margin-bottom:12px">
-          <div class="flex-between">
-            <h2>Khula Maal — Day Grid</h2>
-            <div style="display:flex;gap:8px;align-items:center">
-              <div class="small">Date</div>
-              <input id="viewDate" type="date" style="width:150px;padding:8px"/>
-              <button id="btnExport" class="small-cta">Export CSV</button>
-            </div>
-          </div>
+      <!-- KHULA MAAL DAY GRID -->
+      <div class="card">
+        <div class="card-title">Khula Maal — Day Grid</div>
+        <div class="tbl-wrap">
+          <table class="gtbl">
+            <thead>
+              <tr>
+                <th>#</th><th>Customer</th>
+                <th>Khari<br><small style="font-weight:400;font-size:10px;text-transform:none">₹90/kg</small></th>
+                <th>BTC<br><small style="font-weight:400;font-size:10px;text-transform:none">₹100/kg</small></th>
+                <th>Indori<br><small style="font-weight:400;font-size:10px;text-transform:none">₹105/kg</small></th>
+                <th>Maska<br><small style="font-weight:400;font-size:10px;text-transform:none">₹130/kg</small></th>
+                <th>Biscuits<br><small style="font-weight:400;font-size:10px;text-transform:none">₹123/kg</small></th>
+                <th>Day Total</th><th>Prev Due</th><th>Grand Total</th><th>Paid</th><th>Balance</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="gridBody"><tr><td colspan="13" style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
 
-          <div style="margin-top:10px;overflow:auto">
-            <table id="dayGridTable">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Customer</th>
-                  <th>Khari</th>
-                  <th>BTC</th>
-                  <th>Indori</th>
-                  <th>Maska Khari</th>
-                  <th>Biscuits</th>
-                  <th>Day Total</th>
-                  <th>Prev Due</th>
-                  <th>Total </th>
-                  <th>Paid </th>
-                  <th>Balance </th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="dayGridBody">
-                <tr><td colspan="13" class="small">Loading...</td></tr>
-              </tbody>
-            </table>
-          </div>
+      <!-- PACKAGE MAAL TABLE -->
+      <div class="card">
+        <div class="card-title">Package Maal</div>
+        <div class="tbl-wrap">
+          <table class="gtbl">
+            <thead><tr><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Prev Due</th><th>Paid</th><th>Balance</th><th>Actions</th></tr></thead>
+            <tbody id="pkgBody"><tr><td colspan="8" style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No packages yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="card">
+        <div class="card-title">History</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <input id="histSearch" class="inp" placeholder="Search customer for lifetime history…" style="flex:1">
+          <button id="btnHistSearch" class="btn btn-sec">Search</button>
         </div>
 
-        <div class="card" style="margin-bottom:12px">
-          <div class="flex-between">
-            <h2>Package Maal (per customer)</h2>
-            <div class="small">Separate list for package items</div>
-          </div>
-          <div style="margin-top:10px;overflow:auto">
-            <table id="pkgTable"><thead><tr><th>Customer</th><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th><th>Prev</th><th>Paid</th><th>Remaining</th><th></th></tr></thead>
-              <tbody id="pkgBody"><tr><td colspan="9" class="small">No packages yet.</td></tr></tbody></table>
-          </div>
+        <!-- Lifetime view -->
+        <div id="lifetimeWrap" style="display:none">
+          <button id="btnBackHist" class="btn btn-sec" style="margin-bottom:10px;width:auto;padding:8px 14px">← Back</button>
+          <div id="lifetimeTitle" style="font-weight:700;font-size:15px;margin-bottom:8px"></div>
+          <div id="lifetimeContent" class="lifetime"></div>
         </div>
 
-        <div class="card">
-          <div class="flex-between"><h2>Customer History / Search</h2>
-            <div><input id="histSearch" placeholder="Search name..." style="width:240px"/></div>
-          </div>
-          <div id="custHistory" style="margin-top:10px;max-height:260px;overflow:auto" class="small">Select a customer row to view lifetime history.</div>
+        <!-- Date accordion -->
+        <div id="histWrap">
+          <div id="histDates" class="hist-dates"><div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Loading history…</div></div>
         </div>
-
       </div>
 
     </div>
   </div>
+</div>
 
-  <!-- Firebase + Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import {
-      getFirestore, collection, doc, setDoc, addDoc, getDocs, getDoc,
-      query, where, orderBy, updateDoc, deleteDoc, collectionGroup, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+<!-- EDIT ROW MODAL -->
+<div id="editRowModal" class="modal-ov">
+  <div class="modal-box">
+    <div class="modal-title">Edit Khula Entry</div>
+    <input type="hidden" id="erRowId"><input type="hidden" id="erDate">
+    <div class="field"><label class="field-label">Customer</label><input id="erCust" class="inp" disabled></div>
+    <div class="prod-rows" id="erProds">
+      <div class="prod-row"><span class="pr-label">Khari</span><input type="number" id="er_khari" class="pr-input" min="0" step="0.001"><span class="pr-unit">KG</span></div>
+      <div class="prod-row"><span class="pr-label">BTC</span><input type="number" id="er_btc" class="pr-input" min="0" step="0.001"><span class="pr-unit">KG</span></div>
+      <div class="prod-row"><span class="pr-label">Indori</span><input type="number" id="er_indori" class="pr-input" min="0" step="0.001"><span class="pr-unit">KG</span></div>
+      <div class="prod-row"><span class="pr-label">Maska Khari</span><input type="number" id="er_maska" class="pr-input" min="0" step="0.001"><span class="pr-unit">KG</span></div>
+      <div class="prod-row"><span class="pr-label">Biscuits</span><input type="number" id="er_biscuits" class="pr-input" min="0" step="0.001"><span class="pr-unit">KG</span></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <div class="field" style="flex:1;margin-bottom:0"><label class="field-label">Previous Due (₹)</label><input type="number" id="er_prevDue" class="inp" min="0" step="0.01"></div>
+      <div class="field" style="flex:1;margin-bottom:0"><label class="field-label">Paid Today (₹)</label><input type="number" id="er_paidToday" class="inp" min="0" step="0.01"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-sec" id="cancelErRow">Cancel</button>
+      <button class="btn btn-primary" id="saveErRow" style="width:auto">Save Changes</button>
+    </div>
+  </div>
+</div>
 
-    // --- config (use your project) ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
-      authDomain: "modernbakery-08.firebaseapp.com",
-      projectId: "modernbakery-08",
-      storageBucket: "modernbakery-08.appspot.com",
-      messagingSenderId: "551391878340",
-      appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+<!-- EDIT PACKAGE MODAL -->
+<div id="editPkgModal" class="modal-ov">
+  <div class="modal-box">
+    <div class="modal-title">Edit Package Entry</div>
+    <input type="hidden" id="epId">
+    <div class="field"><label class="field-label">Customer</label><input id="epCust" class="inp" disabled></div>
+    <div id="epItemsWrap"></div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <div class="field" style="flex:1;margin-bottom:0"><label class="field-label">Prev Due (₹)</label><input type="number" id="ep_prevDue" class="inp" min="0" step="0.01"></div>
+      <div class="field" style="flex:1;margin-bottom:0"><label class="field-label">Paid (₹)</label><input type="number" id="ep_paid" class="inp" min="0" step="0.01"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-sec" id="cancelEpModal">Cancel</button>
+      <button class="btn btn-primary" id="saveEpModal" style="width:auto">Save Changes</button>
+    </div>
+  </div>
+</div>
 
-    // UI refs
-    const userEmail = document.getElementById("userEmail");
-    const backDash = document.getElementById("backDash");
+<!-- DELETE CONFIRM -->
+<div id="delModal" class="modal-ov">
+  <div class="modal-box" style="max-width:370px">
+    <div class="modal-title">Confirm Delete</div>
+    <p class="modal-text" id="delMsg"></p>
+    <div class="modal-actions">
+      <button class="btn btn-sec" id="cancelDel">Cancel</button>
+      <button class="btn" id="confirmDel" style="background:var(--danger);color:#fff;width:auto;padding:10px 18px">Delete</button>
+    </div>
+  </div>
+</div>
 
-    const mode_khula = document.getElementById("mode_khula");
-    const mode_package = document.getElementById("mode_package");
-    const mode_payment = document.getElementById("mode_payment");
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
+  updateDoc, deleteDoc, query, where, orderBy, limit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    const quickName = document.getElementById("quickName");
-    const nameSuggest = document.getElementById("nameSuggest");
-    const btnNewCustomer = document.getElementById("btnNewCustomer");
+const firebaseConfig = {
+  apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
+  authDomain: "modernbakery-08.firebaseapp.com",
+  projectId: "modernbakery-08",
+  storageBucket: "modernbakery-08.firebasestorage.app",
+  messagingSenderId: "551391878340",
+  appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-    const kh_item = document.getElementById("kh_item");
-    const itemSuggest = document.getElementById("itemSuggest");
-    const kh_qty = document.getElementById("kh_qty");
-    const kh_rate = document.getElementById("kh_rate");
-    const kh_notes = document.getElementById("kh_notes");
-    const saveKhula = document.getElementById("saveKhula");
-    const saveKhulaAndPay = document.getElementById("saveKhulaAndPay");
+/* ── CONSTANTS ── */
+const ITEMS = [
+  {key:'khari',   label:'Khari',      rate:90 },
+  {key:'btc',     label:'BTC',        rate:100},
+  {key:'indori',  label:'Indori',     rate:105},
+  {key:'maska',   label:'Maska Khari',rate:130},
+  {key:'biscuits',label:'Biscuits',   rate:123}
+];
 
-    const pkg_item = document.getElementById("pkg_item");
-    const pkg_qty = document.getElementById("pkg_qty");
-    const pkg_rate = document.getElementById("pkg_rate");
-    const pkg_notes = document.getElementById("pkg_notes");
-    const savePkg = document.getElementById("savePkg");
+/* ── STATE ── */
+let basket = [];
+let delTarget = null;
+let editPkgItems = [];
+let savedPkgItemNames = [];
+let khLoadedCustomer = null;   // which customer's data is currently loaded into the Khula form
+let payLoadedCustomer = null;  // which customer's balance is currently shown in Payment tab
 
-    const pay_amount = document.getElementById("pay_amount");
-    const pay_date = document.getElementById("pay_date");
-    const pay_notes = document.getElementById("pay_notes");
-    const savePayment = document.getElementById("savePayment");
+/* ── HELPERS ── */
+const g = id => document.getElementById(id);
+const money = n => '₹' + Number(n||0).toFixed(2);
+const num = v => Number(v)||0;
+function isoDate(d){ const dt=d?new Date(d):new Date(); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`; }
+function showStatus(msg, isErr=false){
+  const el=g('quickStatus'); el.textContent=msg;
+  el.className='status-msg show '+(isErr?'s-err':'s-ok');
+  setTimeout(()=>el.classList.remove('show'), 3500);
+}
+function escH(s){ const d=document.createElement('div'); d.textContent=String(s??''); return d.innerHTML; }
 
-    const quickStatus = document.getElementById("quickStatus");
-    const newCustomersList = document.getElementById("newCustomersList");
+/* ── AUTH ── */
+onAuthStateChanged(auth, async user=>{
+  if(!user){ window.location.href='index.html'; return; }
+  g('userEmail').textContent = user.email||'Admin';
+  g('viewDate').value = isoDate();
+  g('pay_date').value = isoDate();
+  await loadAll();
+  await loadPkgItemNames();
+});
+g('backDash').onclick = ()=> window.location.href='home.html';
+g('logoutBtn').onclick = ()=> signOut(auth).then(()=> window.location.href='index.html').catch(e=>alert(e.message));
 
-    const mini_sales = document.getElementById("mini_sales");
-    const mini_paid = document.getElementById("mini_paid");
-    const mini_net = document.getElementById("mini_net");
+/* ── TABS ── */
+document.querySelectorAll('.tab[data-tab]').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab[data-tab]').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    t.classList.add('active');
+    g('tab-'+t.dataset.tab).classList.add('active');
+    g('quickStatus').classList.remove('show');
+  });
+});
 
-    const viewDate = document.getElementById("viewDate");
-    const dayGridBody = document.getElementById("dayGridBody");
-    const pkgBody = document.getElementById("pkgBody");
-    const custHistory = document.getElementById("custHistory");
-    const histSearch = document.getElementById("histSearch");
+/* ── DATE CHANGE ── */
+g('viewDate').addEventListener('change', loadAll);
+async function loadAll(){ await Promise.all([loadGrid(), loadPkgs(), loadHistory(), runAnalytics()]); }
 
-    const btnExport = document.getElementById("btnExport");
-
-    // constants
-    const DEFAULT_ITEMS = [
-      {key:'khari', label:'Khari', rate:90},
-      {key:'btc', label:'BTC', rate:100},
-      {key:'indori', label:'Indori', rate:100},
-      {key:'maska', label:'Maska Khari', rate:130},
-      {key:'biscuits', label:'Biscuits', rate:120}
-    ];
-
-    // state
-    let MODE = 'khula'; // khula | package | payment
-    let TODAY = new Date();
-    function isoDate(d){ const dt = d ? new Date(d) : new Date(); const y=dt.getFullYear(); const m=String(dt.getMonth()+1).padStart(2,'0'); const dd=String(dt.getDate()).padStart(2,'0'); return `${y}-${m}-${dd}`; }
-    viewDate.value = isoDate(TODAY);
-
-    // UI mode toggles
-    function setMode(m){
-      MODE = m;
-      mode_khula.classList.toggle('selected', m==='khula');
-      mode_package.classList.toggle('selected', m==='package');
-      mode_payment.classList.toggle('selected', m==='payment');
-      document.getElementById('khulaFields').style.display = m==='khula' ? 'block' : 'none';
-      document.getElementById('packageFields').style.display = m==='package' ? 'block' : 'none';
-      document.getElementById('paymentFields').style.display = m==='payment' ? 'block' : 'none';
-    }
-    mode_khula.onclick = ()=> setMode('khula');
-    mode_package.onclick = ()=> setMode('package');
-    mode_payment.onclick = ()=> setMode('payment');
-
-    // auth check
-    onAuthStateChanged(auth, async user=>{
-      if(!user){ userEmail.innerText = "Not logged"; return; }
-      userEmail.innerText = user.email || user.displayName || "Admin";
-      // initial loads
-      await loadDayGrid();
-      await loadPackages();
-      await loadNewCustomers();
-      runMiniAnalytics();
-    });
-
-    backDash.onclick = ()=> window.location.href = 'dashboard.html';
-
-    // === Helpers: Firestore paths & data model ===
-    // We'll store per-day khula grid in collection "daily_grids" with doc id = yyyy-mm-dd:
-    // daily_grids/{date}/rows/{autoId}  -> {customerName, items: {khari:qty, btc:qty, ...}, prevDue, paidToday, notes}
-    // For package items: collection "package_items" with doc {date, customer, item, qty, rate, paid, prev}
-    // For customer lifetime history: "customers" collection with subcollections goods_history & payment_history (we will also add entries on quick add)
-    // new_customers/{date}/{doc} store list of customers added today (for khula only)
-
-    // === Suggest / Search for names & items ===
-    async function suggestNames(q){
-      nameSuggest.innerHTML=''; nameSuggest.style.display='none';
-      if(!q) return;
-      // Search customers collection by nameLower prefix
-      try {
-        const col = collection(db,'customers');
-        const qref = query(col, where('nameLower','>=', q.toLowerCase()), where('nameLower','<', q.toLowerCase() + '\uf8ff'), );
-        const snap = await getDocs(qref);
-        if(snap.empty) return;
-        snap.forEach(s=>{
-          const data = s.data();
-          const d = document.createElement('div');
-          d.innerText = data.name + (data.phone ? ' • '+data.phone : '');
-          d.onclick = ()=> { quickName.value = data.name; nameSuggest.style.display='none'; }
-          nameSuggest.appendChild(d);
-        });
-        nameSuggest.style.display = nameSuggest.children.length ? 'block' : 'none';
-      } catch(e){ console.warn('name suggest failed',e); }
-    }
-
-    quickName.addEventListener('input', (e)=> suggestNames(e.target.value));
-
-    // item suggest from DEFAULT_ITEMS + saved item list from DB (inventory names)
-    async function suggestItems(q){
-      itemSuggest.innerHTML=''; itemSuggest.style.display='none';
-      if(!q) return;
-      // local defaults
-      const results = DEFAULT_ITEMS.filter(it => it.label.toLowerCase().includes(q.toLowerCase()));
-      results.forEach(it=>{
-        const d = document.createElement('div'); d.innerText = `${it.label} • ₹${it.rate}`; d.onclick = ()=> { kh_item.value = it.label; kh_rate.value = it.rate; itemSuggest.style.display='none'; }
-        itemSuggest.appendChild(d);
-      });
-      // also try to fetch inventory items
-      try {
-        const invSnap = await getDocs(query(collection(db,'Inventory'), ));
-        invSnap.forEach(s=> {
-          const it = s.data();
-          if(it.name && it.name.toLowerCase().includes(q.toLowerCase())){
-            const d = document.createElement('div'); d.innerText = `${it.name} • ₹${it.price||''}`; d.onclick = ()=> { kh_item.value = it.name; kh_rate.value = it.price||''; itemSuggest.style.display='none'; }
-            itemSuggest.appendChild(d);
-          }
-        });
-      } catch(e){ console.warn('inv suggest failed',e); }
-      itemSuggest.style.display = itemSuggest.children.length ? 'block' : 'none';
-    }
-    kh_item.addEventListener('input', (e)=> suggestItems(e.target.value));
-
-    // When New customer button -> create in customers collection & add to new_customers/{date}
-    btnNewCustomer.onclick = async ()=>{
-      const name = quickName.value.trim();
-      if(!name) return alert('Type a name to add new customer');
-      try {
-        // create customer if not exists (unique by nameLower)
-        const col = collection(db,'customers');
-        const existing = await getDocs(query(col, where('nameLower','==', name.toLowerCase())));
-        let cid = null;
-        if(existing.empty){
-          const ndoc = doc(col);
-          await setDoc(ndoc, { name, nameLower: name.toLowerCase(), createdAt: serverTimestamp() });
-          cid = ndoc.id;
-        } else {
-          cid = existing.docs[0].id;
-        }
-        // register in new_customers/day
-        const dayCol = collection(db, 'new_customers', viewDate.value || isoDate(new Date()), 'list');
-        await addDoc(dayCol, { name, createdAt: serverTimestamp() });
-        quickStatus.innerText = `New customer added: ${name}`;
-        await loadNewCustomers();
-      } catch(e){ alert('Add customer failed: '+e.message); }
-    };
-
-    // === Core: Save khula item to today's grid ===
-    saveKhula.onclick = async ()=>{
-      await saveKhulaCore(false);
-    };
-    saveKhulaAndPay.onclick = async ()=>{
-      await saveKhulaCore(true);
-    };
-
-    async function saveKhulaCore(doRecordPayment){
-      const name = quickName.value.trim();
-      if(!name) return alert('Enter customer name');
-      const item = kh_item.value.trim();
-      const qty = Number(kh_qty.value || 0);
-      const rate = Number(kh_rate.value || 0);
-      if(!item || qty<=0) return alert('Enter item and qty');
-
-      const dateStr = viewDate.value || isoDate(new Date());
-      try {
-        // find or create daily grid doc for this customer (by name)
-        const dayDocRef = doc(collection(db,'daily_grids', dateStr, 'rows'));
-        // We will create a new row per customer per day if not exists. But to simplify and ensure one row per customer,
-        // first search for existing row with same name
-        const rowsCol = collection(db,'daily_grids', dateStr, 'rows');
-        const q = query(rowsCol, where('customer','==', name));
-        const existing = await getDocs(q);
-
-        if(!existing.empty){
-          // update the found doc (take first)
-          const rdoc = existing.docs[0];
-          const data = rdoc.data();
-          // merge items: increment the matching key if matches DEFAULT_ITEMS label
-          const items = data.items || {};
-          // map label to key (lower)
-          const key = item.toLowerCase().replace(/\s+/g,'_');
-          items[key] = (items[key]||0) + qty;
-          // update prevDue unchanged
-          await updateDoc(doc(db,'daily_grids',dateStr,'rows',rdoc.id), { items, lastUpdated: serverTimestamp() });
-          await ensureCustomerHistoryEntry(name, { type:'goods', item, qty, rate, total: qty*rate, date: dateStr, notes: kh_notes.value || null });
-        } else {
-          // create fresh row
-          const obj = {
-            customer: name,
-            items: {},
-            prevDue: 0,
-            paidToday: 0,
-            notes: '',
-            createdAt: serverTimestamp()
-          };
-          const key = item.toLowerCase().replace(/\s+/g,'_');
-          obj.items[key] = qty;
-          await addDoc(rowsCol, obj);
-          await ensureCustomerHistoryEntry(name, { type:'goods', item, qty, rate, total: qty*rate, date: dateStr, notes: kh_notes.value || null });
-        }
-
-        // if record payment
-        if(doRecordPayment){
-          const amount = qty*rate;
-          await recordPaymentForCustomer(name, amount, viewDate.value);
-        }
-
-        // update UI
-        kh_item.value=''; kh_qty.value=''; kh_rate.value=''; kh_notes.value='';
-        quickStatus.innerText = `Added ${qty} ${item} for ${name} on ${dateStr}`;
-        await loadDayGrid();
-        await runMiniAnalytics();
-      } catch(e){ alert('Save failed: '+e.message); console.error(e); }
-    }
-
-    // Save package item
-    savePkg.onclick = async ()=>{
-      const name = quickName.value.trim();
-      if(!name) return alert('Select customer');
-      const qty = Number(pkg_qty.value || 0);
-      const rate = Number(pkg_rate.value || 0);
-      const item = pkg_item.value.trim();
-      if(!item || qty<=0) return alert('Enter package item and qty');
-      const dateStr = viewDate.value || isoDate(new Date());
-      try{
-        const col = collection(db,'package_items');
-        await addDoc(col, { customer: name, item, qty, rate, total: qty*rate, date: dateStr, prevDue:0, paid:0, notes: pkg_notes.value||null, createdAt: serverTimestamp() });
-        pkg_item.value=''; pkg_qty.value=''; pkg_rate.value=''; pkg_notes.value='';
-        quickStatus.innerText = `Package item added for ${name}`;
-        await loadPackages();
-        await ensureCustomerHistoryEntry(name, { type:'package', item, qty, rate, total: qty*rate, date: dateStr });
-        await runMiniAnalytics();
-      }catch(e){ alert('Save pkg failed: '+e.message); }
-    };
-
-    // Record payment
-    savePayment.onclick = async ()=>{
-      const name = quickName.value.trim();
-      if(!name) return alert('Select customer');
-      const amount = Number(pay_amount.value || 0);
-      if(amount<=0) return alert('Enter amount');
-      const dateStr = pay_date.value || isoDate(new Date());
-      try{
-        await recordPaymentForCustomer(name, amount, dateStr, pay_notes.value||null);
-        pay_amount.value=''; pay_date.value=''; pay_notes.value='';
-        quickStatus.innerText = `Payment ₹${amount.toFixed(2)} recorded for ${name}`;
-        await loadDayGrid();
-        await loadPackages();
-        await runMiniAnalytics();
-      }catch(e){ alert('Record payment failed: '+e.message); }
-    };
-
-    // records a payment into customers/{id}/payment_history and also stores a simple payments collection for analytics
-    async function recordPaymentForCustomer(name, amount, dateStr, notes){
-      // find customer id
-      const cCol = collection(db,'customers');
-      const cSnap = await getDocs(query(cCol, where('nameLower','==', name.toLowerCase())));
-      let custId = null;
-      if(cSnap.empty){
-        // create minimal customer doc
-        const newc = doc(cCol);
-        await setDoc(newc, { name, nameLower: name.toLowerCase(), createdAt: serverTimestamp() });
-        custId = newc.id;
-      } else {
-        custId = cSnap.docs[0].id;
-      }
-      // add to payment_history subcollection
-      await addDoc(collection(db,'customers',custId,'payment_history'), { amount, dateClient: dateStr, notes: notes||null, date: serverTimestamp() });
-      // also add to global payments collection (for analytics)
-      await addDoc(collection(db,'payments'), { customer: name, amount, dateClient: dateStr, notes: notes||null, date: serverTimestamp() });
-
-      // Also apply payment to today's daily grid row if exists for that customer/date
-      const dateKey = dateStr || isoDate(new Date());
-      const rowsCol = collection(db,'daily_grids', dateKey, 'rows');
-      const existing = await getDocs(query(rowsCol, where('customer','==', name)));
-      if(!existing.empty){
-        const rdoc = existing.docs[0];
-        const curr = rdoc.data();
-        const paid = Number(curr.paidToday || 0) + amount;
-        await updateDoc(doc(db,'daily_grids',dateKey,'rows',rdoc.id), { paidToday: paid });
-      }
-    }
-
-    // ensure goods_history / package_history entries for customer lifetime
-    async function ensureCustomerHistoryEntry(name, entry){
-      // get or create customer doc
-      const cCol = collection(db,'customers');
-      const cSnap = await getDocs(query(cCol, where('nameLower','==', name.toLowerCase())));
-      let custId;
-      if(cSnap.empty){
-        const newc = doc(cCol);
-        await setDoc(newc, { name, nameLower: name.toLowerCase(), createdAt: serverTimestamp() });
-        custId = newc.id;
-      } else custId = cSnap.docs[0].id;
-
-      // put into appropriate subcollection
-      const sub = entry.type === 'package' ? 'package_history' : 'goods_history';
-      await addDoc(collection(db,'customers',custId,sub), { ...entry, ts: serverTimestamp() });
-    }
-
-    // === Loaders: Day Grid, Packages, New Customers, History ===
-    async function loadDayGrid(){
-      const dateStr = viewDate.value || isoDate(new Date());
-      dayGridBody.innerHTML = `<tr><td colspan="13" class="small">Loading...</td></tr>`;
-      try{
-        const rowsCol = collection(db,'daily_grids',dateStr,'rows');
-        const snap = await getDocs(query(rowsCol, orderBy('customer','asc')));
-        dayGridBody.innerHTML = '';
-        if(snap.empty){
-          dayGridBody.innerHTML = `<tr><td colspan="13" class="small">No records for ${dateStr}</td></tr>`;
-          return;
-        }
-        let idx = 0;
-        for(const d of snap.docs){
-          idx++;
-          const data = d.data();
-          const customer = data.customer;
-          // compute columns 2-6 using DEFAULT_ITEMS mapping keys (match by label lower)
-          const items = data.items || {};
-          // for consistent ordering use DEFAULT_ITEMS
-          const colVals = DEFAULT_ITEMS.map(it => Number(items[it.label.toLowerCase().replace(/\s+/g,'_')]||0));
-          const colTotals = DEFAULT_ITEMS.map((it,i)=> colVals[i] * Number(it.rate||0));
-          const dayTotal = colTotals.reduce((s,x)=> s + x, 0);
-          const prevDue = Number(data.prevDue || 0);
-          const total79 = dayTotal + prevDue;
-          const paid = Number(data.paidToday || 0);
-          const balance = total79 - paid;
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${idx}</td>
-            <td><strong class="cust-link" style="cursor:pointer;color:var(--accent)">${customer}</strong></td>
-            <td>${colVals[0] || ''}</td>
-            <td>${colVals[1] || ''}</td>
-            <td>${colVals[2] || ''}</td>
-            <td>${colVals[3] || ''}</td>
-            <td>${colVals[4] || ''}</td>
-            <td>₹ ${dayTotal.toFixed(2)}</td>
-            <td>₹ ${prevDue.toFixed(2)}</td>
-            <td>₹ ${total79.toFixed(2)}</td>
-            <td>₹ ${paid.toFixed(2)}</td>
-            <td>₹ ${balance.toFixed(2)}</td>
-            <td>
-              <button class="small-cta" data-id="${d.id}" data-cust="${customer}">Edit</button>
-              <button class="small-cta" data-del="${d.id}" style="background:#ffecec">Del</button>
-            </td>
-          `;
-          // attach click for customer history
-          tr.querySelector('.cust-link').onclick = ()=> openCustomerHistory(customer);
-          // edit
-          tr.querySelector('[data-id]').onclick = async (ev)=>{
-            const rid = ev.currentTarget.dataset.id;
-            await openEditRow(dateStr, rid);
-          };
-          // delete
-          tr.querySelector('[data-del]').onclick = async (ev)=>{
-            const rid = ev.currentTarget.dataset.del;
-            if(!confirm('Delete this row?')) return;
-            await deleteDoc(doc(db,'daily_grids',dateStr,'rows',rid));
-            await loadDayGrid();
-          };
-          dayGridBody.appendChild(tr);
-        }
-      }catch(e){ console.error(e); dayGridBody.innerHTML = `<tr><td colspan="13" class="small">Failed to load: ${e.message}</td></tr>`;}
-    }
-
-    async function loadPackages(){
-      pkgBody.innerHTML = `<tr><td colspan="9" class="small">Loading...</td></tr>`;
-      try{
-        const snap = await getDocs(query(collection(db,'package_items'), orderBy('date','desc')));
-        pkgBody.innerHTML = '';
-        if(snap.empty){ pkgBody.innerHTML = `<tr><td colspan="9" class="small">No packages yet.</td></tr>`; return;}
-        snap.forEach(s=>{
-          const d = s.data();
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${d.customer}</td><td>${d.item}</td><td>${d.qty}</td><td>₹ ${Number(d.rate||0).toFixed(2)}</td><td>₹ ${(d.total||0).toFixed(2)}</td>
-            <td>₹ ${(d.prevDue||0).toFixed(2)}</td><td>₹ ${(d.paid||0).toFixed(2)}</td><td>₹ ${((d.total||0)+(d.prevDue||0)-(d.paid||0)).toFixed(2)}</td>
-            <td><button class="small-cta">Edit</button></td>`;
-          pkgBody.appendChild(tr);
-        });
-      }catch(e){ console.error(e); pkgBody.innerHTML = `<tr><td colspan="9" class="small">Failed to load packages</td></tr>`;}
-    }
-
-    async function loadNewCustomers(){
-      const dateStr = viewDate.value || isoDate(new Date());
-      newCustomersList.innerHTML = 'Loading...';
-      try{
-        const snap = await getDocs(query(collection(db,'new_customers', dateStr, 'list')));
-        newCustomersList.innerHTML = '';
-        if(snap.empty) { newCustomersList.innerHTML = '<div class="small">No new customers today.</div>'; return;}
-        snap.forEach(s=>{
-          const d = s.data();
-          const div = document.createElement('div');
-          div.innerText = d.name + ' • ' + (new Date(d.createdAt?.seconds ? d.createdAt.seconds*1000 : Date.now()).toLocaleTimeString());
-          newCustomersList.appendChild(div);
-        });
-      }catch(e){ console.error(e); newCustomersList.innerHTML = '<div class="small">Failed to load</div>'; }
-    }
-
-    // Export CSV of day grid
-    btnExport.onclick = async ()=>{
-      const rows = [];
-      const dateStr = viewDate.value || isoDate(new Date());
-      const snap = await getDocs(query(collection(db,'daily_grids',dateStr,'rows'), orderBy('customer')));
+/* ── AUTOCOMPLETE ── */
+function setupAC(inputId, listId, onPick){
+  const inp=g(inputId), lst=g(listId);
+  if(!inp||!lst) return;
+  inp.addEventListener('input', async ()=>{
+    const q=inp.value.trim();
+    lst.style.display='none'; lst.innerHTML='';
+    if(!q) return;
+    try{
+      const snap=await getDocs(query(collection(db,'customers'),
+        where('nameLower','>=',q.toLowerCase()),
+        where('nameLower','<',q.toLowerCase()+'\uf8ff'),limit(10)));
+      if(snap.empty) return;
       snap.forEach(s=>{
-        const d = s.data();
-        const items = d.items || {};
-        const row = {
-          customer: d.customer,
-          ...DEFAULT_ITEMS.reduce((acc,it)=> (acc[it.label]=items[it.label.toLowerCase().replace(/\s+/g,'_')]||0, acc), {}),
-          prevDue: d.prevDue||0,
-          paidToday: d.paidToday||0
-        };
-        rows.push(row);
+        const d=s.data(), div=document.createElement('div');
+        div.className='ac-item';
+        div.innerHTML=`<b>${escH(d.name)}</b>${d.phone?` <span style="color:var(--muted);font-size:11.5px">• ${escH(d.phone)}</span>`:''}`;
+        div.onclick=()=>{ inp.value=d.name; lst.style.display='none'; if(onPick) onPick(d); };
+        lst.appendChild(div);
       });
-      if(rows.length===0) return alert('No rows to export');
-      // build CSV
-      const headers = ['Customer', ...DEFAULT_ITEMS.map(i=>i.label),'PrevDue','PaidToday'];
-      const csv = [headers.join(',')].concat(rows.map(r=> headers.map(h=> `"${(r[h]||'')}"`).join(','))).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = `daily_grid_${viewDate.value||isoDate(new Date())}.csv`; a.click(); URL.revokeObjectURL(url);
+      lst.style.display='block';
+    }catch(e){ console.warn(e); }
+  });
+  document.addEventListener('click',e=>{ if(!inp.contains(e.target)&&!lst.contains(e.target)) lst.style.display='none'; });
+}
+setupAC('kh_cust','kh_cust_list', async d=> loadKhulaCustomer(d.name));
+setupAC('pkg_cust','pkg_cust_list', null);
+setupAC('pay_cust','pay_cust_list', async d=> loadPayBalance(d.name));
+
+/* If the customer name is edited by hand after being loaded, don't silently
+   keep showing another customer's previous-due / balance. */
+g('kh_cust').addEventListener('input', ()=>{
+  if(g('kh_cust').value.trim() !== khLoadedCustomer){
+    khLoadedCustomer = null;
+    ITEMS.forEach(it=>{ const el=g('kh_'+it.key); if(el) el.value=''; });
+    if(g('kh_prevDue')){ g('kh_prevDue').textContent=money(0); g('kh_prevDue').dataset.val=0; }
+    if(g('kh_payment')) g('kh_payment').value='';
+    calcKhula();
+  }
+});
+g('pay_cust').addEventListener('input', ()=>{
+  if(g('pay_cust').value.trim() !== payLoadedCustomer){
+    payLoadedCustomer = null;
+    if(g('payBalCard')) g('payBalCard').style.display='none';
+  }
+});
+
+/* ── KHULA CALC ── */
+function calcKhula(){
+  let day=0;
+  ITEMS.forEach(it=>{
+    const qty=num(g('kh_'+it.key)?.value);
+    const amt=qty*it.rate; day+=amt;
+    const el=g('am_'+it.key); if(el) el.textContent=money(amt);
+  });
+  const prev=num(g('kh_prevDue')?.dataset.val);
+  const grand=day+prev;
+  const paid=num(g('kh_payment')?.value);
+  const bal=grand-paid;
+  if(g('kh_dayTotal')) g('kh_dayTotal').textContent=money(day);
+  if(g('kh_grandTotal')) g('kh_grandTotal').textContent=money(grand);
+  const balEl=g('kh_balance');
+  if(balEl){ balEl.textContent=money(bal); balEl.className=bal>0?'bal-neg':'bal-ok'; }
+}
+ITEMS.forEach(it=>{ const el=g('kh_'+it.key); if(el) el.addEventListener('input',calcKhula); });
+g('kh_payment')?.addEventListener('input',calcKhula);
+
+async function loadKhulaCustomer(name){
+  khLoadedCustomer = name;
+  const dateStr=g('viewDate').value||isoDate();
+  const snap=await getDocs(query(collection(db,'daily_grids',dateStr,'rows'),where('customer','==',name)));
+  const prevEl=g('kh_prevDue');
+  if(!snap.empty){
+    const data=snap.docs[0].data();
+    ITEMS.forEach(it=>{ const el=g('kh_'+it.key); if(el) el.value=data.items?.[it.key]||''; });
+    const prev=num(data.prevDue);
+    if(prevEl){ prevEl.textContent=money(prev); prevEl.dataset.val=prev; }
+    if(g('kh_payment')) g('kh_payment').value=data.paidToday||'';
+  } else {
+    ITEMS.forEach(it=>{ const el=g('kh_'+it.key); if(el) el.value=''; });
+    if(prevEl){ prevEl.textContent=money(0); prevEl.dataset.val=0; }
+    if(g('kh_payment')) g('kh_payment').value='';
+  }
+  calcKhula();
+}
+
+/* ── SAVE KHULA ── */
+g('btnSaveKhula').addEventListener('click', async ()=>{
+  const name=g('kh_cust').value.trim();
+  if(!name){ showStatus('Enter customer name',true); return; }
+  let hasItem=false;
+  ITEMS.forEach(it=>{ if(num(g('kh_'+it.key)?.value)>0) hasItem=true; });
+  if(!hasItem){ showStatus('Enter at least one quantity',true); return; }
+  g('btnSaveKhula').disabled=true; g('btnSaveKhula').textContent='Saving…';
+  try{
+    const dateStr=g('viewDate').value||isoDate();
+    const items={}; ITEMS.forEach(it=>{ items[it.key]=num(g('kh_'+it.key)?.value); });
+    const prevDue=num(g('kh_prevDue')?.dataset.val||0);
+    const paidToday=num(g('kh_payment')?.value);
+    const custId=await ensureCustomer(name);
+    const rowsCol=collection(db,'daily_grids',dateStr,'rows');
+    const existing=await getDocs(query(rowsCol,where('customer','==',name)));
+    if(!existing.empty){
+      await updateDoc(doc(db,'daily_grids',dateStr,'rows',existing.docs[0].id),{ items, paidToday, lastUpdated:serverTimestamp() });
+    } else {
+      await addDoc(rowsCol,{ customer:name, items, prevDue, paidToday, notes:'', createdAt:serverTimestamp() });
+    }
+    if(custId){
+      for(const it of ITEMS){
+        const qty=num(items[it.key]);
+        if(qty>0) await addDoc(collection(db,'customers',custId,'goods_history'),{ type:'goods',item:it.label,key:it.key,qty,rate:it.rate,total:qty*it.rate,date:dateStr,ts:serverTimestamp() });
+      }
+    }
+    ITEMS.forEach(it=>{ const el=g('kh_'+it.key); if(el) el.value=''; });
+    g('kh_cust').value=''; g('kh_payment').value=''; khLoadedCustomer=null;
+    if(g('kh_prevDue')){ g('kh_prevDue').textContent=money(0); g('kh_prevDue').dataset.val=0; }
+    calcKhula();
+    showStatus(`Entry saved for ${name}`);
+    await loadAll();
+  }catch(e){ showStatus('Failed: '+e.message,true); console.error(e); }
+  finally{ g('btnSaveKhula').disabled=false; g('btnSaveKhula').textContent='Save Entry'; }
+});
+
+/* ── PACKAGE ITEM SUGGESTIONS ── */
+async function loadPkgItemNames(){
+  try{
+    const snap=await getDocs(collection(db,'package_items'));
+    const set=new Set();
+    snap.forEach(s=>{ const d=s.data(); if(d.item) set.add(d.item); if(Array.isArray(d.items)) d.items.forEach(i=>{ if(i.item) set.add(i.item); }); });
+    savedPkgItemNames=[...set];
+  }catch(e){}
+}
+function setupPkgItemAC(){
+  const inp=g('pkg_item'), lst=g('pkg_item_list');
+  if(!inp||!lst) return;
+  inp.addEventListener('input',()=>{
+    const q=inp.value.trim().toLowerCase();
+    lst.innerHTML=''; lst.style.display='none';
+    if(!q) return;
+    const matches=savedPkgItemNames.filter(n=>n.toLowerCase().includes(q));
+    if(!matches.length) return;
+    matches.slice(0,8).forEach(m=>{ const d=document.createElement('div'); d.className='ac-item'; d.textContent=m; d.onclick=()=>{ inp.value=m; lst.style.display='none'; }; lst.appendChild(d); });
+    lst.style.display='block';
+  });
+  document.addEventListener('click',e=>{ if(!inp.contains(e.target)&&!lst.contains(e.target)) lst.style.display='none'; });
+}
+setupPkgItemAC();
+
+/* ── BASKET ── */
+function renderBasket(){
+  const el=g('basketEl'), empty=g('basketEmpty'), tot=g('basketTotal');
+  [...el.querySelectorAll('.basket-item')].forEach(x=>x.remove());
+  let total=0;
+  basket.forEach((it,i)=>{
+    total+=it.amount;
+    const div=document.createElement('div'); div.className='basket-item';
+    div.innerHTML=`<span class="bi-name">${escH(it.item)}</span><span class="bi-info">${it.qty} × ₹${it.rate}</span><span class="bi-amt">${money(it.amount)}</span><button class="bi-rm" data-i="${i}">×</button>`;
+    div.querySelector('.bi-rm').onclick=e=>{ basket.splice(num(e.target.dataset.i),1); renderBasket(); };
+    el.insertBefore(div,empty);
+  });
+  if(empty) empty.style.display=basket.length?'none':'block';
+  if(tot) tot.textContent=money(total);
+}
+
+g('btnAddItem').addEventListener('click',()=>{
+  const item=g('pkg_item').value.trim();
+  const qty=num(g('pkg_qty').value);
+  const rate=num(g('pkg_rate').value);
+  if(!item||qty<=0||rate<=0){ showStatus('Enter item, qty and rate',true); return; }
+  basket.push({item,qty,rate,amount:qty*rate});
+  g('pkg_item').value=''; g('pkg_qty').value=''; g('pkg_rate').value='';
+  if(!savedPkgItemNames.includes(item)) savedPkgItemNames.push(item);
+  renderBasket();
+});
+
+g('btnSavePkg').addEventListener('click', async ()=>{
+  const name=g('pkg_cust').value.trim();
+  if(!name){ showStatus('Enter customer name',true); return; }
+  if(!basket.length){ showStatus('Add at least one item',true); return; }
+  g('btnSavePkg').disabled=true; g('btnSavePkg').textContent='Saving…';
+  try{
+    const dateStr=g('viewDate').value||isoDate();
+    const total=basket.reduce((s,i)=>s+i.amount,0);
+    const custId=await ensureCustomer(name);
+    const snap=await getDocs(query(collection(db,'package_items'),where('customer','==',name),where('date','==',dateStr)));
+    if(!snap.empty){
+      const ref=snap.docs[0].ref; const existing=snap.docs[0].data();
+      const merged=[...(existing.items||[]),...basket];
+      await updateDoc(ref,{ items:merged, total:merged.reduce((s,i)=>s+i.amount,0), lastUpdated:serverTimestamp() });
+    } else {
+      await addDoc(collection(db,'package_items'),{ customer:name, date:dateStr, items:[...basket], total, prevDue:0, paid:0, notes:'', createdAt:serverTimestamp() });
+    }
+    if(custId){
+      for(const it of basket) await addDoc(collection(db,'customers',custId,'package_history'),{ type:'package',item:it.item,qty:it.qty,rate:it.rate,total:it.amount,date:dateStr,ts:serverTimestamp() });
+    }
+    basket=[]; renderBasket(); g('pkg_cust').value='';
+    showStatus(`Package saved for ${name}`);
+    await loadAll();
+  }catch(e){ showStatus('Failed: '+e.message,true); console.error(e); }
+  finally{ g('btnSavePkg').disabled=false; g('btnSavePkg').textContent='Save All Items'; }
+});
+
+/* ── PAYMENT ── */
+async function loadPayBalance(name){
+  payLoadedCustomer = name;
+  const dateStr=g('viewDate').value||isoDate();
+  const snap=await getDocs(query(collection(db,'daily_grids',dateStr,'rows'),where('customer','==',name)));
+  const card=g('payBalCard'), amtEl=g('payBalAmt');
+  if(!snap.empty){
+    const d=snap.docs[0].data(); const items=d.items||{}; let day=0;
+    ITEMS.forEach(it=>{ day+=num(items[it.key])*it.rate; });
+    const bal=day+num(d.prevDue)-num(d.paidToday);
+    if(card) card.style.display='block'; if(amtEl) amtEl.textContent=money(bal);
+  } else { if(card) card.style.display='none'; }
+}
+
+g('btnSavePay').addEventListener('click', async ()=>{
+  const name=g('pay_cust').value.trim();
+  const amount=num(g('pay_amount').value);
+  if(!name){ showStatus('Enter customer name',true); return; }
+  if(amount<=0){ showStatus('Enter a valid amount',true); return; }
+  g('btnSavePay').disabled=true; g('btnSavePay').textContent='Saving…';
+  try{
+    const dateStr=g('pay_date').value||isoDate();
+    const notes=g('pay_notes').value.trim()||null;
+    const custId=await ensureCustomer(name);
+    if(custId) await addDoc(collection(db,'customers',custId,'payment_history'),{ amount,dateClient:dateStr,notes,date:serverTimestamp() });
+    await addDoc(collection(db,'payments'),{ customer:name,amount,dateClient:dateStr,notes,date:serverTimestamp() });
+    const snap=await getDocs(query(collection(db,'daily_grids',dateStr,'rows'),where('customer','==',name)));
+    if(!snap.empty){ const r=snap.docs[0]; await updateDoc(doc(db,'daily_grids',dateStr,'rows',r.id),{ paidToday:num(r.data().paidToday)+amount }); }
+    g('pay_amount').value=''; g('pay_notes').value=''; g('pay_cust').value=''; payLoadedCustomer=null;
+    if(g('payBalCard')) g('payBalCard').style.display='none';
+    showStatus(`Payment ${money(amount)} recorded for ${name}`);
+    await loadAll();
+  }catch(e){ showStatus('Failed: '+e.message,true); console.error(e); }
+  finally{ g('btnSavePay').disabled=false; g('btnSavePay').textContent='Record Payment'; }
+});
+
+/* ── NEW CUSTOMER ── */
+g('btnCreateCust').addEventListener('click', async ()=>{
+  const name=g('nc_name').value.trim();
+  if(!name){ showStatus('Enter customer name',true); return; }
+  g('btnCreateCust').disabled=true; g('btnCreateCust').textContent='Creating…';
+  try{
+    const snap=await getDocs(query(collection(db,'customers'),where('nameLower','==',name.toLowerCase())));
+    if(!snap.empty){ showStatus(`"${name}" already exists`,true); return; }
+    await addDoc(collection(db,'customers'),{ name,nameLower:name.toLowerCase(),phone:g('nc_phone').value.trim()||null,address:g('nc_addr').value.trim()||null,createdAt:serverTimestamp() });
+    g('nc_name').value=''; g('nc_phone').value=''; g('nc_addr').value='';
+    showStatus(`Customer "${name}" created`);
+  }catch(e){ showStatus('Failed: '+e.message,true); }
+  finally{ g('btnCreateCust').disabled=false; g('btnCreateCust').textContent='Create Customer'; }
+});
+
+/* ── HELPER: ensure customer doc ── */
+async function ensureCustomer(name){
+  try{
+    const snap=await getDocs(query(collection(db,'customers'),where('nameLower','==',name.toLowerCase())));
+    if(!snap.empty) return snap.docs[0].id;
+    const ref=await addDoc(collection(db,'customers'),{ name,nameLower:name.toLowerCase(),createdAt:serverTimestamp() });
+    return ref.id;
+  }catch(e){ return null; }
+}
+
+/* ── LOAD GRID (Khula Maal) ── */
+async function loadGrid(){
+  const dateStr=g('viewDate').value||isoDate();
+  const tbody=g('gridBody'); if(!tbody) return;
+  tbody.innerHTML=`<tr><td colspan="13" style="padding:18px;text-align:center;color:var(--muted);font-size:13px">Loading…</td></tr>`;
+  try{
+    const snap=await getDocs(query(collection(db,'daily_grids',dateStr,'rows'),orderBy('customer','asc')));
+    tbody.innerHTML='';
+    if(snap.empty){ tbody.innerHTML=`<tr><td colspan="13" style="padding:18px;text-align:center;color:var(--muted);font-size:13px">No records for ${dateStr}</td></tr>`; return; }
+    let i=0;
+    for(const d of snap.docs){
+      i++; const data=d.data(); const items=data.items||{};
+      const vals=ITEMS.map(it=>num(items[it.key]));
+      const day=ITEMS.reduce((s,it,idx)=>s+vals[idx]*it.rate,0);
+      const prev=num(data.prevDue); const grand=day+prev;
+      const paid=num(data.paidToday); const bal=grand-paid;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td data-label="#">${i}</td>
+        <td data-label="Customer"><span class="cust-link" data-c="${escH(data.customer)}">${escH(data.customer)}</span></td>
+        <td data-label="Khari">${vals[0]||''}</td>
+        <td data-label="BTC">${vals[1]||''}</td>
+        <td data-label="Indori">${vals[2]||''}</td>
+        <td data-label="Maska">${vals[3]||''}</td>
+        <td data-label="Biscuits">${vals[4]||''}</td>
+        <td data-label="Day Total">${money(day)}</td>
+        <td data-label="Prev Due">${money(prev)}</td>
+        <td data-label="Grand Total" style="font-weight:700">${money(grand)}</td>
+        <td data-label="Paid">${money(paid)}</td>
+        <td data-label="Balance" class="${bal>0?'neg':'pos'}">${money(bal)}</td>
+        <td data-label="Actions"><div class="row-actions">
+          <button class="btn btn-edit" data-er="${d.id}" data-edate="${dateStr}">Edit</button>
+          <button class="btn btn-del" data-dr="${d.id}" data-ddate="${dateStr}">Del</button>
+        </div></td>`;
+      tr.querySelector('[data-c]').addEventListener('click',e=> openLifetime(e.target.dataset.c));
+      tr.querySelector('[data-er]').addEventListener('click',()=> openErModal(d.id,dateStr,data));
+      tr.querySelector('[data-dr]').addEventListener('click',()=> openDel('row',d.id,`Delete entry for "${data.customer}" on ${dateStr}?`,dateStr));
+      tbody.appendChild(tr);
+    }
+  }catch(e){ console.error(e); tbody.innerHTML=`<tr><td colspan="13" style="padding:14px;color:var(--danger);font-size:13px">Failed: ${e.message}</td></tr>`; }
+}
+
+/* ── LOAD PACKAGES ──
+   NOTE: query intentionally does NOT use orderBy alongside where() —
+   a where+orderBy on different fields needs a Firestore composite index,
+   which caused this section to hang on "Loading…" forever. Sorting is
+   done client-side instead so it works with zero manual index setup. */
+async function loadPkgs(){
+  const dateStr=g('viewDate').value||isoDate();
+  const tbody=g('pkgBody'); if(!tbody) return;
+  tbody.innerHTML=`<tr><td colspan="8" style="padding:18px;text-align:center;color:var(--muted);font-size:13px">Loading…</td></tr>`;
+  try{
+    const snap=await getDocs(query(collection(db,'package_items'),where('date','==',dateStr)));
+    const docs=snap.docs.slice().sort((a,b)=> (a.data().customer||'').localeCompare(b.data().customer||''));
+    tbody.innerHTML='';
+    if(docs.length===0){ tbody.innerHTML=`<tr><td colspan="8" style="padding:18px;text-align:center;color:var(--muted);font-size:13px">No packages for ${dateStr}</td></tr>`; return; }
+    for(const d of docs){
+      const data=d.data();
+      const itemsList=Array.isArray(data.items)?data.items:(data.item?[{item:data.item,qty:data.qty,rate:data.rate,amount:data.total}]:[]);
+      const total=num(data.total)||itemsList.reduce((s,i)=>s+num(i.amount||num(i.qty)*num(i.rate)),0);
+      const prev=num(data.prevDue); const paid=num(data.paid); const bal=total+prev-paid;
+      const summary=itemsList.map(i=>`${i.item} ×${i.qty}`).join(', ');
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td data-label="Customer"><span class="cust-link" data-c="${escH(data.customer)}">${escH(data.customer)}</span></td>
+        <td data-label="Date">${data.date||''}</td>
+        <td data-label="Items" style="font-size:12px;max-width:180px;white-space:normal">${escH(summary)}</td>
+        <td data-label="Total">${money(total)}</td>
+        <td data-label="Prev Due">${money(prev)}</td>
+        <td data-label="Paid">${money(paid)}</td>
+        <td data-label="Balance" class="${bal>0?'neg':'pos'}">${money(bal)}</td>
+        <td data-label="Actions"><div class="row-actions">
+          <button class="btn btn-edit" data-ep="${d.id}">Edit</button>
+          <button class="btn btn-del" data-dp="${d.id}">Del</button>
+        </div></td>`;
+      tr.querySelector('[data-c]').addEventListener('click',e=> openLifetime(e.target.dataset.c));
+      tr.querySelector('[data-ep]').addEventListener('click',()=> openEpModal(d.id,data));
+      tr.querySelector('[data-dp]').addEventListener('click',()=> openDel('pkg',d.id,`Delete package for "${data.customer}"?`));
+      tbody.appendChild(tr);
+    }
+  }catch(e){ console.error(e); tbody.innerHTML=`<tr><td colspan="8" style="padding:14px;color:var(--danger);font-size:13px">Failed: ${e.message}</td></tr>`; }
+}
+
+/* ── ANALYTICS ── */
+async function runAnalytics(){
+  try{
+    const dateStr=g('viewDate').value||isoDate();
+    let sales=0,paid=0,count=0;
+    const snap=await getDocs(collection(db,'daily_grids',dateStr,'rows'));
+    snap.forEach(d=>{ count++; const items=d.data().items||{}; ITEMS.forEach(it=>{ sales+=num(items[it.key])*it.rate; }); paid+=num(d.data().paidToday); });
+    const pkgSnap=await getDocs(query(collection(db,'package_items'),where('date','==',dateStr)));
+    pkgSnap.forEach(d=>{ sales+=num(d.data().total)||0; });
+    g('aSales').textContent=money(sales); g('aPaid').textContent=money(paid);
+    g('aNet').textContent=money(sales-paid); g('aCount').textContent=String(count);
+  }catch(e){}
+}
+
+/* ── HISTORY ── */
+async function loadHistory(){
+  const histEl=g('histDates'); if(!histEl) return;
+  histEl.innerHTML=`<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px">Loading…</div>`;
+  try{
+    const now=new Date(); let any=false; histEl.innerHTML='';
+    for(let i=0;i<14;i++){
+      const d=new Date(now); d.setDate(now.getDate()-i);
+      const dateStr=isoDate(d);
+      const snap=await getDocs(collection(db,'daily_grids',dateStr,'rows'));
+      if(snap.empty) continue;
+      any=true; histEl.appendChild(buildDateBlock(dateStr,snap));
+    }
+    if(!any) histEl.innerHTML=`<div style="padding:14px;text-align:center;color:var(--muted);font-size:13px">No history in the last 14 days</div>`;
+  }catch(e){ histEl.innerHTML=`<div style="padding:12px;color:var(--danger);font-size:13px">Failed: ${e.message}</div>`; }
+}
+function buildDateBlock(dateStr,snap){
+  const wrap=document.createElement('div'); wrap.className='hist-date-block';
+  let day=0; const rows=[];
+  snap.forEach(d=>{ const data=d.data(); const items=data.items||{}; let t=0; ITEMS.forEach(it=>t+=num(items[it.key])*it.rate); day+=t; rows.push({id:d.id,...data,dayTotal:t}); });
+  const hdr=document.createElement('div'); hdr.className='hist-date-hdr';
+  hdr.innerHTML=`<div><div class="hdh-title">${dateStr}</div><div class="hdh-sub">${rows.length} customer${rows.length!==1?'s':''} • ${money(day)}</div></div><span class="hdh-chev">▶</span>`;
+  const body=document.createElement('div'); body.className='hist-date-body';
+  rows.forEach(r=>{
+    const paid=num(r.paidToday); const prev=num(r.prevDue); const bal=r.dayTotal+prev-paid;
+    const row=document.createElement('div'); row.className='hist-cust-row';
+    row.innerHTML=`<div><div class="hcr-name">${escH(r.customer)}</div><div class="hcr-sub">Paid ${money(paid)} • Bal ${money(bal)}</div></div><div class="hcr-amt">${money(r.dayTotal)}</div>`;
+    row.onclick=()=> openLifetime(r.customer); body.appendChild(row);
+  });
+  hdr.onclick=()=>{ const open=body.classList.toggle('open'); hdr.querySelector('.hdh-chev').classList.toggle('open',open); };
+  wrap.appendChild(hdr); wrap.appendChild(body); return wrap;
+}
+
+/* Customer search history */
+g('btnHistSearch').addEventListener('click', async ()=>{
+  const q=g('histSearch').value.trim();
+  if(!q){ showStatus('Enter a name to search',true); return; }
+  try{
+    const snap=await getDocs(query(collection(db,'customers'),where('nameLower','>=',q.toLowerCase()),where('nameLower','<',q.toLowerCase()+'\uf8ff'),limit(10)));
+    if(snap.empty){ showStatus('No customers found',true); return; }
+    if(snap.docs.length===1){ openLifetime(snap.docs[0].data().name); return; }
+    const histEl=g('histDates'); histEl.innerHTML='';
+    g('lifetimeWrap').style.display='none'; g('histWrap').style.display='block';
+    snap.forEach(s=>{ const d=s.data(); const div=document.createElement('div'); div.className='hist-cust-row'; div.innerHTML=`<div><div class="hcr-name">${escH(d.name)}</div><div class="hcr-sub">${d.phone||''}</div></div><div style="color:var(--accent);font-size:12.5px;font-weight:600">View →</div>`; div.onclick=()=> openLifetime(d.name); histEl.appendChild(div); });
+  }catch(e){ showStatus('Search failed: '+e.message,true); }
+});
+g('histSearch').addEventListener('keydown',e=>{ if(e.key==='Enter') g('btnHistSearch').click(); });
+
+/* Lifetime history */
+async function openLifetime(name){
+  g('lifetimeWrap').style.display='block'; g('histWrap').style.display='none';
+  g('lifetimeTitle').textContent=`${name} — Lifetime History`;
+  const content=g('lifetimeContent'); content.innerHTML=`<div style="padding:14px;text-align:center;color:var(--muted)">Loading…</div>`;
+  try{
+    const snap=await getDocs(query(collection(db,'customers'),where('nameLower','==',name.toLowerCase())));
+    if(snap.empty){ content.innerHTML=`<div style="color:var(--muted);padding:12px">No record found for ${escH(name)}</div>`; return; }
+    const custId=snap.docs[0].id;
+    const [gs,ps,pks]=await Promise.all([
+      getDocs(query(collection(db,'customers',custId,'goods_history'),orderBy('ts','desc'),limit(50))),
+      getDocs(query(collection(db,'customers',custId,'payment_history'),orderBy('date','desc'),limit(30))),
+      getDocs(query(collection(db,'customers',custId,'package_history'),orderBy('ts','desc'),limit(30)))
+    ]);
+    content.innerHTML='';
+    const mkSec=(title,docs,fn)=>{
+      if(docs.empty) return;
+      const sec=document.createElement('div'); sec.className='lt-sec';
+      sec.innerHTML=`<div class="lt-sec-title">${title}</div>`;
+      docs.forEach(d=>{ const el=document.createElement('div'); el.className='lt-row'; el.innerHTML=fn(d.data()); sec.appendChild(el); });
+      content.appendChild(sec);
     };
+    mkSec('Khula Maal (Goods)',gs,d=>`<span class="lt-date">${d.date||''}</span><span class="lt-item">${escH(d.item||'')} × ${d.qty}</span><span class="lt-amt">${money(d.total)}</span>`);
+    mkSec('Package Maal',pks,d=>`<span class="lt-date">${d.date||''}</span><span class="lt-item">${escH(d.item||'')} × ${d.qty}</span><span class="lt-amt">${money(d.total)}</span>`);
+    mkSec('Payments',ps,d=>`<span class="lt-date">${d.dateClient||''}</span><span class="lt-item">${escH(d.notes||'Payment')}</span><span class="lt-amt" style="color:var(--success)">${money(d.amount)}</span>`);
+    if(!content.children.length) content.innerHTML=`<div style="color:var(--muted);padding:12px">No history yet.</div>`;
+  }catch(e){ content.innerHTML=`<div style="color:var(--danger);padding:12px">Failed: ${e.message}</div>`; }
+}
+g('btnBackHist').addEventListener('click',()=>{ g('lifetimeWrap').style.display='none'; g('histWrap').style.display='block'; });
 
-    // Open edit row modal (simple prompt-based editing for speed)
-    async function openEditRow(dateStr, rowId){
-      const rdoc = await getDoc(doc(db,'daily_grids',dateStr,'rows',rowId));
-      if(!rdoc.exists()) return alert('Row missing');
-      const data = rdoc.data();
-      // prompt for prevDue and paid
-      const newPrev = prompt('Prev Due amount', String(data.prevDue||0));
-      if(newPrev === null) return;
-      const newPaid = prompt('Paid today', String(data.paidToday||0));
-      if(newPaid === null) return;
-      await updateDoc(doc(db,'daily_grids',dateStr,'rows',rowId), { prevDue: Number(newPrev||0), paidToday: Number(newPaid||0), lastUpdated: serverTimestamp() });
-      await loadDayGrid();
-      await runMiniAnalytics();
-    }
+/* ── EDIT ROW MODAL ── */
+function openErModal(rowId,dateStr,data){
+  g('erRowId').value=rowId; g('erDate').value=dateStr; g('erCust').value=data.customer;
+  const items=data.items||{};
+  ITEMS.forEach(it=>{ const el=g('er_'+it.key); if(el) el.value=num(items[it.key])||''; });
+  g('er_prevDue').value=num(data.prevDue)||''; g('er_paidToday').value=num(data.paidToday)||'';
+  g('editRowModal').classList.add('open');
+}
+g('cancelErRow').onclick=()=>g('editRowModal').classList.remove('open');
+g('editRowModal').addEventListener('click',e=>{ if(e.target===g('editRowModal')) g('editRowModal').classList.remove('open'); });
+g('saveErRow').addEventListener('click', async ()=>{
+  const id=g('erRowId').value,dateStr=g('erDate').value;
+  g('saveErRow').disabled=true; g('saveErRow').textContent='Saving…';
+  try{
+    const items={}; ITEMS.forEach(it=>{ items[it.key]=num(g('er_'+it.key).value); });
+    await updateDoc(doc(db,'daily_grids',dateStr,'rows',id),{ items,prevDue:num(g('er_prevDue').value),paidToday:num(g('er_paidToday').value),lastUpdated:serverTimestamp() });
+    g('editRowModal').classList.remove('open'); await loadAll();
+  }catch(e){ alert('Failed: '+e.message); }
+  finally{ g('saveErRow').disabled=false; g('saveErRow').textContent='Save Changes'; }
+});
 
-    // Open customer lifetime history (compile goods_history + payment_history + package_history)
-    async function openCustomerHistory(name){
-      custHistory.innerHTML = 'Loading history...';
-      try{
-        // find customer id
-        const cCol = collection(db,'customers');
-        const cSnap = await getDocs(query(cCol, where('nameLower','==', name.toLowerCase())));
-        if(cSnap.empty){ custHistory.innerHTML = `<div class="small">No history for ${name}</div>`; return;}
-        const cid = cSnap.docs[0].id;
-        const goodsSnap = await getDocs(query(collection(db,'customers',cid,'goods_history'), orderBy('ts','desc'), ));
-        const paySnap = await getDocs(query(collection(db,'customers',cid,'payment_history'), orderBy('date','desc')));
-        const pkgSnap = await getDocs(query(collection(db,'customers',cid,'package_history'), orderBy('ts','desc')));
-        custHistory.innerHTML = `<div style="font-weight:700;margin-bottom:8px">${name} — Lifetime History</div>`;
-        if(!goodsSnap.empty){
-          const h1 = document.createElement('div'); h1.innerHTML = '<div style="font-weight:700">Goods</div>'; custHistory.appendChild(h1);
-          goodsSnap.forEach(s=> { const d=s.data(); const el = document.createElement('div'); el.innerText = `${d.date} • ${d.item} • ${d.qty} • ₹${(d.total||0).toFixed(2)}`; custHistory.appendChild(el);});
-        }
-        if(!pkgSnap.empty){
-          const h2 = document.createElement('div'); h2.innerHTML = '<div style="font-weight:700;margin-top:8px">Package</div>'; custHistory.appendChild(h2);
-          pkgSnap.forEach(s=> { const d=s.data(); const el = document.createElement('div'); el.innerText = `${d.date} • ${d.item} • ${d.qty} • ₹${(d.total||0).toFixed(2)}`; custHistory.appendChild(el);});
-        }
-        if(!paySnap.empty){
-          const h3 = document.createElement('div'); h3.innerHTML = '<div style="font-weight:700;margin-top:8px">Payments</div>'; custHistory.appendChild(h3);
-          paySnap.forEach(s=> { const d=s.data(); const el = document.createElement('div'); el.innerText = `${d.dateClient||''} • ₹${(d.amount||0).toFixed(2)} • ${d.notes||''}`; custHistory.appendChild(el);});
-        }
-      }catch(e){ console.error(e); custHistory.innerHTML = '<div class="small">Failed to load history</div>'; }
-    }
+/* ── EDIT PACKAGE MODAL ── */
+function openEpModal(pkgId,data){
+  g('epId').value=pkgId; g('epCust').value=data.customer;
+  editPkgItems=Array.isArray(data.items)?[...data.items.map(i=>({...i}))]:(data.item?[{item:data.item,qty:data.qty,rate:data.rate,amount:data.total}]:[]);
+  g('ep_prevDue').value=num(data.prevDue)||''; g('ep_paid').value=num(data.paid)||'';
+  renderEpItems(); g('editPkgModal').classList.add('open');
+}
+function renderEpItems(){
+  const wrap=g('epItemsWrap'); wrap.innerHTML='';
+  editPkgItems.forEach((it,i)=>{
+    const row=document.createElement('div'); row.style.cssText='display:flex;gap:7px;align-items:center;margin-bottom:7px;flex-wrap:wrap';
+    row.innerHTML=`<input class="inp inp-sm" value="${escH(it.item)}" placeholder="Item" style="flex:2;min-width:80px" data-f="item" data-i="${i}"><input type="number" class="inp inp-sm" value="${it.qty}" placeholder="Qty" style="flex:1;min-width:60px" data-f="qty" data-i="${i}"><input type="number" class="inp inp-sm" value="${it.rate}" placeholder="Rate" style="flex:1;min-width:60px" data-f="rate" data-i="${i}"><button class="btn btn-del" data-rm="${i}" style="padding:6px 9px;font-size:14px">×</button>`;
+    row.querySelector('[data-rm]').onclick=e=>{ editPkgItems.splice(num(e.target.dataset.rm),1); renderEpItems(); };
+    row.querySelectorAll('[data-f]').forEach(inp=>{ inp.addEventListener('input',()=>{ const idx=num(inp.dataset.i); editPkgItems[idx][inp.dataset.f]=inp.dataset.f==='item'?inp.value:num(inp.value); editPkgItems[idx].amount=num(editPkgItems[idx].qty)*num(editPkgItems[idx].rate); }); });
+    wrap.appendChild(row);
+  });
+  const addBtn=document.createElement('button'); addBtn.className='btn btn-add'; addBtn.textContent='+ Add Item'; addBtn.style.marginTop='4px';
+  addBtn.onclick=()=>{ editPkgItems.push({item:'',qty:0,rate:0,amount:0}); renderEpItems(); };
+  wrap.appendChild(addBtn);
+}
+g('cancelEpModal').onclick=()=>g('editPkgModal').classList.remove('open');
+g('editPkgModal').addEventListener('click',e=>{ if(e.target===g('editPkgModal')) g('editPkgModal').classList.remove('open'); });
+g('saveEpModal').addEventListener('click', async ()=>{
+  const id=g('epId').value;
+  g('saveEpModal').disabled=true; g('saveEpModal').textContent='Saving…';
+  try{
+    const total=editPkgItems.reduce((s,i)=>s+num(i.amount||num(i.qty)*num(i.rate)),0);
+    await updateDoc(doc(db,'package_items',id),{ items:editPkgItems,total,prevDue:num(g('ep_prevDue').value),paid:num(g('ep_paid').value),lastUpdated:serverTimestamp() });
+    g('editPkgModal').classList.remove('open'); await loadPkgs();
+  }catch(e){ alert('Failed: '+e.message); }
+  finally{ g('saveEpModal').disabled=false; g('saveEpModal').textContent='Save Changes'; }
+});
 
-    // Search history quickly
-    histSearch.addEventListener('input', async (e)=>{
-      const q = e.target.value.trim();
-      if(!q) return;
-      // try find matching customer docs
-      const snap = await getDocs(query(collection(db,'customers'), where('nameLower','>=', q.toLowerCase()), where('nameLower','<', q.toLowerCase()+'\uf8ff'), limit(20) ));
-      custHistory.innerHTML = '';
-      if(snap.empty) { custHistory.innerHTML = '<div class="small">No matches</div>'; return; }
-      snap.forEach(s=> {
-        const d = s.data();
-        const div = document.createElement('div'); div.style.padding='8px'; div.style.cursor='pointer';
-        div.innerText = d.name + (d.phone ? ' • '+d.phone : '');
-        div.onclick = ()=> openCustomerHistory(d.name);
-        custHistory.appendChild(div);
-      });
-    });
+/* ── DELETE ── */
+function openDel(type,id,msg,date=null){
+  delTarget={type,id,date}; g('delMsg').textContent=msg; g('delModal').classList.add('open');
+}
+g('cancelDel').onclick=()=>{ g('delModal').classList.remove('open'); delTarget=null; };
+g('delModal').addEventListener('click',e=>{ if(e.target===g('delModal')){ g('delModal').classList.remove('open'); delTarget=null; } });
+g('confirmDel').addEventListener('click', async ()=>{
+  if(!delTarget) return;
+  g('confirmDel').disabled=true; g('confirmDel').textContent='Deleting…';
+  try{
+    if(delTarget.type==='row') await deleteDoc(doc(db,'daily_grids',delTarget.date,'rows',delTarget.id));
+    else if(delTarget.type==='pkg') await deleteDoc(doc(db,'package_items',delTarget.id));
+    g('delModal').classList.remove('open'); delTarget=null;
+    await loadAll();
+  }catch(e){ alert('Delete failed: '+e.message); }
+  finally{ g('confirmDel').disabled=false; g('confirmDel').textContent='Delete'; }
+});
 
-    // === Mini Analytics (today) ===
-    async function runMiniAnalytics(){
-      try{
-        const dateStr = viewDate.value || isoDate(new Date());
-        // sales: sum of goods in daily_grids for date
-        let sales = 0, paid = 0;
-        const rowsCol = collection(db,'daily_grids',dateStr,'rows');
-        const snap = await getDocs(rowsCol);
-        snap.forEach(s=>{
-          const d = s.data();
-          const items = d.items || {};
-          // compute using DEFAULT_ITEMS rates (if rate not available we fallback to 0)
-          DEFAULT_ITEMS.forEach(it=>{
-            const qty = Number(items[it.label.toLowerCase().replace(/\s+/g,'_')]||0);
-            sales += qty * Number(it.rate||0);
-          });
-          paid += Number(d.paidToday||0);
-        });
-        // add package totals for date as sales
-        const pkgSnap = await getDocs(query(collection(db,'package_items'), where('date','==', dateStr)));
-        pkgSnap.forEach(s=> sales += Number(s.data().total||0));
-
-        mini_sales.innerText = `₹ ${sales.toFixed(2)}`;
-        mini_paid.innerText = `₹ ${paid.toFixed(2)}`;
-        mini_net.innerText = `₹ ${(sales - paid).toFixed(2)}`;
-      }catch(e){ console.error('mini analytics failed', e); }
-    }
-
-    // reload when date changed
-    viewDate.addEventListener('change', async ()=>{
-      await loadDayGrid();
-      await loadPackages();
-      await loadNewCustomers();
-      await runMiniAnalytics();
-    });
-
-    // initial suggestions prefill default items as rates (optional)
-    (function initDefaults(){ /* nothing to do here for now */ })();
-
-    // run initial loads periodically (safety)
-    setInterval(()=> { loadNewCustomers(); runMiniAnalytics(); }, 60*1000);
-
-    // Ensure UI reacts: hide suggestion when click outside
-    document.addEventListener('click', (ev)=>{
-      if(!ev.target.closest('.suggestions')) { itemSuggest.style.display='none'; nameSuggest.style.display='none'; }
-    });
-
-    // small helper to refresh all
-    async function refreshAll(){ await loadDayGrid(); await loadPackages(); await loadNewCustomers(); await runMiniAnalytics(); }
-    window.refreshDailyCustomers = refreshAll;
-
-    // final: load
-    await refreshAll();
-
-  </script>
+/* ── EXPORT ── */
+g('btnExport').addEventListener('click', async ()=>{
+  const dateStr=g('viewDate').value||isoDate();
+  const snap=await getDocs(query(collection(db,'daily_grids',dateStr,'rows'),orderBy('customer','asc')));
+  if(snap.empty){ alert('No data to export'); return; }
+  const headers=['#','Customer',...ITEMS.map(i=>i.label+' (KG)'),'Day Total','Prev Due','Grand Total','Paid','Balance'];
+  const rows=[headers.join(',')]; let i=0;
+  snap.forEach(d=>{ i++; const data=d.data(); const items=data.items||{}; const vals=ITEMS.map(it=>num(items[it.key])); const day=ITEMS.reduce((s,it,idx)=>s+vals[idx]*it.rate,0); const prev=num(data.prevDue); const paid=num(data.paidToday); const grand=day+prev; const bal=grand-paid; rows.push([i,`"${data.customer}"`,...vals,day.toFixed(2),prev.toFixed(2),grand.toFixed(2),paid.toFixed(2),bal.toFixed(2)].join(',')); });
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`bakery_${dateStr}.csv`; a.click(); URL.revokeObjectURL(url);
+});
+</script>
 </body>
 </html>
