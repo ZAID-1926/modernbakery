@@ -1,356 +1,349 @@
 <!DOCTYPE html>
-<html lant="en">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Modern Bakery — Dashboard</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg: linear-gradient(180deg,#e9f1ff 0%, #f8fbff 100%);
-      --panel: #ffffff;
-      --glass: rgba(255,255,255,0.6);
-      --accent: #0b5ed7;
-      --accent-2: #0a3ea8;
-      --muted: #6b7280;
-      --success: #16a34a;
-      --danger: #ef4444;
-      --shadow: 0 12px 40px rgba(12,34,80,0.08);
-      --radius: 14px;
-      --glass-border: rgba(11,94,215,0.08);
+      --bg:#f3f7ff;
+      --card:#ffffff;
+      --accent:#0b5ed7;
+      --accent-2:#042c6b;
+      --gold:#c8973e;
+      --gold-deep:#8a6422;
+      --muted:#6b7280;
+      --muted-light:#94a3b8;
+      --radius:14px;
+      --success:#16a34a;
+      --danger:#ef4444;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:var(--bg);color:#0f1724;-webkit-font-smoothing:antialiased}
-    a { color:inherit; text-decoration:none; }
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background: linear-gradient(180deg,#eaf2ff,#f6f9ff);
+      color:#0f1724;
+      -webkit-font-smoothing:antialiased;
+    }
+    a{color:inherit;text-decoration:none}
 
-    /* Topbar */
+    /* ===== TOPBAR ===== */
     .topbar{
-      position:sticky; top:0; z-index:40;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:18px 28px;
-      background: linear-gradient(90deg, rgba(11,62,136,0.98), rgba(6,33,87,0.98));
-      color:white; box-shadow: 0 8px 30px rgba(2,8,23,0.12);
+      display:flex;justify-content:space-between;align-items:center;
+      padding:16px 28px;
+      background:linear-gradient(90deg,#042c6b,#0b5ed7);
+      color:white;
+      box-shadow:0 10px 30px rgba(7,20,60,0.12);
+      border-bottom:2px solid var(--gold);
+      flex-wrap:wrap;gap:8px;
     }
-    .brand { display:flex;align-items:center;gap:12px }
-    .brand .logo {
-      height:44px; width:44px; border-radius:10px;
-      background: linear-gradient(135deg,#fff0 0%, #ffffff11 100%);
-      display:flex;align-items:center;justify-content:center;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-      border: 1px solid rgba(255,255,255,0.06);
+    .logo-wrap{display:flex;align-items:center;gap:10px}
+    .logo-badge{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);flex-shrink:0}
+    .logo{font-weight:700;font-size:17px;letter-spacing:.2px}
+    .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .small{font-size:13px;color:rgba(255,255,255,0.85)}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.18);color:white;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px;transition:background .15s}
+    .btn-ghost:hover{background:rgba(255,255,255,0.1)}
+
+    .wrap{max-width:1200px;margin:24px auto;padding:18px}
+
+    /* ===== Shared card ===== */
+    .card{
+      background:var(--card);padding:22px;border-radius:var(--radius);
+      box-shadow:0 4px 15px rgba(0,0,0,0.03);
+      border:none;
+      animation:fadeUp .5s ease both;
     }
-    .brand .title { font-weight:700; font-size:18px; letter-spacing:0.2px }
-    .top-actions { display:flex; gap:12px; align-items:center }
-    .user-bubble { display:flex; gap:10px; align-items:center; background: rgba(255,255,255,0.06); padding:8px 12px; border-radius:999px; font-weight:600; font-size:14px; color:white; border:1px solid rgba(255,255,255,0.04) }
-
-    .btn-ghost { background:transparent; color:white; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); cursor:pointer; font-weight:700 }
-    .btn-ghost:hover{ transform:translateY(-2px) }
-
-    .wrap{ max-width:1200px; margin:26px auto; padding:0 18px; }
-
-    /* Grid */
-    .grid-top { display:flex; gap:22px; align-items:stretch; margin-bottom:20px; }
-    .card-hero { flex:1; background:var(--panel); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); border:1px solid var(--glass-border) }
-    .card-hero h2{ margin:0; font-size:20px; }
-    .sub{ color:var(--muted); margin-top:6px; font-size:13px }
-
-    .quick-actions { display:flex; gap:12px; margin-top:16px; flex-wrap:wrap }
-    .qa { background:linear-gradient(180deg,#f8fbff,#ffffff); padding:12px 16px; border-radius:10px; display:flex; align-items:center; gap:10px; box-shadow:0 8px 26px rgba(10,30,80,0.04); cursor:pointer; border:1px solid #eef5ff; transition:transform .16s ease }
-    .qa:hover { transform:translateY(-6px) }
-
-    /* main grid for modules */
-    .modules { display:grid; grid-template-columns: repeat(3, 1fr); gap:18px; margin-top:18px; }
-    .module { background:linear-gradient(180deg,#fff,#fbfdff); border-radius:12px; padding:18px; box-shadow:0 20px 50px rgba(8,26,80,0.06); border:1px solid #eef6ff; display:flex; flex-direction:column; gap:12px; min-height:140px; transition:transform .14s ease, box-shadow .14s ease; cursor:pointer; }
-    .module:hover { transform:translateY(-8px); box-shadow:0 36px 80px rgba(10,30,80,0.09) }
-    .module .m-head { display:flex; justify-content:space-between; align-items:center }
-    .module h3 { margin:0; font-size:16px; }
-    .module .desc { color:var(--muted); font-size:13px }
-    .module .cta { margin-top:auto; display:flex; justify-content:space-between; align-items:center }
-    .pill { background:var(--accent); color:white; padding:8px 12px; border-radius:999px; font-weight:700; box-shadow: 0 6px 20px rgba(11,94,215,0.12) }
-
-    /* footer small cards */
-    .mini-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:18px }
-    .mini { background:var(--panel); border-radius:10px; padding:12px; border:1px solid #f0f6ff; box-shadow:0 10px 28px rgba(6,22,60,0.04); }
-
-    /* --- NEW analytics section --- */
-    #analyticsWrap{ margin-top:26px; display:grid; grid-template-columns: 1fr 420px; gap:18px; align-items:start;}
-    .analytics-card{ background:var(--panel); border-radius:12px; padding:16px; box-shadow:var(--shadow); border:1px solid #eef6ff; }
-    .analytics-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px }
-    .analytics-tile{ background:linear-gradient(180deg,#fff,#fbfdff); padding:12px;border-radius:10px;border:1px solid #f0f6ff; text-align:center }
-    .analytics-tile .val{ font-size:18px;font-weight:800;color:var(--accent-2); margin-top:8px }
-    .small-graph{ height:120px; display:flex; align-items:flex-end; gap:6px; padding:10px; border-radius:10px; background:linear-gradient(180deg,#fbfdff,#fff); border:1px solid #f4f8ff }
-    .graph-bar{ width:30%; border-radius:6px; display:flex; align-items:flex-end; justify-content:center; color:white; font-weight:800; font-size:12px }
-
-    /* responsive tweaks */
-    @media (max-width:1100px){
-      .modules { grid-template-columns: repeat(2,1fr); }
-      .mini-grid { grid-template-columns: repeat(2,1fr); }
-      #analyticsWrap{ grid-template-columns: 1fr; }
+    .eyebrow{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold-deep);font-weight:700;margin-bottom:6px}
+    .muted{color:var(--muted);font-size:13px}
+    .primary{
+      background:var(--accent);color:white;padding:12px 20px;border-radius:10px;border:none;cursor:pointer;
+      font-weight:700;font-family:"Poppins",sans-serif;font-size:14px;
+      box-shadow:0 8px 20px rgba(11,94,215,0.25);transition:transform .15s,box-shadow .15s,background .15s;
     }
-    @media (max-width:700px){
-      .modules { grid-template-columns: 1fr; }
-      .grid-top { flex-direction:column; }
-      .mini-grid { grid-template-columns: 1fr; }
-    }
+    .primary:hover{background:var(--accent-2);transform:translateY(-2px);box-shadow:0 14px 30px rgba(11,94,215,0.3)}
 
-    /* small helper */
-    .muted { color:var(--muted); font-size:13px }
-    .large-num { font-size:22px; font-weight:800; color:var(--accent-2) }
-    .hint { font-size:12px; color:#9aa6c7 }
-    .quick-link { padding:8px 10px; background:#f3f6ff; border-radius:8px; border:1px solid #eef6ff; cursor:pointer; font-weight:700 }
+    /* ===== EXACT UI SUMMARY GRID ===== */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .sum-card {
+      background: #fdfefe;
+      border: 1px solid #f0f4f8;
+      border-radius: 12px;
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    /* Centered styling (Row 1) */
+    .sum-card.centered { align-items: center; text-align: center; }
+    /* Left-aligned styling (Row 2) */
+    .sum-card.left-aligned { align-items: flex-start; text-align: left; padding: 16px 14px; }
+
+    .sum-title { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .sum-currency { font-weight: 700; color: var(--accent-2); font-size: 16px; line-height: 1.2; }
+    .sum-value { font-weight: 700; color: var(--accent-2); font-size: 17px; margin-top: 4px; line-height: 1; word-break: break-word; }
+    .sum-sub { font-size: 10.5px; color: var(--muted-light); margin-top: 10px; }
+    
+    /* Used to push values down for cards without currency/subtitles */
+    .push-down { margin-top: auto; margin-bottom: 8px; font-size: 18px; }
+
+    /* ===== GRAPH BOX ===== */
+    .graph-box {
+      background: #fdfefe;
+      border: 1px solid #f0f4f8;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: flex-end;
+      min-height: 90px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      gap: 16px;
+    }
+    .btn-light {
+      background: #eff6ff;
+      color: #0b5ed7;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      font-family: "Poppins", sans-serif;
+    }
+    .btn-light:hover { background: #dbeafe; }
+
+    /* ===== MODULE GRID ===== */
+    .section-title{font-family:"Playfair Display",serif;font-size:21px;font-weight:700;color:var(--accent-2);margin:34px 0 16px}
+    .modules{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .module{
+      background:var(--card);border-radius:12px;padding:18px;
+      box-shadow:0 1px 2px rgba(4,20,60,0.04), 0 12px 28px rgba(4,20,60,0.06);
+      border:1px solid #eef6ff;display:flex;flex-direction:column;gap:10px;min-height:130px;cursor:pointer;
+      transition:transform .16s,box-shadow .16s;
+      animation:fadeUp .55s ease both;
+    }
+    .module:hover{transform:translateY(-6px);box-shadow:0 1px 3px rgba(4,20,60,0.06), 0 26px 52px rgba(10,30,80,0.12)}
+    .module .m-head{display:flex;justify-content:space-between;align-items:center}
+    .module h3{margin:0;font-size:16px;font-weight:700}
+    .module .desc{color:var(--muted);font-size:13px}
+    .module .cta{margin-top:auto;display:flex;justify-content:space-between;align-items:center}
+    .pill{background:var(--accent);color:white;padding:6px 12px;border-radius:999px;font-weight:700;font-size:12px}
+    .m-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+    @keyframes fadeUp{ from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ===== MODAL ===== */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(4,20,60,0.45);z-index:100;align-items:center;justify-content:center;padding:16px}
+    .modal-overlay.open{display:flex}
+    .modal{background:white;border-radius:16px;padding:26px;width:380px;max-width:100%;box-shadow:0 30px 80px rgba(4,20,60,0.2)}
+    .modal h3{margin:0 0 16px;font-size:19px;font-family:"Playfair Display",serif;color:var(--accent-2)}
+    .modal label{display:block;margin-top:12px;color:var(--muted);font-size:13px}
+    .modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #eef2ff;margin-top:6px;font-size:14px;font-family:inherit;background:#fbfdff}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .btn-cancel{flex:1;background:#f3f4f6;color:#111;border:none;padding:11px;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit}
+    .modal-status{margin-top:10px;font-size:13px;min-height:18px}
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:1100px){ .modules{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:760px){
+      .topbar{padding:14px 18px}
+      .modules{grid-template-columns:1fr}
+      .summary-grid{gap:8px}
+      .sum-card{padding:12px 6px}
+      .sum-card.left-aligned{padding:12px 10px}
+      .sum-value{font-size:15px}
+    }
   </style>
 </head>
 <body>
 
+  <!-- ===== TOPBAR ===== -->
   <div class="topbar">
-    <div class="brand">
-      <div class="logo" aria-hidden>
-        <!-- small svg bakery-ish mark -->
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="6" width="20" height="12" rx="3" fill="#fff" opacity="0.06"/>
-          <path d="M6 10c.5-2 2-3 4-3s3.5 1 4 3" stroke="#fff" stroke-opacity="0.9" stroke-width="1.2" stroke-linecap="round"/>
-          <circle cx="12" cy="9" r="1.2" fill="#fff" opacity="0.9"/>
-        </svg>
-      </div>
-      <div>
-        <div class="title">Modern Bakery</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.85)">Admin Dashboard</div>
-      </div>
+    <div class="logo-wrap">
+      <img src="logo.png" class="logo-badge" alt="Modern Bakery" onerror="this.style.display='none'">
+      <div class="logo">Modern Bakery — Dashboard</div>
     </div>
+    <div class="actions">
+      <div id="userEmail" class="small">Checking...</div>
+      <button class="btn-ghost" id="addUserBtn">+ Add User</button>
+      <button class="btn-ghost" id="logoutBtn">Logout</button>
+    </div>
+  </div>
 
-    <div class="top-actions">
-      <div id="userBubble" class="user-bubble">Checking...</div>
-      <button id="logoutBtn" class="btn-ghost">Logout</button>
+  <!-- ===== ADD USER MODAL ===== -->
+  <div class="modal-overlay" id="addUserModal">
+    <div class="modal">
+      <h3>Add New Admin</h3>
+      <label>Full Name</label>
+      <input type="text" id="newName" placeholder="e.g. Ali Khan">
+      <label>Email</label>
+      <input type="email" id="newEmail" placeholder="admin@example.com">
+      <label>Password</label>
+      <input type="password" id="newPassword" placeholder="Min 6 characters">
+      <div class="modal-actions">
+        <button class="btn-cancel" id="cancelModal">Cancel</button>
+        <button class="primary" id="createUserBtn" style="flex:1">Create Account</button>
+      </div>
+      <div class="modal-status" id="modalStatus"></div>
     </div>
   </div>
 
   <div class="wrap">
-    <div class="grid-top">
-      <div class="card-hero">
-        <h2>Welcome back</h2>
-        <div class="sub">Fast access to Inventory, Accounts, Workers and more. Click any card to open.</div>
 
-        <div class="quick-actions">
-          <div class="qa" onclick="go('inventory.html')">
-            <svg width="18" height="18" viewBox="0 0 24 24" style="opacity:.9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18M7 11h10M4 17h16" stroke="#0b5ed7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <div>
-              <div style="font-weight:700">Inventory</div>
-              <div class="muted">Add / Update stock</div>
-            </div>
-          </div>
 
-          <div class="qa" onclick="go('accounts.html')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2v6" stroke="#0b5ed7" stroke-width="1.6" stroke-linecap="round"/><rect x="3" y="10" width="18" height="12" rx="2" stroke="#0b5ed7" stroke-width="1.6"/></svg>
-            <div>
-              <div style="font-weight:700">Accounts</div>
-              <div class="muted">Customers & Ledgers</div>
-            </div>
-          </div>
 
-          <div class="qa" onclick="go('workers.html')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="#0b5ed7" stroke-width="1.6"/><path d="M5 20c1.5-3 4.5-4 7-4s5.5 1 7 4" stroke="#0b5ed7" stroke-width="1.6"/></svg>
-            <div>
-              <div style="font-weight:700">Workers</div>
-              <div class="muted">Attendance & Payments</div>
-            </div>
-          </div>
+    <!-- ===== MAIN ANALYTICS CARD ===== -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="font-size:18px;font-weight:700;color:#111;">Today — Analytics</div>
+        <div class="muted" style="font-size:12px">Live • <span id="analyticsDate"></span></div>
+      </div>
+
+      <div class="summary-grid">
+        <!-- Row 1: Centered Data -->
+        <div class="sum-card centered">
+          <div class="sum-title">Sales</div>
+          <div class="sum-currency">₹</div>
+          <div class="sum-value" id="todaySales">0.00</div>
+          <div class="sum-sub">Today's goods</div>
+        </div>
+        <div class="sum-card centered">
+          <div class="sum-title">Expenses</div>
+          <div class="sum-currency">₹</div>
+          <div class="sum-value" id="todayExpenses">0.00</div>
+          <div class="sum-sub">Today's expenses</div>
+        </div>
+        <div class="sum-card centered">
+          <div class="sum-title">Net P&L</div>
+          <div class="sum-currency">₹</div>
+          <div class="sum-value" id="todayNet">0.00</div>
+          <div class="sum-sub">Sales - Expenses</div>
+        </div>
+
+        <!-- Row 2: Left-Aligned Data -->
+        <div class="sum-card left-aligned">
+          <div class="sum-title">Workers present</div>
+          <div class="sum-value push-down" style="color:#111" id="workersPresent">0</div>
+        </div>
+        <div class="sum-card left-aligned">
+          <div class="sum-title">Transactions</div>
+          <div class="sum-value push-down" style="color:#111" id="totalTxns">0</div>
+        </div>
+        <div class="sum-card left-aligned">
+          <div class="sum-title" style="margin-bottom:6px">Inventory worth</div>
+          <div class="sum-currency" style="color:#111;margin-bottom:2px">₹</div>
+          <div class="sum-value push-down" style="color:#111" id="inventoryWorth">0.00</div>
         </div>
       </div>
 
-      <div class="card-hero" style="max-width:360px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="muted">Today's overview</div>
-            <div style="display:flex;gap:8px;align-items:baseline;margin-top:8px">
-              <div class="large-num" id="todayCount">0</div>
-              <div class="muted">active items</div>
-            </div>
-          </div>
-          <div style="text-align:right">
-            <div class="muted">Balance</div>
-            <div style="font-weight:800; font-size:18px; margin-top:6px">₹ <span id="balanceNow">0</span></div>
-            <div class="hint">Updated live</div>
-          </div>
-        </div>
+      <div class="muted" style="margin-top:24px;font-size:12px;margin-bottom:8px">Sales vs Expenses</div>
+      
+      <!-- Graph box exactly matching the image layout -->
+      <div class="graph-box" id="miniGraph">
+        <!-- Rendered by JS -->
+      </div>
 
-        <div style="margin-top:14px">
-          <div class="muted">Quick Links</div>
-          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-            <div class="quick-link" onclick="go('daily_customers.html')">Daily Customers</div>
-            <div class="quick-link" onclick="go('daily_txns.html')">Daily Txns</div>
-            <div class="quick-link" onclick="go('documents.html')">Documents</div>
-          </div>
-        </div>
+      <div style="display:flex;justify-content:center;gap:12px;margin-top:20px;">
+        <button class="btn-light" onclick="go('inventory.html')">Add Inventory</button>
+        <button class="btn-light" onclick="go('daily_txns.html')">Add Txn</button>
       </div>
     </div>
 
-    <!-- Modules -->
-    <div class="modules" id="modules">
+    <!-- ===== RECENT ACTIVITY CARD ===== -->
+    <div class="card" style="margin-top:16px;">
+      <div style="font-weight:700;font-size:16px;color:#111;margin-bottom:14px;">Recent Activity</div>
+      
+      <div id="analyticsRecent" style="font-size:13px;color:#6b7280;line-height:1.9;margin-bottom:20px;min-height:50px;">
+        Loading...
+      </div>
+      
+      <div style="display:flex;gap:12px;align-items:center;">
+        <button class="btn-light" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; background:#eff6ff;" id="refreshAnalytics">
+          ↻ Refresh
+        </button>
+        <select id="autoRefresh" style="flex:1; padding:10px; border-radius:8px; border:none; background:#f1f5f9; color:#475569; font-size:12.5px; font-family:inherit; cursor:pointer;">
+          <option value="off">Auto-refresh: Off</option>
+          <option value="30">Every 30s</option>
+          <option value="60">Every 1 min</option>
+          <option value="300">Every 5 min</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ===== MODULE GRID ===== -->
+    <div class="section-title">Shortcuts</div>
+    <div class="modules">
       <div class="module" onclick="go('inventory.html')">
-        <div class="m-head"><h3>Inventory</h3><div class="desc">Stock manager</div></div>
-        <div class="desc">Add materials, vendors, update quantities and quick delete.</div>
-        <div class="cta"><div class="muted">Manage stock items</div><div class="pill">Open</div></div>
+        <div class="m-head"><h3>Inventory</h3>
+          <div class="m-icon" style="background:#eef5ff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M7 11h10M4 17h16" stroke="#0b5ed7" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="desc">Add materials, vendors, update quantities and delete items.</div>
+        <div class="cta"><div class="muted">Manage stock</div><div class="pill">Open</div></div>
       </div>
 
       <div class="module" onclick="go('accounts.html')">
-        <div class="m-head"><h3>Accounts</h3><div class="desc">Customer ledgers</div></div>
+        <div class="m-head"><h3>Accounts</h3>
+          <div class="m-icon" style="background:#eef0ff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="18" height="12" rx="2" stroke="#4f46e5" stroke-width="1.6"/><path d="M12 2v6" stroke="#4f46e5" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        </div>
         <div class="desc">Create customers, log goods & payments, full ledger history.</div>
         <div class="cta"><div class="muted">Customer balances</div><div class="pill">Open</div></div>
       </div>
 
       <div class="module" onclick="go('workers.html')">
-        <div class="m-head"><h3>Workers</h3><div class="desc">Attendance & expenses</div></div>
+        <div class="m-head"><h3>Workers</h3>
+          <div class="m-icon" style="background:#e6fbff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="#0891b2" stroke-width="1.6"/><path d="M5 20c1.5-3 4.5-4 7-4s5.5 1 7 4" stroke="#0891b2" stroke-width="1.6"/></svg></div>
+        </div>
         <div class="desc">Daily attendance, bulk mark, add expenses and calculate wages.</div>
         <div class="cta"><div class="muted">Manage team</div><div class="pill">Open</div></div>
       </div>
 
       <div class="module" onclick="go('daily_customers.html')">
-        <div class="m-head"><h3>Daily Customers</h3><div class="desc">Walk-in records</div></div>
-        <div class="desc">Record daily purchases & payments from customers.</div>
+        <div class="m-head"><h3>Daily Customers</h3>
+          <div class="m-icon" style="background:#f5f0ff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#7c3aed" stroke-width="1.6"/><circle cx="9" cy="7" r="4" stroke="#7c3aed" stroke-width="1.6"/></svg></div>
+        </div>
+        <div class="desc">Record daily purchases & payments from walk-in customers.</div>
         <div class="cta"><div class="muted">Daily logs</div><div class="pill">Open</div></div>
       </div>
 
       <div class="module" onclick="go('daily_txns.html')">
-        <div class="m-head"><h3>Daily Transactions</h3><div class="desc">Cashbook</div></div>
-        <div class="desc">Add expenses, income, and view day's P&L quickly.</div>
+        <div class="m-head"><h3>Daily Transactions</h3>
+          <div class="m-icon" style="background:#e8f6ff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20" stroke="#0284c7" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="desc">Add expenses, income and view the day's profit & loss quickly.</div>
         <div class="cta"><div class="muted">Cash flow</div><div class="pill">Open</div></div>
       </div>
 
       <div class="module" onclick="go('documents.html')">
-        <div class="m-head"><h3>Documents</h3><div class="desc">Files & PDFs</div></div>
-        <div class="desc">Store invoices, licenses, and other docs in one place.</div>
+        <div class="m-head"><h3>Documents</h3>
+          <div class="m-icon" style="background:#f1f5f9"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#334155" stroke-width="1.6"/><polyline points="14 2 14 8 20 8" stroke="#334155" stroke-width="1.6"/></svg></div>
+        </div>
+        <div class="desc">Store invoices, licenses, and other business documents.</div>
         <div class="cta"><div class="muted">All files</div><div class="pill">Open</div></div>
       </div>
     </div>
 
-    <div class="mini-grid" style="margin-top:26px">
-      <div class="mini">
-        <div class="muted">Recent Activity</div>
-        <div id="recentList" style="margin-top:8px" class="small">No activity yet.</div>
-      </div>
-      <div class="mini">
-        <div class="muted">Shortcuts</div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="qa" onclick="go('inventory.html')" style="padding:8px">Inventory</button>
-          <button class="qa" onclick="go('workers.html')" style="padding:8px">Workers</button>
-        </div>
-      </div>
-      <div class="mini">
-        <div class="muted">Help</div>
-        <div class="small" style="margin-top:8px">Need quick help? Ping your dev or check console for errors.</div>
-      </div>
-    </div>
+  </div><!-- /.wrap -->
 
-    <!-- ===== NEW PREMIUM ANALYTICS SECTION (keeps design intact) ===== -->
-    <div id="analyticsWrap">
-      <div class="analytics-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div style="font-weight:700">Today — Mini Analytics</div>
-          <div class="small">Live | Updated from Firestore</div>
-        </div>
-
-        <div class="analytics-grid">
-          <div class="analytics-tile">
-            <div class="muted">Today's Sales</div>
-            <div class="val" id="todaySales">₹ 0</div>
-            <div class="small">Sum of goods (today)</div>
-          </div>
-          <div class="analytics-tile">
-            <div class="muted">Today's Expenses</div>
-            <div class="val" id="todayExpenses">₹ 0</div>
-            <div class="small">Expenses recorded (today)</div>
-          </div>
-          <div class="analytics-tile">
-            <div class="muted">Net (Sales − Expenses)</div>
-            <div class="val" id="todayNet">₹ 0</div>
-            <div class="small">Profit / Loss</div>
-          </div>
-        </div>
-
-        <div style="margin-bottom:10px; display:flex; gap:12px; align-items:center;">
-          <div style="flex:1">
-            <div class="muted">Total workers present (today)</div>
-            <div style="font-weight:800; font-size:18px; margin-top:6px" id="workersPresent">0</div>
-          </div>
-          <div style="width:220px">
-            <div class="muted">Total transactions</div>
-            <div style="font-weight:800; font-size:18px; margin-top:6px" id="totalTxns">0</div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px">
-          <div class="muted">Inventory worth (approx.)</div>
-          <div style="font-weight:800; font-size:18px; margin-top:6px" id="inventoryWorth">₹ 0</div>
-        </div>
-
-        <hr style="margin:12px 0">
-
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="muted">Quick actions</div>
-          <div style="display:flex;gap:8px">
-            <button class="quick-link" onclick="go('inventory.html')">Add Inventory</button>
-            <button class="quick-link" onclick="go('daily_txns.html')">Add Txn</button>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <div class="muted">Mini Graph (Sales vs Expenses)</div>
-          <div class="small-graph" id="miniGraph">
-            <!-- bars added dynamically -->
-          </div>
-        </div>
-      </div>
-
-      <div class="analytics-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-weight:700">Mini Analytics — Details</div>
-          <div class="small">Today: <span id="analyticsDate"></span></div>
-        </div>
-
-        <div style="margin-top:10px">
-          <div class="muted">Top recent activity</div>
-          <div id="analyticsRecent" style="margin-top:8px" class="small">No recent items</div>
-        </div>
-
-        <hr style="margin:12px 0">
-
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <div style="flex:1">
-            <div class="muted">Refresh analytics</div>
-            <button class="quick-link" style="margin-top:8px" id="refreshAnalytics">Refresh</button>
-          </div>
-          <div style="width:140px">
-            <div class="muted">Auto-refresh</div>
-            <select id="autoRefresh" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #eef6ff">
-              <option value="off">Off</option>
-              <option value="30">30s</option>
-              <option value="60">60s</option>
-              <option value="300">5m</option>
-            </select>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-
-  <!-- FIREBASE + LOGIC (modular) -->
   <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import {
-  getFirestore, collection, collectionGroup, getDocs, query, where, orderBy, limit, Timestamp
+  getFirestore, collection, collectionGroup, getDocs, query,
+  where, orderBy, limit, Timestamp, doc, setDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// --- FIREBASE CONFIG (your project) ---
 const firebaseConfig = {
   apiKey: "AIzaSyCvtoXuKzelFWvJ5TTtoJBJakaxpyYBv3Q",
   authDomain: "modernbakery-08.firebaseapp.com",
   projectId: "modernbakery-08",
-  storageBucket: "modernbakery-08.appspot.com",
+  storageBucket: "modernbakery-08.firebasestorage.app",
   messagingSenderId: "551391878340",
   appId: "1:551391878340:web:1ee116fd7adb898c0cfd91"
 };
@@ -359,311 +352,228 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// UI elements
-const userBubble = document.getElementById("userBubble");
-const logoutBtn = document.getElementById("logoutBtn");
-const todayCountEl = document.getElementById("todayCount");
-const balanceNowEl = document.getElementById("balanceNow");
-const recentList = document.getElementById("recentList");
+window.go = (href) => window.location.href = href;
 
-// analytics UI
-const todaySalesEl = document.getElementById("todaySales");
-const todayExpensesEl = document.getElementById("todayExpenses");
-const todayNetEl = document.getElementById("todayNet");
-const workersPresentEl = document.getElementById("workersPresent");
-const totalTxnsEl = document.getElementById("totalTxns");
-const inventoryWorthEl = document.getElementById("inventoryWorth");
-const miniGraphEl = document.getElementById("miniGraph");
+const userEmailEl     = document.getElementById("userEmail");
+const logoutBtn       = document.getElementById("logoutBtn");
+const todaySalesEl    = document.getElementById("todaySales");
+const todayExpEl      = document.getElementById("todayExpenses");
+const todayNetEl      = document.getElementById("todayNet");
+const workersPEl      = document.getElementById("workersPresent");
+const totalTxnsEl     = document.getElementById("totalTxns");
+const invWorthEl      = document.getElementById("inventoryWorth");
+const miniGraphEl     = document.getElementById("miniGraph");
 const analyticsDateEl = document.getElementById("analyticsDate");
-const analyticsRecentEl = document.getElementById("analyticsRecent");
-const refreshAnalyticsBtn = document.getElementById("refreshAnalytics");
-const autoRefreshSelect = document.getElementById("autoRefresh");
+const analyticsRecEl  = document.getElementById("analyticsRecent");
+const refreshBtn      = document.getElementById("refreshAnalytics");
+const autoRefSel      = document.getElementById("autoRefresh");
 
-// helper: start/end of today (JS Date) and convert to Firestore Timestamp
-function getTodayRangeTimestamps(){
-  const now = new Date();
-  const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0,0,0,0);
-  const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0,0,0,0);
-  return { startDate, endDate, startTs: Timestamp.fromDate(startDate), endTs: Timestamp.fromDate(endDate) };
-}
+const addUserBtn    = document.getElementById("addUserBtn");
+const modal         = document.getElementById("addUserModal");
+const cancelModal   = document.getElementById("cancelModal");
+const createUserBtn = document.getElementById("createUserBtn");
+const newName       = document.getElementById("newName");
+const newEmail      = document.getElementById("newEmail");
+const newPassword   = document.getElementById("newPassword");
+const modalStatus   = document.getElementById("modalStatus");
 
-function fmtRupee(x){ return "₹ " + Number(x||0).toFixed(2); }
+addUserBtn.addEventListener("click", () => modal.classList.add("open"));
+cancelModal.addEventListener("click", () => { modal.classList.remove("open"); clearModal(); });
+modal.addEventListener("click", (e) => { if(e.target === modal){ modal.classList.remove("open"); clearModal(); } });
+function clearModal(){ newName.value=""; newEmail.value=""; newPassword.value=""; modalStatus.innerText=""; }
 
-// auth guard
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
-  const email = user.email || user.displayName || "Admin";
-  userBubble.innerHTML = `<span style="opacity:.9">${email}</span>`;
+createUserBtn.addEventListener("click", async () => {
+  const name = newName.value.trim();
+  const email = newEmail.value.trim();
+  const pass = newPassword.value.trim();
+  if(!name || !email || !pass){ modalStatus.style.color="#ef4444"; modalStatus.innerText = "Please fill all fields."; return; }
+  if(pass.length < 6){ modalStatus.style.color="#ef4444"; modalStatus.innerText = "Password must be at least 6 characters."; return; }
 
-  // initial lightweight loads
+  createUserBtn.disabled = true;
+  modalStatus.style.color = "#6b7280";
+  modalStatus.innerText = "Creating account...";
+
   try {
-    const invSnap = await getDocs(query(collection(db,"Inventory"), orderBy("lastUpdated","desc"), limit(1)));
-    todayCountEl.innerText = invSnap.size ? invSnap.size : "—";
+    const secondApp = initializeApp(firebaseConfig, "secondApp_" + Date.now());
+    const secondAuth = getAuth(secondApp);
+    const cred = await createUserWithEmailAndPassword(secondAuth, email, pass);
+    await setDoc(doc(db, "users", cred.user.uid), { name, email, createdAt: new Date().toISOString() });
+    await secondAuth.signOut();
 
-    const vSnap = await getDocs(query(collection(db,"vendor_records"), orderBy("date","desc"), limit(5)));
-    if(vSnap.empty) recentList.innerHTML = "<div class='small'>No recent activity.</div>";
-    else {
-      recentList.innerHTML = "";
-      vSnap.forEach(s => {
-        const d = s.data();
-        const div = document.createElement("div");
-        div.className = "small";
-        const name = d.vendorName || d.itemName || "Record";
-        const txt = `${name} • ${d.itemName || ""} • ${d.deliveredQty || ""} ${d.unit || ""}`;
-        div.innerText = txt;
-        recentList.appendChild(div);
-      });
-    }
-  } catch(e){
-    console.error("Load dashboard data:", e);
+    modalStatus.style.color = "#16a34a";
+    modalStatus.innerText = `Account created for ${name}. Share the email & password with them.`;
+    newName.value=""; newEmail.value=""; newPassword.value="";
+  } catch(err) {
+    modalStatus.style.color = "#ef4444";
+    modalStatus.innerText = "Error: " + (err.message || err);
+  } finally {
+    createUserBtn.disabled = false;
   }
+});
 
-  // load analytics once user is confirmed
+onAuthStateChanged(auth, (user) => {
+  if(!user){ window.location.href = "index.html"; return; }
+  userEmailEl.innerText = user.email || "Admin";
   runAnalytics();
 });
 
-logoutBtn.addEventListener("click", ()=> {
-  signOut(auth).then(()=> window.location.href = "index.html").catch(e=> alert("Logout failed: "+e.message));
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => window.location.href = "index.html")
+    .catch(e => alert("Logout failed: " + e.message));
 });
 
-// navigation helper
-window.go = function (href) { window.location.href = href; };
+function getTodayRange(){
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
+  return { startDate:start, endDate:end, startTs:Timestamp.fromDate(start), endTs:Timestamp.fromDate(end) };
+}
 
-// ---- Analytics logic ----
-let autoRefreshTimer = null;
-if (refreshAnalyticsBtn) refreshAnalyticsBtn.addEventListener("click", runAnalytics);
-if (autoRefreshSelect) autoRefreshSelect.addEventListener("change", ()=>{
-  if(autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
-  const val = autoRefreshSelect.value;
-  if(val && val !== "off"){
-    autoRefreshTimer = setInterval(runAnalytics, Number(val)*1000);
+// ===== Count-up animation for pure numbers (₹ is handled in HTML) =====
+function animateNumber(el, end, isCurrency){
+  if(!el) return;
+  const start = 0, duration = 750, startTime = performance.now();
+  function step(now){
+    const p = Math.min((now-startTime)/duration, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    const current = start + (end-start)*eased;
+    el.innerText = isCurrency ? Number(current).toFixed(2) : String(Math.round(current));
+    if(p < 1) requestAnimationFrame(step);
   }
+  requestAnimationFrame(step);
+}
+
+let autoTimer = null;
+refreshBtn.addEventListener("click", runAnalytics);
+autoRefSel.addEventListener("change", () => {
+  if(autoTimer){ clearInterval(autoTimer); autoTimer=null; }
+  const v = autoRefSel.value;
+  if(v && v!=="off") autoTimer = setInterval(runAnalytics, Number(v)*1000);
 });
 
 async function runAnalytics(){
-  // compute timestamps for today
-  const { startDate, endDate, startTs, endTs } = getTodayRangeTimestamps();
-  if (analyticsDateEl) analyticsDateEl.innerText = startDate.toLocaleDateString();
+  const { startDate, endDate, startTs, endTs } = getTodayRange();
+  if(analyticsDateEl) analyticsDateEl.innerText = `${startDate.getDate()}/${startDate.getMonth()+1}/${startDate.getFullYear()}`;
 
   try {
-    // 1) Today's Sales: goods_history docs with Firestore timestamp 'date' or serverTimestamp 'date' field
-    let salesTotal = 0;
-    let goodsCount = 0;
+    let salesTotal=0, goodsCount=0;
     try {
-      const goodsQ = query(collectionGroup(db, "goods_history"),
-        where("date", ">=", startTs), where("date", "<", endTs));
-      const goodsSnap = await getDocs(goodsQ);
-      goodsSnap.forEach(s => {
-        const g = s.data();
-        const t = Number(g.total || 0);
-        salesTotal += t;
-      });
-      goodsCount = goodsSnap.size;
-    } catch (eGoods) {
-      // fallback: if 'date' stored as JS Date string or client iso - try comparing by client ISO strings (less ideal)
-      console.warn("goods_history date query failed, falling back to looser comparison", eGoods);
-      const goodsAll = await getDocs(collectionGroup(db, "goods_history"));
-      goodsAll.forEach(s => {
-        const g = s.data();
-        // try both Timestamp and ISO string
-        const d = g.date && g.date.toDate ? g.date.toDate() : (g.date ? new Date(g.date) : null);
-        if (d && d >= startDate && d < endDate) {
-          salesTotal += Number(g.total || 0);
-          goodsCount++;
-        }
-      });
+      const gSnap = await getDocs(query(collectionGroup(db,"goods_history"), where("date",">=",startTs), where("date","<",endTs)));
+      gSnap.forEach(s => { salesTotal += Number(s.data().total||0); goodsCount++; });
+    } catch(e) {
+      const gAll = await getDocs(collectionGroup(db,"goods_history"));
+      gAll.forEach(s => { const d=s.data(); const dt=d.date?.toDate?d.date.toDate():new Date(d.date||0); if(dt>=startDate&&dt<endDate){salesTotal+=Number(d.total||0);goodsCount++;} });
     }
 
-    // 2) Today's Payments
-    let paymentsTotal = 0;
-    let paymentsCount = 0;
+    let paymentsTotal=0, paymentsCount=0;
     try {
-      const payQ = query(collectionGroup(db, "payment_history"), where("date", ">=", startTs), where("date", "<", endTs));
-      const paySnap = await getDocs(payQ);
-      paySnap.forEach(s => {
-        const p = s.data();
-        paymentsTotal += Number(p.amount || 0);
-      });
-      paymentsCount = paySnap.size;
-    } catch (ePay) {
-      console.warn("payment_history date query failed, fallback", ePay);
-      const payAll = await getDocs(collectionGroup(db, "payment_history"));
-      payAll.forEach(s => {
-        const p = s.data();
-        const d = p.date && p.date.toDate ? p.date.toDate() : (p.date ? new Date(p.date) : null);
-        if (d && d >= startDate && d < endDate) {
-          paymentsTotal += Number(p.amount || 0);
-          paymentsCount++;
-        }
-      });
+      const pSnap = await getDocs(query(collectionGroup(db,"payment_history"), where("date",">=",startTs), where("date","<",endTs)));
+      pSnap.forEach(s => { paymentsTotal+=Number(s.data().amount||0); paymentsCount++; });
+    } catch(e) {
+      const pAll = await getDocs(collectionGroup(db,"payment_history"));
+      pAll.forEach(s => { const d=s.data(); const dt=d.date?.toDate?d.date.toDate():new Date(d.date||0); if(dt>=startDate&&dt<endDate){paymentsTotal+=Number(d.amount||0);paymentsCount++;} });
     }
 
-    // 3) Today's Expenses (workers' expenses collectionGroup)
-    let expensesTotal = 0;
+    let expTotal=0;
     try {
-      const expQ = query(collectionGroup(db, "expenses"), where("date", ">=", startTs), where("date", "<", endTs));
-      const expSnap = await getDocs(expQ);
-      expSnap.forEach(s => {
-        const e = s.data();
-        expensesTotal += Number(e.amount || 0);
-      });
-    } catch (eExp) {
-      console.warn("expenses date query failed, fallback", eExp);
-      const expAll = await getDocs(collectionGroup(db, "expenses"));
-      expAll.forEach(s => {
-        const e = s.data();
-        const d = e.date && e.date.toDate ? e.date.toDate() : (e.date ? new Date(e.date) : null);
-        if (d && d >= startDate && d < endDate) expensesTotal += Number(e.amount || 0);
-      });
+      const eSnap = await getDocs(query(collectionGroup(db,"expenses"), where("date",">=",startTs), where("date","<",endTs)));
+      eSnap.forEach(s => expTotal+=Number(s.data().amount||0));
+    } catch(e) {
+      const eAll = await getDocs(collectionGroup(db,"expenses"));
+      eAll.forEach(s => { const d=s.data(); const dt=d.date?.toDate?d.date.toDate():new Date(d.date||0); if(dt>=startDate&&dt<endDate)expTotal+=Number(d.amount||0); });
     }
 
-    // 4) Workers present today (attendance with status "P")
-    let presentCount = 0;
+    let present=0;
     try {
-      const attQ = query(collectionGroup(db, "attendance"),
-        where("status", "==", "P"), where("timestamp", ">=", startTs), where("timestamp", "<", endTs));
-      const attSnap = await getDocs(attQ);
-      presentCount = attSnap.size;
-    } catch(attErr){
-      console.warn("attendance query by 'timestamp' failed, trying 'date' field fallback", attErr);
+      const aSnap = await getDocs(query(collectionGroup(db,"attendance"), where("status","==","P"), where("timestamp",">=",startTs), where("timestamp","<",endTs)));
+      present = aSnap.size;
+    } catch(e) {
       try {
-        const attQ2 = query(collectionGroup(db, "attendance"),
-          where("status", "==", "P"), where("date", ">=", startTs), where("date", "<", endTs));
-        const attSnap2 = await getDocs(attQ2);
-        presentCount = attSnap2.size;
-      } catch(attErr2){
-        console.warn("attendance fallbacks failed:", attErr2);
-        // final fallback: iterate all attendance docs small-scale (expensive)
-        const attAll = await getDocs(collectionGroup(db, "attendance"));
-        attAll.forEach(s=>{
-          const a = s.data();
-          const d = a.timestamp && a.timestamp.toDate ? a.timestamp.toDate() : (a.date ? (a.date.toDate ? a.date.toDate() : new Date(a.date)) : null);
-          if (a.status === "P" && d && d >= startDate && d < endDate) presentCount++;
-        });
+        const aSnap2 = await getDocs(query(collectionGroup(db,"attendance"), where("status","==","P"), where("date",">=",startTs), where("date","<",endTs)));
+        present = aSnap2.size;
+      } catch(e2) {
+        const aAll = await getDocs(collectionGroup(db,"attendance"));
+        aAll.forEach(s => { const a=s.data(); const dt=a.timestamp?.toDate?a.timestamp.toDate():(a.date?.toDate?a.date.toDate():null); if(a.status==="P"&&dt&&dt>=startDate&&dt<endDate)present++; });
       }
     }
 
-    // 5) total transactions
-    const totalTransactions = paymentsCount + goodsCount;
-
-    // 6) Inventory worth
-    let inventoryWorth = 0;
+    let invWorth=0;
     try {
-      const invSnapAll = await getDocs(query(collection(db, "Inventory")));
-      invSnapAll.forEach(s => {
-        const it = s.data();
-        const qty = Number(it.qty || 0);
-        const price = Number(it.price || 0);
-        inventoryWorth += qty * price;
-      });
-    } catch(invErr){
-      console.warn("Inventory worth computation failed:", invErr);
-    }
+      const iSnap = await getDocs(collection(db,"Inventory"));
+      iSnap.forEach(s => { const it=s.data(); invWorth+=Number(it.qty||0)*Number(it.price||0); });
+    } catch(e){}
 
-    // Update UI safely (guard if element exists)
-    if(todaySalesEl) todaySalesEl.innerText = fmtRupee(salesTotal);
-    if(todayExpensesEl) todayExpensesEl.innerText = fmtRupee(expensesTotal);
-    if(todayNetEl) todayNetEl.innerText = fmtRupee(salesTotal - expensesTotal);
-    if(workersPresentEl) workersPresentEl.innerText = String(presentCount);
-    if(totalTxnsEl) totalTxnsEl.innerText = String(totalTransactions);
-    if(inventoryWorthEl) inventoryWorthEl.innerText = fmtRupee(inventoryWorth);
+    const netAmount = salesTotal - expTotal;
 
-    // mini graph
-    if(miniGraphEl) renderMiniGraph(salesTotal, expensesTotal);
+    animateNumber(todaySalesEl, salesTotal, true);
+    animateNumber(todayExpEl, expTotal, true);
+    animateNumber(todayNetEl, netAmount, true);
+    animateNumber(workersPEl, present, false);
+    animateNumber(totalTxnsEl, goodsCount+paymentsCount, false);
+    animateNumber(invWorthEl, invWorth, true);
+    
+    // Draw the exact custom graph layout
+    if(miniGraphEl) renderCustomGraph(salesTotal, expTotal);
 
-    // analytics recent items - combine vendor, goods, payments (limit)
-    const recentEls = [];
-    try {
-      const vSnap = await getDocs(query(collection(db,"vendor_records"), orderBy("date","desc"), limit(6)));
-      vSnap.forEach(s => { const d = s.data(); recentEls.push(`${d.vendorName||"Vendor"} • ${d.itemName||""}`); });
-    } catch(e){ /* ignore */ }
-    // append some goods/payment items
-    // goodsSnap/paySnap might not be in scope if fallback occurred — safer to requery small limit
-    try {
-      const gRecent = await getDocs(query(collectionGroup(db, "goods_history"), orderBy("date","desc"), limit(6)));
-      gRecent.forEach(s => { const g = s.data(); recentEls.push(`${g.itemName||'Sale'} ₹${(Number(g.total||0)).toFixed(2)}`); });
-    } catch(e){ /* ignore */ }
-    try {
-      const pRecent = await getDocs(query(collectionGroup(db, "payment_history"), orderBy("date","desc"), limit(6)));
-      pRecent.forEach(s => { const p = s.data(); recentEls.push(`Payment ₹${(Number(p.amount||0)).toFixed(2)}`); });
-    } catch(e){ /* ignore */ }
+    const items=[];
+    try { const v=await getDocs(query(collection(db,"vendor_records"),orderBy("date","desc"),limit(4))); v.forEach(s=>{const d=s.data();items.push(`${d.vendorName||"Vendor"} • ${d.itemName||""}`)}); } catch(e){}
+    try { const g=await getDocs(query(collectionGroup(db,"goods_history"),orderBy("date","desc"),limit(4))); g.forEach(s=>{const d=s.data();items.push(`${d.itemName||"Sale"} ₹${Number(d.total||0).toFixed(2)}`)}); } catch(e){}
+    try { const p=await getDocs(query(collectionGroup(db,"payment_history"),orderBy("date","desc"),limit(4))); p.forEach(s=>{const d=s.data();items.push(`Payment ₹${Number(d.amount||0).toFixed(2)}`)}); } catch(e){}
 
-    analyticsRecentEl && (analyticsRecentEl.innerHTML = "");
-    if(analyticsRecentEl){
-      if(recentEls.length === 0) analyticsRecentEl.innerHTML = "<div class='small'>No activity today.</div>";
+    if(analyticsRecEl){
+      if(items.length===0){ analyticsRecEl.innerHTML="No activity today."; }
       else {
-        recentEls.slice(0,8).forEach(t => {
-          const d = document.createElement("div");
-          d.className = "small";
-          d.style.marginBottom = "6px";
-          d.innerText = t;
-          analyticsRecentEl.appendChild(d);
+        analyticsRecEl.innerHTML = "";
+        items.slice(0,5).forEach(t=>{ 
+          const d=document.createElement("div"); 
+          d.style.marginBottom="6px"; 
+          d.innerText=t; 
+          analyticsRecEl.appendChild(d); 
         });
       }
     }
-
   } catch(e){
-    console.error("Analytics load failed:", e);
-    // show small inline notice instead of alert
-    if(analyticsRecentEl) analyticsRecentEl.innerHTML = "<div class='small' style='color:#b91c1c'>Analytics update failed — see console.</div>";
+    console.error("Analytics failed:",e);
+    if(analyticsRecEl) analyticsRecEl.innerHTML = "<span style='color:#ef4444'>Analytics failed — check console.</span>";
   }
 }
 
-function renderMiniGraph(sales, expenses){
+// Exactly mimics the custom graph logic in the image
+function renderCustomGraph(sales, expenses){
   if(!miniGraphEl) return;
-  miniGraphEl.innerHTML = "";
+  
   const max = Math.max(1, sales, expenses);
-  const salesPct = Math.round((sales / max) * 100);
-  const expPct = Math.round((expenses / max) * 100);
+  const salesHeight = Math.max(15, Math.round((sales / max) * 100)); 
+  const expHeight = Math.max(2, Math.round((expenses / max) * 100)); // Keeps expense thin if low
 
-  const salesBar = document.createElement("div");
-  salesBar.className = "graph-bar";
-  salesBar.style.height = (salesPct) + "%";
-  salesBar.style.background = "linear-gradient(180deg,#16a34a,#059669)";
-  salesBar.style.width = "45%";
-  salesBar.style.borderRadius = "8px";
-  salesBar.style.display = "flex";
-  salesBar.style.flexDirection = "column";
-  salesBar.style.justifyContent = "flex-end";
-  salesBar.style.alignItems = "center";
-  salesBar.innerText = "";
-
-  const expBar = document.createElement("div");
-  expBar.className = "graph-bar";
-  expBar.style.height = (expPct) + "%";
-  expBar.style.background = "linear-gradient(180deg,#ef4444,#dc2626)";
-  expBar.style.width = "45%";
-  expBar.style.borderRadius = "8px";
-  expBar.style.display = "flex";
-  expBar.style.flexDirection = "column";
-  expBar.style.justifyContent = "flex-end";
-  expBar.style.alignItems = "center";
-  expBar.innerText = "";
-
-  const wrapper = document.createElement("div");
-  wrapper.style.display = "flex";
-  wrapper.style.gap = "8px";
-  wrapper.style.width = "100%";
-  wrapper.style.justifyContent = "space-between";
-  wrapper.style.alignItems = "end";
-  wrapper.appendChild(salesBar);
-  wrapper.appendChild(expBar);
-
-  miniGraphEl.appendChild(wrapper);
-
-  const legend = document.createElement("div");
-  legend.style.display = "flex";
-  legend.style.justifyContent = "space-between";
-  legend.style.marginTop = "8px";
-  legend.innerHTML = `<div class="small"><span style="display:inline-block;width:10px;height:10px;background:#16a34a;border-radius:2px;margin-right:6px"></span> Sales ${fmtRupee(sales)}</div>
-                      <div class="small"><span style="display:inline-block;width:10px;height:10px;background:#ef4444;border-radius:2px;margin-right:6px"></span> Expenses ${fmtRupee(expenses)}</div>`;
-  miniGraphEl.appendChild(legend);
+  miniGraphEl.innerHTML = `
+    <!-- Bars section -->
+    <div style="display:flex; align-items:flex-end; gap:16px; flex:1; height:65px;">
+      <div style="width:55px; height:${salesHeight}%; background:#16a34a; border-radius:6px;"></div>
+      <div style="flex:1; height:${expHeight}%; background:#ef4444; border-radius:4px;"></div>
+    </div>
+    
+    <!-- Legend Section -->
+    <div style="display:flex; flex-direction:column; gap:12px; min-width:110px;">
+      <!-- Legend row 1 -->
+      <div style="display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:#6b7280;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <div style="width:10px;height:10px;background:#16a34a;border-radius:2px;"></div>
+          Sales ₹
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <div style="width:10px;height:10px;background:#ef4444;border-radius:2px;"></div>
+          Expenses ₹
+        </div>
+      </div>
+      <!-- Legend row 2 (Values) -->
+      <div style="display:flex; align-items:center; justify-content:space-between; font-size:12.5px; color:#111;">
+        <div>${Number(sales).toFixed(2)}</div>
+        <div>${Number(expenses).toFixed(2)}</div>
+      </div>
+    </div>
+  `;
 }
-
-// runAnalytics is invoked after auth load
-</script>
+  </script>
 </body>
 </html>
